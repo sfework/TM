@@ -1,0 +1,79 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = Model.DocumentName;
+}
+@model TMT_Documents
+<div class="header">
+    <i class="file alternate outline icon"></i>
+    @Model.DocumentName
+</div>
+<style>
+    .content { background-color: #f9f9f9 !important; }
+    .content > .context_con { padding: 30px; width: 100%; background: #fff; margin-left: auto; margin-right: auto; font-size: 14px; }
+    .ui.modal > .scrolling.content.edit { padding: 0 !important; }
+    .jodit_container:not(.jodit_inline) .jodit_workplace { border:0;}
+    .jodit_toolbar { border-top:0;}
+</style>
+<div class="content scrolling edit">
+    <div class="context_con">
+        @Html.Raw(Model.Content)
+    </div>
+</div>
+<script>
+    var model_action = {
+        edit_obj: null,
+        edit: function () {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                if (model_action.edit_obj) {
+                    var data = {
+                        DocumentID: '@Model.DocumentID',
+                        Content: model_action.edit_obj.getEditorValue()
+                    };
+                    ajax.post('/Document/Document_Save', data, function () {
+                        if (target) { $(target).load_show(); };
+                    }, function (success, data) {
+                        if (target) {
+                            $(target).load_hide();
+                        };
+                        if (success && data.Success) {
+                            model_action.edit_obj.destruct();
+                            model_action.edit_obj = null;
+                            $('.edit_tag').text('编辑');
+                        };
+                    });
+                    return;
+                }
+                $('.edit').addClass('edit_content');
+                model_action.edit_obj = new Jodit(".context_con", {
+                    "autofocus": true,
+                    "language": "zh_cn",
+                    "direction": "ltr",
+                    "enter": "P",
+                    "defaultMode": "1",
+                    "showCharsCounter": false,
+                    "showWordsCounter": false,
+                    "showXPathInStatusbar": false,
+                    "askBeforePasteHTML": false,
+                    "askBeforePasteFromWord": false,
+                    "height": 500,
+                    "allowResizeX": false,
+                    "allowResizeY": false,
+                    "buttons": "paragraph,brush,|,bold,strikethrough,underline,italic,eraser,|,outdent,indent,|,image,file,video,table,link,|,align,undo,redo,hr",
+                    //"buttons": "paragraph,brush,|,bold,strikethrough,underline,italic,eraser,|,outdent,indent,|,image,file,video,table,link,|,align,undo,redo,hr,fullsize",
+                    uploader: {
+                        url: '/Home/Edit_UPload'
+                    },
+                });
+                $('.edit_tag').text('保存');
+            }
+        }
+    };
+</script>
+<div class="actions">
+    @if (Model.CreateUserID == User.UserID)
+    {
+        <a class="ui button left floated green small edit_tag" onclick="model_action.edit()">编辑</a>
+    }
+    <button class="ui button cancel black small">关闭</button>
+</div>

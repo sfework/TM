@@ -1,0 +1,75 @@
+﻿@inherits Modal_PageModel
+<div class="ui dimmer modals page transition hidden">
+    @foreach (var item in Modals)
+    {
+        if (item.ModalType == ModalType.信息)
+        {
+            <div class="ui modal mini" @ref="item.Element">
+                <i class="close icon" @onclick="async () => { await CallBack(item, ModelResult.关闭); }"></i>
+                <div class="header">
+                    @if (!string.IsNullOrWhiteSpace(item.ICON))
+                    {
+                        <i class="icon @item.ICON"></i>
+                    }
+                    @item.Title
+                </div>
+                <div class="content">
+                    @item.Message
+                </div>
+                <div class="actions">
+                    <div class="ui red button" @onclick="async () => { await CallBack(item, ModelResult.取消); }">
+                        取消
+                    </div>
+                </div>
+            </div>
+        }
+        else if (item.ModalType == ModalType.询问)
+        {
+            <div class="ui modal mini" @ref="item.Element">
+                <i class="close icon" @onclick="async () => { await CallBack(item, ModelResult.关闭); }"></i>
+                <div class="header">
+                    @if (!string.IsNullOrWhiteSpace(item.ICON))
+                    {
+                        <i class="icon @item.ICON"></i>
+                    }
+                    @item.Title
+                </div>
+                <div class="content">
+                    @item.Message
+                </div>
+                <div class="actions">
+                    <div class="ui green button" @onclick="async () => { await CallBack(item, ModelResult.确认); }">
+                        确认
+                    </div>
+                    <div class="ui red button" @onclick="async () => { await CallBack(item, ModelResult.取消); }">
+                        取消
+                    </div>
+                </div>
+            </div>
+        }
+        else if (item.ModalType == ModalType.自定)
+        {
+            <div class="ui modal mini" @ref="item.Element">
+                <i class="close icon" @onclick="async () => { await CallBack(item, ModelResult.关闭); }"></i>
+                <div class="header">
+                    @if (!string.IsNullOrWhiteSpace(item.ICON))
+                    {
+                        <i class="icon @item.ICON"></i>
+                    }
+                    @item.Title
+                </div>
+                <div class="content">
+                    @item.ComponentRender
+                </div>
+                <div class="actions">
+                    <div class="ui green button" @onclick="async () => { await CallBack(item, ModelResult.确认); }">
+                        确认
+                    </div>
+                    <div class="ui red button" @onclick="async () => { await CallBack(item, ModelResult.取消); }">
+                        取消
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

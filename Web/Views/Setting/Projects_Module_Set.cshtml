@@ -1,0 +1,66 @@
+﻿@{
+    Layout = null;
+}
+@model IQueryable<TMT_Modules>
+<div class="header"><i class="settings icon"></i>项目模块设置</div>
+<div class="content scrolling">
+    <div class="ui form mini">
+        <div id="project_module_set" style="width:419px;">
+            @foreach (var item in Model)
+            {
+                <div class="item" style="width:200px;float:left;margin-bottom:10px;">
+                    <div class="ui action input mini">
+                        <input type="text" data-value="@item.ModuleID" value="@item.ModuleName" style="width:150px;">
+                        <button class="ui icon button red" onclick="model_action.del()">
+                            <i class="trash alternate outline icon"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    var model_action = {
+        save: function () {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                var data = {
+                ProjectID:@ViewBag.ProjectID,
+                Modules:new Array()
+            };
+            $('#project_module_set .ui.action.input>input').each((i, e) => {
+                var t1 = $(e).data('value'), t2 = $(e).val();
+                if (!t1) {
+                    t1 = 0;
+                }
+                data.Modules.push({ ModuleID: t1, ProjectID: data.ProjectID, ModuleName: t2 });
+            });
+            ajax.post('/Setting/Projects_Module_Set', data, function () {
+                if (target) { $(target).load_show(); }
+            }, function (success, data) {
+                if (target) {
+                    $(target).load_hide();
+                }
+                if (success && data.Success) {
+                    window.location.reload();
+                }
+            });
+            }
+        },
+        del: function () {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                $(target).parent().parent().remove();
+            }
+        },
+        new: function () {
+            $('#project_module_set').append('<div class="item" style="width:200px;float:left;margin-bottom:10px;"><div class="ui action input mini"><input type="text" style="width:150px;"><button class="ui icon button red" onclick="model_action.del()"><i class="trash alternate outline icon"></i></button></div></div>');
+        }
+    };
+</script>
+<div class="actions">
+    <button class="ui button left floated teal small" onclick="model_action.new()">新增</button>
+    <button class="ui button green small" onclick="model_action.save()">保存</button>
+    <button class="ui button cancel black small">取消</button>
+</div>

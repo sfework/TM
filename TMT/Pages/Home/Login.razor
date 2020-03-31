@@ -1,0 +1,15 @@
+﻿@page "/Login"
+@inherits PagesModel.Home.Login
+<h3>Login</h3>
+<div class="ui form">
+    <div class="field">
+        <label>First Name</label>
+        <input type="text" name="first-name" placeholder="First Name" @bind-value="Account">
+    </div>
+    <div class="field">
+        <label>Last Name</label>
+        <input type="text" name="last-name" placeholder="Last Name" @bind-value="PassWord">
+    </div>
+    <button class="ui button" @onclick="AccountLogin">Submit</button>
+    <button class="ui button" @onclick="Sub">Submit1</button>
+</div>

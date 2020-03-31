@@ -1,0 +1,42 @@
+﻿@page "/"
+@namespace Tools.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tools</title>
+    <base href="~/" />
+    <link href="~/Fomantic-UI/semantic.min.css" rel="stylesheet" />
+    <link href="~/Style.css" rel="stylesheet" />
+    <script src="~/jquery.min.js"></script>
+    <script src="~/Fomantic-UI/semantic.min.js"></script>
+    <script src="~/JavaScript.js"></script>
+</head>
+<body>
+    <component type="typeof(App)" render-mode="ServerPrerendered" />
+    <script>
+        window.web = {
+            modal: {
+                show: function (obj) {
+                    $(obj).modal({ allowMultiple: true }).modal('show');
+                },
+                hide: function (obj) {
+                    $(obj).modal('hide');
+                }
+            },
+            init: function () {
+                //带有可清除标记的下拉框初始化
+                $('.ui.dropdown.clearable[tabindex!="0"]').dropdown({ clearable: true });
+                //其他普通下拉框初始化
+                $('.ui.dropdown[tabindex!="0"]').dropdown();
+            }
+        }
+    </script>
+    <script src="_framework/blazor.server.js"></script>
+</body>
+</html>

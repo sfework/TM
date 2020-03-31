@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Shared\Components\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NewLife.Redis" Version="3.3.2019.1117" />
+  </ItemGroup>
+
+</Project>

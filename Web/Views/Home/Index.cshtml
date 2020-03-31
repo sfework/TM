@@ -1,0 +1,61 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+<div class="ui breadcrumb">
+    <div class="section">Home</div>
+</div>
+<div class="ui divider"></div>
+<div class="context_box">
+    <table class="ui single line table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Registration Date</th>
+                <th>E-mail address</th>
+                <th>Premium Plan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>John Lilki</td>
+                <td>September 14, 2013</td>
+                <td>jhlilk22@yahoo.com</td>
+                <td>No</td>
+            </tr>
+            <tr>
+                <td>Jamie Harington</td>
+                <td>January 11, 2014</td>
+                <td>jamieharingonton@yahoo.com</td>
+                <td>Yes</td>
+            </tr>
+            <tr>
+                <td>Jill Lewis</td>
+                <td>May 11, 2014</td>
+                <td>jilsewris22@yahoo.com</td>
+                <td>Yes</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4" class="right aligned">
+                    <div class="ui pagination menu paging"><div class="item" style="font-size:12px;">共计：109条，1/6页</div><div class="item fitted"><div class="ui selection dropdown" tabindex="0"><input type="hidden" value="20"><i class="dropdown icon"></i><div class="text">20/页</div><div class="menu" tabindex="-1"><div class="item active selected" data-value="20">20/页</div><div class="item" data-value="50">50/页</div><div class="item" data-value="100">100/页</div></div></div></div><a class="icon item disabled"><i class="left double angle icon"></i></a><a class="icon item disabled"><i class="left angle icon"></i></a><a class="icon item" href="javascript:url.load(2)"><i class="right angle icon"></i></a><a class="icon item" href="javascript:url.load(6)"><i class="right double angle icon"></i></a></div>
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+<partial name="TestView" model="11111" />
+<script>
+    //var b = new Vue({
+    //    el: '#app',
+    //    methods: {
+    //        reset: function () {
+    //            this.foo = "123";
+    //            console.log(this.foo);
+    //        }
+    //    },
+    //    data: {
+    //        foo: 'bar'
+    //    }
+    //})
+</script>

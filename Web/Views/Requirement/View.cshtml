@@ -1,0 +1,184 @@
+﻿@{
+    ViewData["Title"] = "新增需求";
+}
+@model Web.ParamModels.Requirement.Requirement_Model
+<div class="ui breadcrumb" style="padding-left:25px;margin-top:10px;font-size:12px;">
+    <a class="section" href="/Requirement/Index">
+        <i class="briefcase icon"></i>
+        需求管理
+    </a>
+    <i class="right angle icon divider"></i>
+    <div class="active section">新增需求</div>
+</div>
+<style>
+    .jodit_workplace { min-height: 500px !important; }
+    .s_top { position: fixed !important; top: 10px; }
+</style>
+<div class="ui divider" style="margin-top:10px;margin-bottom: 0px;"></div>
+<link href="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.css" rel="stylesheet">
+<script src="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.js"></script>
+<div class="context_box" style="height:calc(100vh - 100px);">
+    <div class="req_add" style="display:flex;flex-direction:row;min-height:100%;">
+        <input type="hidden" id="RequirementID" value="@Model.Requirement?.RequirementID">
+        <div class="c_left" style="flex:1;">
+            <div class="ui form mini" style="min-height:100%;">
+                <div class="inline field" style="width:570px;">
+                    @if (Model.TP == 1)
+                    {
+                        <h2 class="ui header" style="display:inline-block;margin: 0 0.3em 0 0;">@Model.Requirement?.Title</h2>
+                        <div class="ui mini label horizontal basic">
+                            @Model.Requirement?.NowVersion
+                        </div>
+                    }
+                    else
+                    {
+                        <label>需求标题</label>
+                        <input type="text" id="Title" value="@Model.Requirement?.Title" style="width: 500px; " autocomplete="off">
+                    }
+                </div>
+                <div class="field">
+                    <div class="context_con"></div>
+                </div>
+            </div>
+        </div>
+        <div class="c_right" style="width:340px;margin-left:30px;">
+            <div class="ui form mini" id="c_right_l">
+                <div class="field">
+                    <label>优先级</label>
+                    <div id="EmergencyLevel" class="ui teal rating @(Model.TP == 1?"disabled":"")" data-icon="star" data-rating="1" data-max-rating="5"></div>
+                </div>
+                <div class="field" style="width:253px;">
+                    <label>所属模块</label>
+                    @if (Model.TP == 1)
+                    {
+                        <div class="ui mini label">
+                            @Model.Requirement?.Module.ModuleName
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="ui selection dropdown" style="width:170px;">
+                            <input type="hidden" id="ModuleID" value="@Model.Requirement?.ModuleID">
+                            <i class="dropdown icon"></i>
+                            <div class="default text"></div>
+                            <div class="menu">
+                                @foreach (var item in Model.Modules)
+                                {
+                                    <div class="item" data-value="@item.ModuleID">@item.ModuleName</div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="field" style="margin-right: 14px;">
+                    <label style="width:47.64px;">评审人</label>
+                    @if (Model.TP == 1)
+                    {
+                        <div class="ui image label small blue">
+                            <img src="@Model.Requirement?.AuditorUser.Avatar">
+                            @Model.Requirement?.AuditorUser.UserName
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="ui selection dropdown" style="width:170px;">
+                            <input type="hidden" id="AuditorUserID" value="@Model.Requirement?.AuditorUserID">
+                            <i class="dropdown icon"></i>
+                            <div class="default text"></div>
+                            <div class="menu">
+                                @foreach (var item in Model.Users)
+                                {
+                                    <div class="item" data-value="@item.UserID">
+                                        <img class="ui avatar image" src="@item.Avatar">
+                                        @item.UserName
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="field" style="margin-top:25px;">
+                    <div class="ui button green small" onclick="page_action.save(0)">保存</div>
+                    <div class="ui button blue small" onclick="page_action.save(1)">发布</div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
+<script>
+    $('.ui.rating').rating({
+        onRate: function (value) {
+            $(this).removeClass('teal blue violet purple red');
+            switch (value) {
+                case 1:
+                    $(this).addClass('teal');
+                    break;
+                case 2:
+                    $(this).addClass('blue');
+                    break;
+                case 3:
+                    $(this).addClass('violet');
+                    break;
+                case 4:
+                    $(this).addClass('purple');
+                    break;
+                case 5:
+                    $(this).addClass('red');
+                    break;
+            }
+        }
+    });
+    var page_action = {
+        edit_obj: null,
+        edit: function () {
+            page_action.edit_obj = new Jodit(".context_con", {
+                "autofocus": true,
+                "language": "zh_cn",
+                "direction": "ltr",
+                "enter": "P",
+                "defaultMode": "1",
+                "showCharsCounter": false,
+                "showWordsCounter": false,
+                "showXPathInStatusbar": false,
+                "askBeforePasteHTML": false,
+                "askBeforePasteFromWord": false,
+                "min-height": 800,
+                "allowResizeX": false,
+                "allowResizeY": false,
+                //"buttons": "paragraph,brush,|,bold,strikethrough,underline,italic,eraser,|,outdent,indent,|,image,file,video,table,link,|,align,undo,redo,hr",
+                "buttons": "paragraph,brush,|,bold,strikethrough,underline,italic,eraser,|,outdent,indent,|,image,file,video,table,link,|,align,undo,redo,hr,fullsize",
+                uploader: {
+                    url: '/Home/Edit_UPload'
+                },
+            });
+        },
+        save: function (tp) {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                var data = $('.req_add').getdata();
+                data['EmergencyLevel'] = $('#EmergencyLevel').rating('get rating');
+                data['Content'] = page_action.edit_obj.getEditorValue();
+                data['SaveType'] = tp;
+                ajax.post('/Requirement/Add', data, function () { $(target).load_show(); },
+                    function (success, data) {
+                        $(target).load_hide();
+                        if (success && data.Success) {
+                            //window.location.href = '/';
+                        }
+                    });
+            }
+        }
+    };
+    page_action.edit();
+    $(window).scroll(function () {
+        if ($(window).scrollTop() >= 100) {
+            $('#c_right_l').addClass('s_top');
+        }
+        else {
+            $('#c_right_l').removeClass('s_top');
+        }
+    });
+</script>

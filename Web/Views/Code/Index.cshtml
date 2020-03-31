@@ -1,0 +1,87 @@
+﻿@{
+    ViewData["Title"] = "源码";
+}
+<style>
+    body { display: flex; flex-direction: column; overflow: hidden; }
+    .Context { flex: 1; display: flex; flex-direction: row; overflow: hidden; }
+    .code_left { height: 100%; width: 230px; background: #2f2f2f; color: rgba(255,255,255,.7); padding: 20px; box-shadow: 2px 0px 4px #333333 !important; }
+    .code_right { flex: 1; overflow: auto; padding: 20px; }
+    .code_right::-webkit-scrollbar { width: 12px; }
+    .code_right::-webkit-scrollbar-thumb { border-radius: 0px; cursor: pointer;  }
+</style>
+<div class="code_left">
+    <div class="ui selection dropdown mini">
+        <input type="hidden" name="gender" value="1">
+        <i class="dropdown icon"></i>
+        <div class="default text">Gender</div>
+        <div class="menu">
+            <div class="item" data-value="1">Male</div>
+            <div class="item" data-value="0">Female</div>
+        </div>
+    </div>
+    <div class="ui list inverted small">
+        <div class="item">
+            <i class="folder icon"></i>
+            <div class="content">
+                <div class="header">src</div>
+                <div class="list inverted">
+                    <div class="item">
+                        <i class="folder icon"></i>
+                        <div class="content">
+                            <div class="header">site</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <i class="folder icon"></i>
+                        <div class="content">
+                            <div class="header">themes</div>
+                            <div class="list inverted">
+                                <div class="item">
+                                    <i class="folder icon"></i>
+                                    <div class="content">
+                                        <div class="header">default</div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <i class="folder icon"></i>
+                                    <div class="content">
+                                        <div class="header">my_theme</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <i class="file icon"></i>
+                        <div class="content">
+                            <div class="header">theme.config</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="item">
+            <i class="folder icon"></i>
+            <div class="content">
+                <div class="header">dist</div>
+                <div class="list inverted">
+                    <div class="item">
+                        <i class="folder icon"></i>
+                        <div class="content">
+                            <div class="header">components</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="item">
+            <i class="file icon"></i>
+            <div class="content">
+                <div class="header">semantic.json</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="code_right">
+    <div style="height:1500px;width:100%;float:left;">Code</div>
+</div>

@@ -1,0 +1,56 @@
+﻿@{
+    var Edit = (bool)Model[0];
+    var Auths = Model[1] == null ? new int[] { } : Array.ConvertAll(Model[1].ToString().Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries), c => int.Parse(c));
+}
+@model object[]
+
+
+@if (Edit)
+{
+    foreach (var T1 in Web.Command.AuthorityHelp.Get())
+    {
+        <div class="field left_clear">
+            <div class="grouped fields">
+                <div class="header" style="font-weight:bold;">@T1.Key</div>
+                @foreach (var T2 in T1.Value)
+                {
+                    <div class="field">
+                        <div class="ui checkbox">
+                            <input type="checkbox" value="@T2.Value" @(Edit ? "" : "disabled=\"disabled\"") @(Auths.Contains(T2.Value) ? "checked=\"\"" : "")>
+                            <label>@T2.Key</label>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}
+else
+{
+    foreach (var T1 in Web.Command.AuthorityHelp.Get())
+    {
+        <div class="field left_clear">
+            <div class="grouped fields">
+                <div class="header" style="font-weight:bold;">@T1.Key</div>
+                <div class="ui list">
+                    @foreach (var T2 in T1.Value)
+                    {
+                        <div class="item">
+                            @if (Auths.Contains(T2.Value))
+                            {
+                                <i class="circle grey icon"></i>
+                            }
+                            else
+                            {
+                                <i class="circle outline icon grey"></i>
+                            }
+                            <div class="content">
+                                @T2.Key
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}

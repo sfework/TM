@@ -1,0 +1,59 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Login";
+}
+<script src="~/md5.min.js"></script>
+<style>
+    .login_box { background-color: #1b1c1d; width: 100%; height: 100%; }
+    .login_box > .login_logo { width: 100%; height: 40%; position: relative; }
+    .login_box > .login_logo > .logo { font-size: 10rem; width: 300px; position: absolute; bottom: 10px; left: 50%; margin-left: -150px; text-align: center; }
+    .login_box > .login_logo > .logo > .icon { display: inline-block; padding-top: 80px; }
+    .login_box > .login_logo > .logo > span { font-size: .9rem; color: #848484; display: inline-block; width: 100%; }
+    .login_box > .login_form { margin-top: 25px; }
+    .login_box > .login_form > .form { width: 220px; margin-left: auto; margin-right: auto; }
+</style>
+<div class="login_box">
+    <div class="login_logo">
+        <div class="logo">
+            <i class="icon spider inverted"></i>
+            <span>Technicians Team Management Tool</span>
+        </div>
+    </div>
+    <div class="ui divider"></div>
+    <div class="login_form">
+        <div class="ui form" id="loginform">
+            <div class="field">
+                <div class="ui left icon input">
+                    <input type="text" placeholder="Account" id="Account" onkeydown="keydown()" autocomplete="off">
+                    <i class="user icon"></i>
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <input type="password" placeholder="PassWord" id="PassWord" onkeydown="keydown()">
+                    <i class="lock icon"></i>
+                </div>
+            </div>
+            <button class="ui button orange fluid" onclick="login()">Submit</button>
+        </div>
+    </div>
+</div>
+<script>
+    function keydown(frm, event) {
+        var event = window.event ? window.event : event;
+        if (event.keyCode == 13) {
+            login();
+        }
+    }
+    function login() {
+        var target = $('.login_form .ui.button');
+        var data = $('#loginform').getdata();
+        data.PassWord = md5(data.PassWord);
+        ajax.post('/Home/Login', data, function () { $(target).load_show(); }, function (success, data) {
+            $(target).load_hide();
+            if (success && data.Success) {
+                window.location.href = '/';
+            }
+        });
+    }
+</script>

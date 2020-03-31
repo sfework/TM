@@ -1,0 +1,36 @@
+﻿@{
+    Layout = null;
+}
+@model TMT_Documents
+<div class="header">
+    <i class="paperclip icon"></i>
+    查看附件
+</div>
+<style>
+    #view_att .cen { margin-left: auto; margin-right: auto; }
+    #view_att .f_icon { width: 100px; height: 100px; }
+</style>
+<div class="content" id="view_att">
+    <div class="ui raised card centered basic small" id="view_att" style="width:100%;border:0;box-shadow:none;">
+        <div class="content">
+            <div class="description" style="text-align:center;">
+                <div class="f_icon cen @Model.Class"></div>
+                <div class="header" style="font-weight:bold;">@Model.DocumentName</div>
+            </div>
+        </div>
+        <div class="extra content" style="padding:0.75em 0em;">
+            <div class="ui image label left floated basic">
+                <img src="@Model.User.Avatar">
+                @Model.User.UserName
+            </div>
+            <div class="right floated author" style="font-size: 12px; margin-top: 5px;">
+                <i class="clock outline icon"></i>
+                @Model.CreateDate
+            </div>
+        </div>
+    </div>
+</div>
+<div class="actions">
+    <a class="ui button green left floated small" href="@Model.Content" download="@Model.DocumentName">下载</a>
+    <button class="ui button cancel black small">关闭</button>
+</div>

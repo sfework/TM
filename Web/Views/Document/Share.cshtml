@@ -1,0 +1,54 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = Model.DocumentName;
+}
+@model TMT_Documents
+<style>
+    .a_ctr { width: 600px; margin: auto; padding-top: 50px; }
+    .a_ctr .header_text { padding: 0px 20px 20px 0px; text-align: center; font-size: 18px; font-weight: bold; }
+    .c_bg { background: #f9f9f9; padding-top: 20px; padding-bottom: 20px; }
+    .c_bg > .c_ctr { width: 1000px; margin: auto; background: #fff; padding: 40px; margin-top: 10px; margin-bottom: 10px; }
+    .c_bg > .c_ctr > .c_header { font-size: 26px; font-weight: bold; padding-bottom: 10px;  }
+    .c_bg > .c_ctr > .c_con { padding-top: 10px; }
+    .c_bg > .c_ctr > .c_av { position: relative; height: 45px; border-bottom: solid 1px #eaeaea; line-height: 35px;}
+    .c_bg > .c_ctr > .c_av > .c_av_a { position: absolute; left: 0; }
+    .c_bg > .c_ctr > .c_av > .c_av_b { position: absolute; right: 0; }
+</style>
+
+@if (Model.DocumentType == 1)
+{
+    <div class="c_bg">
+        <div class="c_ctr">
+            <div class="c_header">@Model.DocumentName</div>
+            <div class="c_av">
+                <div class="c_av_a">
+                    <div class="ui image label">
+                        <img src="@Model.User.Avatar">
+                        @Model.User.UserName
+                    </div>
+                </div>
+                <div class="c_av_b">
+                    <span class="ui text grey">@Model.CreateDate</span>
+                </div>
+            </div>
+            <div class="c_con">@Html.Raw(Model.Content)</div>
+        </div>
+    </div>
+}
+@if (Model.DocumentType == 2)
+{
+    <div class="a_ctr">
+        <div class="ui placeholder segment">
+            <div class="ui icon header">
+                <div class="f_icon @Model.Class" style="margin: auto; "></div>
+            </div>
+            <div class="header_text">
+                @Model.DocumentName
+            </div>
+            <a class="ui labeled icon button blue" href="@Model.Content" download="@Model.DocumentName">
+                <i class="download icon"></i>
+                下载
+            </a>
+        </div>
+    </div>
+}

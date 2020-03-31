@@ -1,0 +1,86 @@
+﻿@page "/"
+@namespace TMT.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TMT</title>
+    <base href="~/" />
+    <script src="~/jquery.min.js"></script>
+    <script src="~/Fomantic-UI/semantic.min.js"></script>
+    <link href="~/Fomantic-UI/semantic.min.css" rel="stylesheet" />
+    <link href="~/Style.css" rel="stylesheet" />
+    <script src="~/JavaScript.js"></script>
+</head>
+<body>
+    <app>
+        <component type="typeof(App)" render-mode="ServerPrerendered" />
+    </app>
+    <div id="blazor-error-ui" style="display:none;">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.server.js"></script>
+    <script>
+        window.app = {
+            init: (t) => {
+                console.log('init');
+                document.title = t;
+                //顶部菜单下拉框初始化
+                $('.Top .ui.dropdown[tabindex!="0"]').dropdown({ 'action': 'hide' });
+                //带有可清除标记的下拉框初始化
+                $('.ui.dropdown.clearable[tabindex!="0"]').dropdown({ clearable: true });
+                //其他普通下拉框初始化
+                $('.ui.dropdown[tabindex!="0"]').dropdown();
+            },
+            log: (mess) => {
+                console.log(mess);
+            },
+            url: {
+                go: (url) => {
+                    window.location.href = url;
+                }
+            },
+            cookie: {
+                set: (key, value, exp) => {
+                    var exp = new Date();
+                    exp.setTime(exp.getTime() + exp * 60 * 1000);
+                    document.cookie = key + "=" + escape(value) + ";expires=" + exp.toGMTString();
+                },
+                get: (key) => {
+                    var arr, reg = new RegExp("(^| )" + key + "=([^;]*)(;|$)");
+                    if (arr = document.cookie.match(reg))
+                        return unescape(arr[2]);
+                    else
+                        return null;
+                },
+                del: (key) => {
+                    var exp = new Date();
+                    exp.setTime(exp.getTime() - 1);
+                    document.cookie = key + "= ;expires=" + exp.toGMTString();
+                }
+            },
+            storage: {
+                set: (key, value) => {
+                    localStorage.setItem(key, value);
+                },
+                get: (key) => {
+                    return localStorage.getItem(key);
+                },
+                del: (key) => {
+                    localStorage.removeItem(key);
+                },
+                clear: () => {
+                    localStorage.clear();
+                }
+            }
+        };
+    </script>
+</body>
+</html>

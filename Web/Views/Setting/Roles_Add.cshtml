@@ -1,0 +1,66 @@
+﻿@{
+    Layout = null;
+}
+@model TMT_Roles
+<div class="header">
+    <i class="user tag icon"></i>
+    @(Model==null? "新增角色" : "编辑角色")
+</div>
+<div class="content">
+    <div class="ui form mini rolesM">
+        <input type="hidden" id="RoleID" value="@Model?.RoleID">
+        <div class="inline fields">
+            <div class="field">
+                <label>角色名称</label>
+                <input type="text" id="RoleName" value="@Model?.RoleName">
+            </div>
+        </div>
+    </div>
+    <div class="ui form mini rolesA" id="rolesA" style="float:left;font-size:12px;">
+        <partial name="_Authority" model="new object[] { true, Model?.Auths }" />
+    </div>
+</div>
+<script>
+    var model_action = {
+        init: function () {
+            @*var auths = [@Model?.Auths];
+            for (var i = 0; i < auths.length; i++) {
+                $('.rolesA input:checkbox[value="' + auths[i] + '"]').attr("checked", true)
+            }*@
+        },
+        getAuths: function () {
+            var objs = $('#rolesA input:checkbox:checked');
+            var auths = new Array();
+            for (var i = 0; i < objs.length; i++) {
+                auths.push(Number($(objs[i]).val()));
+            }
+            return auths.join(',');
+        },
+        save: function () {
+            var target = null;
+            if (event) {
+                target = event.currentTarget;
+            }
+            let data = {
+                RoleID: $('.rolesM #RoleID').val(),
+                RoleName: $('.rolesM #RoleName').val(),
+                Auths: model_action.getAuths()
+            };
+            ajax.post('/Setting/Roles_Add_Save', data, function () {
+                if (target) { $(target).load_show(); }
+            }, function (success, data) {
+                if (target) {
+                    $(target).load_hide();
+                }
+                if (success && data.Success) {
+                    window.location.reload();
+                }
+            });
+        }
+    };
+    model_action.init();
+</script>
+<div class="actions" style="clear:left;">
+    <button class="ui button green small" onclick="model_action.save()">保存</button>
+    <button class="ui button cancel black small">取消</button>
+</div>

@@ -1,0 +1,81 @@
+/*整体*/
+body, html { min-width:1200px;}
+/*弹窗的管理按钮位置校正*/
+.ui.modal > .close { color: #1d1b1b !important; top: 1rem !important; right: .4rem !important; }
+.context { height: 100%; width: 100%; padding:15px}
+
+
+.Top { border-radius: 0; background-color: #1b1c1d !important; box-shadow: 0px 2px 4px #333333 !important; }
+.Body_Bottom { padding-top: 52px; }
+.Body_Bottom > .breadcrumb-box { padding: 10px 25px; border-bottom: solid 1px #e6e6e6; }
+.Body_Bottom > .Box { padding: 10px 20px; }
+.ribbon.label { margin-left: 5px !important; }
+.compact.label { padding: .3em .5em !important; }
+
+.paging > .item > .ui.dropdown > .dropdown.icon { padding-top: .85em; }
+.paging > .item > .ui.dropdown { min-width: 80px; border: 0; border-radius: 0; border-right: 1px solid rgba(34,36,38,.15); padding-top: .9em; }
+.paging > .item > .ui.input { width: 100%; height: 100%; }
+.paging > .item > .ui.input > input { border-radius: 0; border: 0; width: 55px; text-align: center; }
+.paging > a, .paging .selection.dropdown { font-size: 12px; }
+
+.searchbox { }
+.searchbox .field > label { color: #9e9e9e !important; }
+.searchbox > .form > .fields > .small.orange { font-size: .91857143rem !important; }
+.searchbox .field.right { position: absolute; right: 0; padding: 0 !important; }
+
+.Box .searchbox .form .field label, #ct_info .field label { background: #e6e6e6; padding: 3px 10px; border-radius: 3px; }
+
+
+/*登录*/
+.Login { background: #1b1c1d; height: 100%; width: 100%; }
+.Login > .loginbox { width: 100%; margin-top: 20px; margin-left: auto; margin-right: auto; width: 230px; }
+.Login > .ui.icon.header { width: 100%; margin-top: 10%; border-bottom: solid 1px #313131; padding-bottom: 20px; }
+.Login > .ui.icon.header > i.icon { font-size: 7.5em; }
+.Login > .ui.icon.header > .content { margin-top: 20px; }
+/*左栏菜单*/
+
+/*右主体内容区中显示区*/
+.context > .body > .container { flex: 1; padding: 15px; overflow-y: scroll; height: calc(100vh - 51px); }
+/*通用列表搜索区样式修复*/
+.searchbox > .inline.fields { min-height: 32px; }
+.ui.form .inline.field > :first-child, .ui.form .inline.fields .field > :first-child { margin: 0 .4em 0 0; }
+.field.right { position: absolute; right: 0; padding: 0 !important; }
+/*右上角用户信息*/
+.userinfo > .label > img { margin-top: 8px; border-radius: 3px !important; }
+.userinfo > .content { width: 80px; margin: .5em 0 .35714286em .74285714em !important; }
+.userinfo > .content > .summary { height: 100%; }
+.userinfo > .content > .summary > span { float: left; display: block; width: 100%; }
+.userinfo > .content > .summary > .role { font-size: 12px; color: #989898; font-weight: normal; }
+
+
+
+/*用户管理列表样式修复*/
+.userlist .card { width: 110px !important; }
+.userlist .card > .content { padding: .4em !important; }
+.userlist .card > .content > .header { font-size: 1em !important; font-weight: normal !important; }
+.userlist .card > .content > .meta { font-size: 12px; }
+
+/*角色管理列表样式修复*/
+.rolelist .accordion > .content > .grid, .rolelist .accordion > .content > .buttons { padding-left: 24px; }
+.rolelist .accordion > .content > .grid > .column:nth-child(1) { width: 200px; }
+.rolelist .accordion > .content > .grid > .column:nth-child(2) { width: 200px; }
+.rolelist .accordion > .content > .grid > .column:nth-child(3) { width: 200px; }
+.rolelist .accordion > .content > .buttons { margin-top: 15px; }
+
+/*团队管理列表样式修复*/
+.teamlist .accordion > .content > .cards > .card { width: 90px; }
+.teamlist .accordion > .content > .cards > .card > .content { padding: .4em !important; }
+.teamlist .accordion > .content > .cards > .card > .content > .header { font-size: 1em !important; font-weight: normal !important; }
+.teamlist .accordion > .content > .cards > .card > .content > .meta { font-size: 12px; }
+.teamlist .accordion > .content > .cards > .card > .ui.icon { position: absolute; z-index: 1000; right: 3px; top: 4px; display: none; }
+.teamlist .accordion > .content > .cards > .card:hover > .ui.icon { display: block; }
+/*隐藏modal的遮罩*/
+.hidedimmer { background-color: unset !important; pointer-events: none; }
+.hidedimmer > .ui.modal { pointer-events: auto; }
+
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
+input[type="number"] { -moz-appearance: textfield; }
+
+.date-ymd > .input { width: 120px !important; }
+span.fg { padding: 0px 5px; color: #c5c5c5 ;}

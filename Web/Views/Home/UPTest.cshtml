@@ -1,0 +1,17 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "UP";
+}
+<div class="ui form" id="up">
+    <div class="field">
+        <label>First Name</label>
+        <input type="file" id="UFile" multiple>
+    </div>
+    <button class="ui button" onclick="up()">Submit</button>
+</div>
+<script>
+    function up() {
+        var data = $('#up').getdata();
+        ajax.post('/Home/UPLoad',data, null, function (s, d) { console.log(d); });
+    }
+</script>

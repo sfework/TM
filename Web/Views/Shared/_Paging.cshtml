@@ -1,0 +1,54 @@
+﻿@model PagingTagHelper
+<th colspan="@Model.LeftColspan" class="Paging" data-pagesize="@Model.PageSize" data-page="@Model.Page">
+    <div class="ui left labeled button small">
+        <div class="ui basic right pointing label">
+            @Model.Page / @Model.MaxPage
+        </div>
+        <div class="ui button small">
+            <i class="icon chart bar outline"></i>@Model.TotalCount
+        </div>
+    </div>
+    <div class="ui floating labeled icon dropdown button small">
+        <i class="dropdown icon"></i>
+        <input type="hidden" value="@Model.PageSize" />
+        <span class="text">Menu</span>
+        <div class="menu">
+            <div class="item" data-value="10">10</div>
+            <div class="item" data-value="15">15</div>
+            <div class="item" data-value="20">20</div>
+            <div class="item" data-value="30">30</div>
+            <div class="item" data-value="50">50</div>
+            <div class="item" data-value="100">100</div>
+        </div>
+    </div>
+</th>
+<th colspan="@Model.RightColspan" class="right aligned">
+    @if (Model.Page == 1)
+    {
+        <button class="ui labeled icon button disabled small">
+            <i class="left arrow icon"></i>
+            上一页
+        </button>
+    }
+    else
+    {
+        <button class="ui labeled icon button small" onclick="url.load('@(Model.Page-1)')">
+            <i class="left arrow icon"></i>
+            上一页
+        </button>
+    }
+    @if (Model.Page == Model.MaxPage)
+    {
+        <button class="ui right labeled icon button disabled small">
+            <i class="right arrow icon"></i>
+            下一页
+        </button>
+    }
+    else
+    {
+        <button class="ui right labeled icon button small" onclick="url.load('@(Model.Page+1)')">
+            <i class="right arrow icon"></i>
+            下一页
+        </button>
+    }
+</th>

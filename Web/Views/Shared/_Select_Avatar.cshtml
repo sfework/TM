@@ -1,0 +1,18 @@
+﻿@model SelectModel
+<div class="ui selection dropdown @(Model.Clearable ? " clearable" : "")@(Model.Multiple ? " multiple" : "")" @(Model.Width > 0 ? Html.Raw(string.Format("style=\"min-width:{0}px !important;\"", Model.Width)) : Html.Raw(""))>
+    <input type="hidden" id="@Model.ID" value="@Model.Default">
+    <i class="dropdown icon"></i>
+    <div class="default text">@Model.Placeholder</div>
+    <div class="menu">
+        @foreach (var item in Model.Items)
+        {
+            <div class="item" data-value="@item.Value">
+                <img class="ui avatar image" src="@item.Value">
+                @item.Key
+            </div>
+        }
+    </div>
+</div>
+<script>
+
+</script>

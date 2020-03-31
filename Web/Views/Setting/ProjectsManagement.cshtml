@@ -1,0 +1,57 @@
+﻿
+@{
+    ViewData["Title"] = "项目管理";
+}
+@model Setting.ProjectsManagementList
+<div class="context_box">
+    <div class="searchbox" data-tag="userM">
+        <div class="ui form mini">
+            <div class="inline fields">
+                <div class="field">
+                    <label>关键字</label>
+                    <div class="ui input clearable">
+                        <input type="text" id="KeyWord" value="@Model.KeyWord">
+                        <i class="close icon"></i>
+                    </div>
+                </div>
+                <div class="field">
+                    <button class="ui button orange mini icon" id="search"><i class="icon search"></i></button>
+                </div>
+                <div class="field right">
+                    <div class="ui floating teal labeled icon button tiny" onclick="modal.load('/Setting/Projects_Add',650)">
+                        <i class="plus icon"></i>新增
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @foreach (var item in Model.List)
+    {
+        <div class="ui segments mini">
+            <div class="ui segment @(item.State==0?"green":"red")">
+                <p>
+                    <i class="briefcase icon grey"></i>
+                    @item.ProjectName
+                </p>
+            </div>
+            <div class="ui secondary segment">
+                @foreach (var U in item.D_Users)
+                {
+                    <div class="ui image label small">
+                        <img src="@U.Avatar">
+                        @U.UserName
+                    </div>
+                }
+                <p style="margin-top:10px;">
+                    @item.Description
+                </p>
+                <p>
+                    <div class="ui primary buttons icon mini">
+                        <button class="ui button" onclick="modal.load('/Setting/Projects_Add?ProjectID=@item.ProjectID',650)"><i class="edit icon"></i></button>
+                        <button class="ui button" onclick="modal.load('/Setting/Projects_Module_Set?ProjectID=@item.ProjectID',450)"><i class="settings icon"></i></button>
+                    </div>
+                </p>
+            </div>
+        </div>
+    }
+</div>

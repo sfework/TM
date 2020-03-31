@@ -1,0 +1,75 @@
+﻿@{
+    Layout = null;
+}
+@model TMT_Projects
+<div class="header"><i class="briefcase icon"></i>@(Model == null ? "新增项目" : "编辑项目")</div>
+<div class="content">
+    <div class="ui form mini" id="project_add">
+        <input type="hidden" id="ProjectID" value="@Model?.ProjectID">
+        <div class="ui fields two">
+            <div class="field">
+                <label>项目名称</label>
+                <input type="text" id="ProjectName" value="@Model?.ProjectName">
+            </div>
+            <div class="field">
+                <label>状态</label>
+                <div class="ui selection dropdown">
+                    <input type="hidden" id="State" value="@Model?.State">
+                    <i class="dropdown icon"></i>
+                    <div class="default text"></div>
+                    <div class="menu">
+                        <div class="item" data-value="0">正常</div>
+                        <div class="item" data-value="1">关闭</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="field">
+            <label>项目人员</label>
+            <select class="ui fluid search five column dropdown" multiple="">
+                @foreach (var item in ViewBag.User)
+                {
+                    <option value="@item.UserID">@item.UserName</option>
+                }
+            </select>
+        </div>
+        <div class="field">
+            <label>项目描述</label>
+            <textarea rows="5" id="Description">@Model?.Description</textarea>
+        </div>
+    </div>
+</div>
+<script>
+    var model_action = {
+        init: function () {
+            var users = '@Model?.Users';
+            $('#project_add .field .ui.five.column.dropdown').dropdown('set selected',users.split(','));
+        },
+        save: function () {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                var data = $('#project_add').getdata();
+                var users = $('#project_add .field .ui.five.column.dropdown').dropdown('get value');
+                if (users !== null) {
+                    data['Users'] = users.join(',');
+                }
+                ajax.post('/Setting/Projects_Add_Save', data, function () {
+                    if (target) { $(target).load_show(); }
+                }, function (success, data) {
+                    if (target) {
+                        $(target).load_hide();
+                    }
+                    if (success && data.Success) {
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+    };
+    model_action.init();
+</script>
+<div class="actions">
+    <button class="ui button green small" onclick="model_action.save()">保存</button>
+    <button class="ui button cancel black small">取消</button>
+</div>
