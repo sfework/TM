@@ -18,16 +18,16 @@ namespace Web
         public void OnAuthorization(AuthorizationFilterContext Context)
         {
             var ReturnAction = Actions.Get(Context);
-            var User = Session.Get<Command.UserModel>("Web_Auth");
+            var G = Session.Get<SystemModel.Model>("Web_System");
             if (!ReturnAction.IsAllowAnonymous)
             {
-                if (User == null)
+                if (G?.User == null)
                 {
                     Context.Result = new RedirectResult("/");
                     return;
                 }
             }
-            Context.HttpContext.Items.Add("Web_User", User);
+            Context.HttpContext.Items.Add("Web_System", G);
         }
     }
     public class AuthenticationAction
@@ -63,10 +63,16 @@ namespace Web
 
     public class AuthAttribute : Attribute
     {
-        public Command.Powers[] Powers { get; set; }
-        public AuthAttribute(params Command.Powers[] _Powers)
+        public AuthAttribute()
         {
-            Powers = _Powers;
+
         }
+    }
+    /// <summary>
+    /// 需要设置默认项目
+    /// </summary>
+    public class NeedSetProject : Attribute
+    { 
+    
     }
 }

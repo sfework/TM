@@ -12,6 +12,7 @@ namespace Web.Models
         public int RequirementID { get; set; }
         public string Content { get; set; }
         public int Version { get; set; }
+        public DateTime CreateDate { get; set; }
 
         [ForeignKey("RequirementID")]
         public virtual TMT_Requirements Requirement { get; set; }

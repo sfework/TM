@@ -1,57 +1,102 @@
 ﻿@{
     Layout = "_Layout";
 }
-<div class="ui inverted menu Top">
-    <div class="item">
-        <i class="icon spider inverted" style="font-size:2.2rem;color:#cecece;"></i>
-    </div>
-    <a class="item" href="/"><i class="icon home grey"></i>首 页</a>
-    <a class="item" href="/Requirement/Index"><i class="file alternate icon grey"></i>需 求</a>
-    <a class="item" href="/Tasks/Index"><i class="icon tasks grey"></i>任 务</a>
-    <a class="item" href="/Requirement/Index"><i class="code branch icon grey"></i>版 本</a>
-    <a class="item" href="/Tasks/Index"><i class="icon bug grey"></i>测 试</a>
-    <a class="item" href="/Document/Index"><i class="file alternate outline icon grey"></i>文 档</a>
-    <a class="item" href="/Code/Index"><i class="icon code grey"></i>源 码</a>
-    <div class="ui dropdown inverted item">
-        <i class="icon settings grey"></i>设 置
-        <i class="dropdown icon"></i>
-        <div class="menu">
-            <a class="item" href="/Setting/UsersManagement"><i class="icon users grey"></i>用 户</a>
-            <a class="item" href="/Setting/RolesManagement"><i class="user tag icon grey"></i>角 色</a>
-            <a class="item" href="/Setting/ProjectsManagement"><i class="briefcase icon grey"></i>项 目</a>
-        </div>
-    </div>
-    <div class="right menu">
-        <div class="item">
-            <div class="ui dropdown floating labeled icon button tiny teal noaction projectset">
-                <i class="briefcase icon"></i>
-                <span class="text">@(string.IsNullOrWhiteSpace(User.DefaultProjectName)?"选择项目": User.DefaultProjectName)</span>
-                <div class="menu">
-                    @foreach (var item in Projects)
-                    {
-                        <div class="item" data-value="@item.ProjectID">@item.ProjectName</div>
-                    }
+<div class="menubox">
+    <div class="blurring dimmable">
+        <div class="info">
+            <img class="avatar" src="@G.User.Avatar" />
+            <h5 class="ui header">
+                @G.User.UserName
+                <span class="sub header">@G.User.RoleName</span>
+            </h5>
+            <div class="ui dimmer">
+                <div class="content">
+                    <button class="ui button teal tiny">
+                        <i class="setting icon"></i>
+                        设置
+                    </button>
+                    <a class="ui button red tiny" href="/Home/Logout">
+                        <i class="power icon"></i>
+                        退出
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="item vertically fitted top_user">
-            <div class="ui dropdown small">
-                <div class="ui comments inverted">
-                    <div class="comment">
-                        <div class="avatar">
-                            <img src="@User.Avatar">
-                        </div>
-                        <div class="content">
-                            <div class="author">@User.UserName</div>
-                            <div class="text">@User.RoleName</div>
-                        </div>
-                    </div>
-                </div>
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                    <div class="item"><i class="setting icon"></i>设 置</div>
-                    <a class="item" href="/Home/Logout"><i class="power off icon"></i>退 出</a>
-                </div>
+    </div>
+    <div class="ui inverted divider" style="margin-top:0;"></div>
+    <div class="pro_set">
+        <div class="ui floating labeled icon dropdown button orange fluid projectset">
+            <i class="briefcase icon"></i>
+            <span class="text">@(string.IsNullOrWhiteSpace(G.NowProject?.ProjectName)? "选择默认项目" : G.NowProject?.ProjectName)</span>
+            <div class="menu">
+                @foreach (var item in G.UsableProject)
+                {
+                    <div class="item" data-value="@item.ProjectID">@item.ProjectName</div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="menulist">
+        <ul>
+            <li>
+                <a href="">
+                    <i class="home icon"></i>
+                    首 页
+                </a>
+            </li>
+            <li>
+                <a href="/Requirement/Index">
+                    <i class="file alternate icon"></i>
+                    需 求
+                </a>
+            </li>
+            <li>
+                <a href="">
+                    <i class="tasks icon"></i>
+                    任 务
+                </a>
+            </li>
+            <li>
+                <a href="">
+                    <i class="code branch icon"></i>
+                    版 本
+                </a>
+            </li>
+            <li>
+                <a href="">
+                    <i class="bug icon"></i>
+                    测 试
+                </a>
+            </li>
+            <li>
+                <a href="/Document/Index">
+                    <i class="file alternate outline icon"></i>
+                    文 档
+                </a>
+            </li>
+            <li>
+                <a href="">
+                    <i class="code icon"></i>
+                    源 码
+                </a>
+            </li>
+        </ul>
+        <div class="ui left pointing dropdown icon button fluid sets">
+            <i class="settings icon" style=" margin-right: 10px !important; "></i>设 置
+            <i class="caret right icon"></i>
+            <div class="menu">
+                <a class="item" href="/Setting/Users">
+                    <i class="users icon"></i>
+                    用 户
+                </a>
+                <a class="item" href="/Setting/Roles">
+                    <i class="user tag icon"></i>
+                    角 色
+                </a>
+                <a class="item" href="/Setting/Projects">
+                    <i class="briefcase icon"></i>
+                    项目
+                </a>
             </div>
         </div>
     </div>

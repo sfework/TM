@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,24 +31,15 @@ namespace Web
         public PagingTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper)
         {
         }
+        [HtmlAttributeNotBound]
+        public int MaxPage { get; set; }
         [HtmlAttributeName("Page")]
-        public int Page { get; set; } = 1;
+        public int Page { get; set; }
         [HtmlAttributeName("PageSize")]
-        public int PageSize { get; set; } = 20;
+        public int PageSize { get; set; }
         [HtmlAttributeName("TotalCount")]
         public int TotalCount { get; set; }
 
-        [HtmlAttributeName("LeftColspan")]
-        public int LeftColspan { get; set; } = 2;
-        [HtmlAttributeName("RightColspan")]
-        public int RightColspan { get; set; } = 2;
-
-        public int MaxPage { get; set; }
-
-        //public PagingTagHelper(IHtmlHelper htmlHelper)
-        //{
-        //    Html = htmlHelper;
-        //}
         public override async Task ProcessAsync(TagHelperContext Context, TagHelperOutput Output)
         {
             MaxPage = TotalCount / PageSize;
@@ -65,13 +57,15 @@ namespace Web
         public SelectModel(IHtmlHelper htmlHelper) : base(htmlHelper)
         {
         }
+        [HtmlAttributeName("Class")]
+        public string Class { get; set; }
         [HtmlAttributeName("ID")]
-        public string ID { get; set; } = null;
+        public string ID { get; set; }
         /// <summary>
         /// 默认提示语
         /// </summary>
         [HtmlAttributeName("Placeholder")]
-        public string Placeholder { get; set; } = null;
+        public string Placeholder { get; set; }
 
         /// <summary>
         /// 指定选择框的最大宽度
@@ -92,14 +86,21 @@ namespace Web
         /// 默认选中的枚举数值（可为int类型的枚举数值，也可以是枚举值）
         /// </summary>
         [HtmlAttributeName("Default")]
-        public object Default { get; set; } = null;
+        public object Default { get; set; }
         [HtmlAttributeName("Clearable")]
         public bool Clearable { get; set; } = true;
+
+        [HtmlAttributeName("Columns")]
+        public int Columns { get; set; }
+        [HtmlAttributeName("Search")]
+        public bool Search { get; set; }
+        [HtmlAttributeName("Fluid")]
+        public bool Fluid { get; set; } = true;
     }
-    [HtmlTargetElement("RoleSelect")]
-    public class RoleSelectTagHelper : SelectModel
+    [HtmlTargetElement("SelectRoles")]
+    public class SelectRolesTagHelper : SelectModel
     {
-        public RoleSelectTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper)
+        public SelectRolesTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper)
         {
         }
 
@@ -115,10 +116,13 @@ namespace Web
         }
     }
 
-    [HtmlTargetElement("AvatarSelect")]
-    public class AvatarSelectTagHelper : SelectModel
+    [HtmlTargetElement("SelectAvatars")]
+    public class SelectAvatarsTagHelper : SelectModel
     {
-        public AvatarSelectTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper)
+        [HtmlAttributeName("RandomSet")]
+        public bool RandomSet { get; set; }
+
+        public SelectAvatarsTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper)
         {
         }
 
@@ -128,18 +132,22 @@ namespace Web
             {
                 Items.Add(item.Name, item.FullName.Replace(System.IO.Directory.GetCurrentDirectory() + "\\wwwroot", ""));
             }
+            if (RandomSet && Default == null)
+            {
+                Default = Items.Skip(new Random().Next(0, Items.Count)).Take(1).FirstOrDefault().Value;
+            }
             Output.TagName = "";
-            Output.Content.SetHtmlContent(await Html.PartialAsync("/Views/Shared/_Select_Avatar.cshtml", this));
+            Output.Content.SetHtmlContent(await Html.PartialAsync("/Views/Shared/_Select.cshtml", this));
         }
     }
-    [HtmlTargetElement("SelectEnum")]
-    public class SelectEnumTagHelper : SelectModel
+    [HtmlTargetElement("SelectEnums")]
+    public class SelectEnumsTagHelper : SelectModel
     {
         [HtmlAttributeName("Enum")]
         public Type EnumValue { get; set; }
 
 
-        public SelectEnumTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper)
+        public SelectEnumsTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper)
         {
         }
         public override async Task ProcessAsync(TagHelperContext Context, TagHelperOutput Output)
@@ -147,6 +155,28 @@ namespace Web
             foreach (var item in Enum.GetValues(EnumValue))
             {
                 Items.Add(item.ToString(), (int)item);
+            }
+            Output.TagName = "";
+            Output.Content.SetHtmlContent(await Html.PartialAsync("/Views/Shared/_Select.cshtml", this));
+        }
+    }
+
+
+    [HtmlTargetElement("SelectUsers")]
+    public class SelectUsersTagHelper : SelectModel
+    {
+        public new List<(int, string, string)> Items { get; set; } = new List<(int, string, string)>();
+
+        public SelectUsersTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper)
+        {
+        }
+
+        public override async Task ProcessAsync(TagHelperContext Context, TagHelperOutput Output)
+        {
+            var DB = (Models.DBContext)VContext.HttpContext.RequestServices.GetService(typeof(Models.DBContext));
+            foreach (var item in DB.TMT_Users.AsNoTracking().Where(c => c.Enable))
+            {
+                Items.Add((item.UserID, item.UserName, item.Avatar));
             }
             Output.TagName = "";
             Output.Content.SetHtmlContent(await Html.PartialAsync("/Views/Shared/_Select.cshtml", this));

@@ -23,8 +23,6 @@ namespace Web.Models
         [ForeignKey("RoleID")]
         public virtual TMT_Roles Role { get; set; }
 
-        [ForeignKey("DefaultProjectID")]
-        public virtual TMT_Projects DefaultProject { get; set; }
         public virtual ICollection<TMT_Documents> Documents { get; set; }
     }
 }

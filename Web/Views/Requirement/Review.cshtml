@@ -1,0 +1,51 @@
+﻿@{
+    Layout = null;
+}
+<div class="header">需求评审</div>
+<div class="content">
+    <div class="ui form tiny">
+        <input type="hidden" id="RequirementID" value="@ViewBag.RequirementID">
+        <div class="ui fields two">
+            <div class="field">
+                <label>评审结果</label>
+                <div class="ui selection dropdown">
+                    <input type="hidden" id="Agree" value="">
+                    <i class="dropdown icon"></i>
+                    <div class="default text"></div>
+                    <div class="menu">
+                        <div class="item" data-value="true">通过</div>
+                        <div class="item" data-value="false">拒绝</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="field">
+            <label>评审备注</label>
+            <textarea rows="5" id="Remark"></textarea>
+        </div>
+    </div>
+</div>
+<script>
+    var modal_action = {
+        review: function () {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                var data = $(target).parents('.ui.modal').find('.ui.form').getdata();
+                ajax.post('/Requirement/Review', data, function () {
+                    if (target) { $(target).load_show(); }
+                }, function (success, data) {
+                    if (target) {
+                        $(target).load_hide();
+                    }
+                    if (success && data.Success) {
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+    };
+</script>
+<div class="actions">
+    <button class="ui button green small" onclick="modal_action.review()">保存</button>
+    <button class="ui button cancel black small">取消</button>
+</div>

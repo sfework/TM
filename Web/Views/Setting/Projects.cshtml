@@ -4,8 +4,8 @@
 }
 @model Setting.ProjectsManagementList
 <div class="context_box">
-    <div class="searchbox" data-tag="userM">
-        <div class="ui form mini">
+    <div class="searchbox">
+        <div class="ui form tiny">
             <div class="inline fields">
                 <div class="field">
                     <label>关键字</label>
@@ -27,14 +27,14 @@
     </div>
     @foreach (var item in Model.List)
     {
-        <div class="ui segments mini">
+        <div class="ui segments">
             <div class="ui segment @(item.State==0?"green":"red")">
                 <p>
                     <i class="briefcase icon grey"></i>
                     @item.ProjectName
                 </p>
             </div>
-            <div class="ui secondary segment">
+            <div class="ui segment">
                 @foreach (var U in item.D_Users)
                 {
                     <div class="ui image label small">

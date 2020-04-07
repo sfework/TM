@@ -7,16 +7,6 @@ namespace Web.ParamModels
 {
     public class Requirement
     {
-        public class Requirement_Model
-        {
-            /// <summary>
-            /// 0为新增，1为查看，2为编辑
-            /// </summary>
-            public int TP { get; set; }
-            public Models.TMT_Requirements Requirement { get; set; }
-            public IQueryable<Models.TMT_Users> Users { get; set; }
-            public IQueryable<Models.TMT_Modules> Modules { get; set; }
-        }
         public class Requirement_Index : PageModel<Models.TMT_Requirements>
         {
             /// <summary>
@@ -26,7 +16,6 @@ namespace Web.ParamModels
             public Models.DBEnums.RequirementStatus? Status { get; set; }
             public string KeyWord { get; set; }
             public int? ModuleID { get; set; }
-            public IQueryable<Models.TMT_Modules> Modules { get; set; }
         }
         public class Requirement_Add_Model
         {
@@ -36,7 +25,6 @@ namespace Web.ParamModels
             public int AuditorUserID { get; set; }
             public int EmergencyLevel { get; set; }
             public string Content { get; set; }
-            public int SaveType { get; set; } = 0;
         }
     }
 }

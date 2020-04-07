@@ -11,9 +11,9 @@ namespace Web.Models
         {
             草稿 = 0,
             待审 = 1,
-            拒审 = 2,
-            已审 = 3,
-            关闭 = 4
+            拒绝 = 2,
+            通过 = 3,
+            归档 = 4
         }
         public enum LogType
         {

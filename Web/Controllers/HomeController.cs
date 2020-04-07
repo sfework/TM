@@ -9,38 +9,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Web.Controllers
 {
     public class HomeController : ControllersBase
     {
-        public string GenerateCheckCode(int codeCount)
-        {
-            string str = string.Empty;
-            var rep = new Random().Next(1, int.MaxValue);
-            long num2 = DateTime.Now.Ticks + rep;
-            Random random = new Random(((int)(((ulong)num2) & 0xffffffffL)) | ((int)(num2 >> rep)));
-            for (int i = 0; i < codeCount; i++)
-            {
-                char ch;
-                int num = random.Next();
-                if ((num % 2) == 0)
-                {
-                    ch = (char)(0x30 + ((ushort)(num % 10)));
-                }
-                else
-                {
-                    ch = (char)(0x41 + ((ushort)(num % 0x1a)));
-                }
-                str = str + ch.ToString();
-            }
-            return str;
-        }
         [AllowAnonymous]
         public IActionResult Index()
         {
-            if (User == null)
+            if (G?.User == null)
             {
                 return View("Login");
             }
@@ -72,21 +51,23 @@ namespace Web.Controllers
             }
             Temp.LastLoginDate = DateTime.Now;
             DB.SaveChanges();
-            Session.Add("Web_Auth", new Command.UserModel
+            Session.Add("Web_System", new SystemModel.Model
             {
-                UserID = Temp.UserID,
-                UserName = Temp.UserName,
-                Avatar = Temp.Avatar,
-                Auths = Array.ConvertAll(Temp.Role.Auths.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries), c => int.Parse(c)),
-                RoleName = Temp.Role.RoleName,
-                DefaultProjectID = Temp.DefaultProjectID,
-                DefaultProjectName = Temp.DefaultProject?.ProjectName
+                User = new SystemModel.UserModel
+                {
+                    UserID = Temp.UserID,
+                    UserName = Temp.UserName,
+                    Avatar = Temp.Avatar,
+                    Auths = Array.ConvertAll(Temp.Role.Auths.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries), c => int.Parse(c)),
+                    RoleName = Temp.Role.RoleName,
+                    DefaultProjectID = Temp.DefaultProjectID
+                }
             });
             return Json();
         }
         public IActionResult Logout()
         {
-            Session.Remove("Web_Auth");
+            Session.Remove("Web_System");
             return Redirect("/");
         }
 
@@ -94,17 +75,16 @@ namespace Web.Controllers
         [HttpPost]
         public IActionResult ProjectSet(int ProjectID)
         {
-            var Project = Projects.FirstOrDefault(c => c.ProjectID == ProjectID);
+            var Project = G.UsableProject.FirstOrDefault(c => c.ProjectID == ProjectID);
             if (Project == null)
             {
-                return Json("无权访问此项目！");
+                return Json("无权访问此项目或此项目不存在！");
             }
-            var Model = DB.TMT_Users.Find(User.UserID);
+            var Model = DB.TMT_Users.Find(G.User.UserID);
             Model.DefaultProjectID = Project.ProjectID;
-            User.DefaultProjectID = Project.ProjectID;
-            User.DefaultProjectName = Project.ProjectName;
-            Session.Add("Web_Auth", User);
+            G.User.DefaultProjectID = Project.ProjectID;
             DB.SaveChanges();
+            Session.Add("Web_System", G);
             return Json();
         }
 

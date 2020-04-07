@@ -1,0 +1,166 @@
+﻿@{
+    ViewData["Title"] = "新增需求";
+}
+@model TMT_Requirements
+<link href="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.css" rel="stylesheet">
+<script src="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.js"></script>
+<style>
+    .segments.basic { margin: 0 !important; float: right !important; }
+    .segments.basic > .segment.basic { padding: 0 !important; margin: 0 !important; }
+    .Context { background: #f9f9f9; }
+    .context_box { float: left !important; display: flex; flex-direction: column; flex: 1; overflow: hidden; padding: 40px; background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
+    .jodit_workplace { border: 0 !important; margin-top: 10px; flex: 1; }
+    .jodit_wysiwyg { padding: 0 !important; height: 100%; }
+    .jodit_container { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+</style>
+<div class="ui segments basic">
+    <div class="ui left floated segment basic">
+        <div class="ui form tiny">
+            <div class="inline fields" style="margin-bottom:0;">
+                <div class="field">
+                    <label>项目</label>
+                    <div class="ui label basic">
+                        <i class="briefcase icon"></i> @G.NowProject.ProjectName
+                    </div>
+                </div>
+                <div class="field">
+                    <label>所属模块</label>
+                    <div class="ui selection dropdown" style="width:170px;">
+                        <input type="hidden" id="ModuleID" value="@Model?.ModuleID">
+                        <i class="dropdown icon"></i>
+                        <div class="default text"></div>
+                        <div class="menu">
+                            @foreach (var item in G.NowProject.Modules)
+                            {
+                                <div class="item" data-value="@item.ModuleID">@item.ModuleName</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>评审人</label>
+                    <SelectUsers Width="160" Clearable="false" Fluid="false" ID="AuditorUserID" Default="Model?.AuditorUserID"></SelectUsers>
+                </div>
+                <div class="field">
+                    <label>优先级</label>
+                    <div class="ui grey rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?0:Model.EmergencyLevel)" data-max-rating="5"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ui right floated segment basic">
+        @if (Model == null || Model.Status == DBEnums.RequirementStatus.草稿)
+        {
+            <div class="ui button green small" onclick="modal_action.save(0)">保存</div>
+        }
+        <div class="ui button blue small" onclick="modal_action.save(1)">发布</div>
+    </div>
+</div>
+<div class="ui divider"></div>
+<div class="context_box">
+    <input type="hidden" id="RequirementID" value="@Model?.RequirementID" />
+    <div class="ui transparent input fluid" style="margin-bottom:20px;">
+        <input type="text" id="Title" placeholder="需求标题..." value="@Model?.Title" style="font-size:28px;font-weight:bold !important;" autocomplete="off">
+    </div>
+    <div class="strbox">
+        @(Model==null?null: Html.Raw(Model.Detailes.FirstOrDefault(c=>c.Version==Model.NowVersion).Content))
+    </div>
+</div>
+<script>
+    var modal_action = {
+        edit_obj: null,
+        init: function () {
+            modal_action.edit();
+            $('#EmergencyLevel').rating({
+                onRate: function (value) {
+                    $(this).removeClass('green olive yellow orange red grey');
+                    switch (value) {
+                        case 1:
+                            $(this).addClass('green');
+                            break;
+                        case 2:
+                            $(this).addClass('olive');
+                            break;
+                        case 3:
+                            $(this).addClass('yellow');
+                            break;
+                        case 4:
+                            $(this).addClass('orange');
+                            break;
+                        case 5:
+                            $(this).addClass('red');
+                            break;
+                    }
+                }
+            }).rating('set rating', $('#EmergencyLevel').rating('get rating'));
+        },
+        edit: function () {
+            modal_action.edit_obj = new Jodit(".strbox", {
+                //"autofocus": true,
+                "language": "zh_cn",
+                "direction": "ltr",
+                "enter": "P",
+                "defaultMode": "1",
+                "showCharsCounter": false,
+                "showWordsCounter": false,
+                "showXPathInStatusbar": false,
+                "askBeforePasteHTML": false,
+                "askBeforePasteFromWord": false,
+                "placeholder": "",
+                //"min-height": 800,
+                "allowResizeX": false,
+                "allowResizeY": false,
+                "buttons": "paragraph,brush,|,bold,strikethrough,underline,italic,eraser,|,outdent,indent,|,image,file,video,table,link,|,align,undo,redo,hr",
+                //"buttons": "paragraph,brush,|,bold,strikethrough,underline,italic,eraser,|,outdent,indent,|,image,file,video,table,link,|,align,undo,redo,hr,fullsize",
+                uploader: {
+                    url: '/Home/Edit_UPload'
+                },
+            });
+        },
+        save: function (tp) {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                var data = {
+                    RequirementID: $('#RequirementID').val(),
+                    AuditorUserID: $('#AuditorUserID').val(),
+                    ModuleID: $('#ModuleID').val(),
+                    EmergencyLevel: $('#EmergencyLevel').rating('get rating'),
+                    Content: modal_action.edit_obj.getEditorValue(),
+                    Title: $('#Title').val()
+                };
+                var _url = '/Requirement/Save';
+                if (tp == 0) {
+                    ajax.post(_url, data, function () { $(target).load_show(); },
+                        function (success, data) {
+                            $(target).load_hide();
+                            if (success && data.Success) {
+                                if (document.referrer) {
+                                    window.location.href = document.referrer;
+                                }
+                                else {
+                                    window.location.href = '/Requirement/Index';
+                                }
+                            }
+                        });
+                }
+                else {
+                    _url = '/Requirement/Publish';
+                    modal.ask('发布后将进行需求版本控制，确认发布此需求？', function () {
+                        ajax.post(_url, data, function () { $(target).load_show(); }, function (success, data) {
+                            $(target).load_hide();
+                            if (success && data.Success) {
+                                if (document.referrer) {
+                                    window.location.href = document.referrer;
+                                }
+                                else {
+                                    window.location.href = '/Requirement/Index';
+                                }
+                            }
+                        });
+                    });
+                }
+            }
+        }
+    };
+    modal_action.init();
+</script>

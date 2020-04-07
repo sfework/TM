@@ -15,9 +15,7 @@ namespace Web.Models
         public int ProjectID { get; set; }
         public int ModuleID { get; set; }
         public int AuditorUserID { get; set; }
-
-
-        public DateTime CreateDate { get; set; }
+        public DateTime LastUPDate { get; set; }
         public int CreateUserID { get; set; }
         public int NowVersion { get; set; }
 
@@ -30,5 +28,7 @@ namespace Web.Models
         [ForeignKey("AuditorUserID")]
         public virtual TMT_Users AuditorUser { get; set; }
         public virtual ICollection<TMT_Requirements_Detaile> Detailes { get; set; }
+
+        public virtual ICollection<TMT_Logs> Logs { get; set; }
     }
 }

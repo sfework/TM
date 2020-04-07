@@ -20,15 +20,15 @@
     </div>
 </div>
 <script>
-    var model_action = {
+    var modal_action = {
         edit_obj: null,
         edit: function () {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
-                if (model_action.edit_obj) {
+                if (modal_action.edit_obj) {
                     var data = {
                         DocumentID: '@Model.DocumentID',
-                        Content: model_action.edit_obj.getEditorValue()
+                        Content: modal_action.edit_obj.getEditorValue()
                     };
                     ajax.post('/Document/Document_Save', data, function () {
                         if (target) { $(target).load_show(); };
@@ -37,15 +37,15 @@
                             $(target).load_hide();
                         };
                         if (success && data.Success) {
-                            model_action.edit_obj.destruct();
-                            model_action.edit_obj = null;
+                            modal_action.edit_obj.destruct();
+                            modal_action.edit_obj = null;
                             $('.edit_tag').text('编辑');
                         };
                     });
                     return;
                 }
                 $('.edit').addClass('edit_content');
-                model_action.edit_obj = new Jodit(".context_con", {
+                modal_action.edit_obj = new Jodit(".context_con", {
                     "autofocus": true,
                     "language": "zh_cn",
                     "direction": "ltr",
@@ -56,7 +56,7 @@
                     "showXPathInStatusbar": false,
                     "askBeforePasteHTML": false,
                     "askBeforePasteFromWord": false,
-                    "height": 500,
+                    "height": 600,
                     "allowResizeX": false,
                     "allowResizeY": false,
                     "buttons": "paragraph,brush,|,bold,strikethrough,underline,italic,eraser,|,outdent,indent,|,image,file,video,table,link,|,align,undo,redo,hr",
@@ -71,9 +71,9 @@
     };
 </script>
 <div class="actions">
-    @if (Model.CreateUserID == User.UserID)
+    @if (Model.CreateUserID == G.User.UserID)
     {
-        <a class="ui button left floated green small edit_tag" onclick="model_action.edit()">编辑</a>
+        <a class="ui button left floated green small edit_tag" onclick="modal_action.edit()">编辑</a>
     }
     <button class="ui button cancel black small">关闭</button>
 </div>

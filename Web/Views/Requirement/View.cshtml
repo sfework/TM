@@ -1,184 +1,138 @@
 ﻿@{
     ViewData["Title"] = "新增需求";
 }
-@model Web.ParamModels.Requirement.Requirement_Model
-<div class="ui breadcrumb" style="padding-left:25px;margin-top:10px;font-size:12px;">
-    <a class="section" href="/Requirement/Index">
-        <i class="briefcase icon"></i>
-        需求管理
-    </a>
-    <i class="right angle icon divider"></i>
-    <div class="active section">新增需求</div>
-</div>
-<style>
-    .jodit_workplace { min-height: 500px !important; }
-    .s_top { position: fixed !important; top: 10px; }
-</style>
-<div class="ui divider" style="margin-top:10px;margin-bottom: 0px;"></div>
+@model TMT_Requirements
 <link href="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.css" rel="stylesheet">
 <script src="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.js"></script>
-<div class="context_box" style="height:calc(100vh - 100px);">
-    <div class="req_add" style="display:flex;flex-direction:row;min-height:100%;">
-        <input type="hidden" id="RequirementID" value="@Model.Requirement?.RequirementID">
-        <div class="c_left" style="flex:1;">
-            <div class="ui form mini" style="min-height:100%;">
-                <div class="inline field" style="width:570px;">
-                    @if (Model.TP == 1)
-                    {
-                        <h2 class="ui header" style="display:inline-block;margin: 0 0.3em 0 0;">@Model.Requirement?.Title</h2>
-                        <div class="ui mini label horizontal basic">
-                            @Model.Requirement?.NowVersion
-                        </div>
-                    }
-                    else
-                    {
-                        <label>需求标题</label>
-                        <input type="text" id="Title" value="@Model.Requirement?.Title" style="width: 500px; " autocomplete="off">
-                    }
+<style>
+    .segments.basic { margin: 0 !important; }
+    .segments.basic > .segment.basic { padding: 0 !important; margin: 0 !important; }
+    .Context { background: #f9f9f9; }
+    .context_box { flex: 1; overflow: hidden; display: flex; flex-direction: row; }
+    .context_box > .cleft { flex: 1; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; background: #fff; padding: 40px; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
+    .context_box > .cright { width: 300px; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; margin-left: 2%; padding: 20px; background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
+    .context_box111 { display: flex; flex-direction: column; flex: 1; overflow: hidden; padding: 40px; width: 985px; margin-left: auto; margin-right: auto; background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
+    .strbox p { margin-bottom: 1px !important }
+</style>
+<div class="ui segments basic">
+    <div class="ui left floated segment basic">
+        <div class="ui form tiny">
+            <div class="inline fields" style="margin-bottom:0;">
+                <div class="field">
+                    <label>项目</label>
+                    <div class="ui label basic">
+                        <i class="briefcase icon"></i> @G.NowProject.ProjectName
+                    </div>
                 </div>
                 <div class="field">
-                    <div class="context_con"></div>
+                    <label>所属模块</label>
+                    <div class="ui label basic">
+                        <i class="archive icon"></i> @Model.Module.ModuleName
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="c_right" style="width:340px;margin-left:30px;">
-            <div class="ui form mini" id="c_right_l">
+                <div class="field">
+                    <label>评审人</label>
+                    <div class="ui image label basic">
+                        <img src="@Model.AuditorUser.Avatar">
+                        @Model.AuditorUser.UserName
+                    </div>
+                </div>
                 <div class="field">
                     <label>优先级</label>
-                    <div id="EmergencyLevel" class="ui teal rating @(Model.TP == 1?"disabled":"")" data-icon="star" data-rating="1" data-max-rating="5"></div>
-                </div>
-                <div class="field" style="width:253px;">
-                    <label>所属模块</label>
-                    @if (Model.TP == 1)
-                    {
-                        <div class="ui mini label">
-                            @Model.Requirement?.Module.ModuleName
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="ui selection dropdown" style="width:170px;">
-                            <input type="hidden" id="ModuleID" value="@Model.Requirement?.ModuleID">
-                            <i class="dropdown icon"></i>
-                            <div class="default text"></div>
-                            <div class="menu">
-                                @foreach (var item in Model.Modules)
-                                {
-                                    <div class="item" data-value="@item.ModuleID">@item.ModuleName</div>
-                                }
-                            </div>
-                        </div>
-                    }
-                </div>
-                <div class="field" style="margin-right: 14px;">
-                    <label style="width:47.64px;">评审人</label>
-                    @if (Model.TP == 1)
-                    {
-                        <div class="ui image label small blue">
-                            <img src="@Model.Requirement?.AuditorUser.Avatar">
-                            @Model.Requirement?.AuditorUser.UserName
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="ui selection dropdown" style="width:170px;">
-                            <input type="hidden" id="AuditorUserID" value="@Model.Requirement?.AuditorUserID">
-                            <i class="dropdown icon"></i>
-                            <div class="default text"></div>
-                            <div class="menu">
-                                @foreach (var item in Model.Users)
-                                {
-                                    <div class="item" data-value="@item.UserID">
-                                        <img class="ui avatar image" src="@item.Avatar">
-                                        @item.UserName
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    }
-                </div>
-                <div class="field" style="margin-top:25px;">
-                    <div class="ui button green small" onclick="page_action.save(0)">保存</div>
-                    <div class="ui button blue small" onclick="page_action.save(1)">发布</div>
+                    <div class="ui red rating disabled" id="EmergencyLevel" data-icon="star" data-rating="@Model.EmergencyLevel" data-max-rating="5"></div>
                 </div>
             </div>
         </div>
-
-
-
+    </div>
+    <div class="ui right floated segment basic">
+        @if ((Model.Status == DBEnums.RequirementStatus.草稿 || Model.Status == DBEnums.RequirementStatus.拒绝 || Model.Status == DBEnums.RequirementStatus.通过) && Model.CreateUserID == G.User.UserID)
+        {
+            <a class="ui button green small" href="/Requirement/Add?RequirementID=@Model.RequirementID">编辑</a>
+        }
+        @if (Model.Status == DBEnums.RequirementStatus.待审 && Model.AuditorUserID == G.User.UserID)
+        {
+            <div class="ui button orange small" onclick="modal.load('/Requirement/Review?RequirementID=@Model.RequirementID',400)">评审</div>
+        }
+        @if (Model.Status == DBEnums.RequirementStatus.通过 && Model.CreateUserID == G.User.UserID)
+        {
+            <div class="ui button red small" onclick="page_action.sealUP(@Model.RequirementID)">归档</div>
+        }
     </div>
 </div>
-<script>
-    $('.ui.rating').rating({
-        onRate: function (value) {
-            $(this).removeClass('teal blue violet purple red');
-            switch (value) {
-                case 1:
-                    $(this).addClass('teal');
-                    break;
-                case 2:
-                    $(this).addClass('blue');
-                    break;
-                case 3:
-                    $(this).addClass('violet');
-                    break;
-                case 4:
-                    $(this).addClass('purple');
-                    break;
-                case 5:
-                    $(this).addClass('red');
-                    break;
+<div class="ui divider" style="margin-top: 10px;"></div>
+<div class="context_box">
+    <div class="cleft">
+        <h1 class="ui header">
+            @Model.Title
+            @if (Model.Status != DBEnums.RequirementStatus.草稿)
+            {
+                <span class="ui label basic">@Model.NowVersion</span>
             }
-        }
-    });
+        </h1>
+        <div class="strbox">
+            @Html.Raw(Model.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
+        </div>
+    </div>
+    @if (Model.Status != DBEnums.RequirementStatus.草稿)
+    {
+        <div class="cright">
+            <div class="ui comments small">
+                @foreach (var item in Model.Logs)
+                {
+                    <div class="comment">
+                        <a class="avatar">
+                            <img src="@item.TriggerUser.Avatar">
+                        </a>
+                        <div class="content">
+                            <a class="author">@item.TriggerUser.UserName</a>
+                            <div class="metadata">
+                                <span class="date">@item.CreateDate</span>
+                            </div>
+                            <div class="text">
+                                @Html.Raw(item.Content)
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+<script>
     var page_action = {
-        edit_obj: null,
-        edit: function () {
-            page_action.edit_obj = new Jodit(".context_con", {
-                "autofocus": true,
-                "language": "zh_cn",
-                "direction": "ltr",
-                "enter": "P",
-                "defaultMode": "1",
-                "showCharsCounter": false,
-                "showWordsCounter": false,
-                "showXPathInStatusbar": false,
-                "askBeforePasteHTML": false,
-                "askBeforePasteFromWord": false,
-                "min-height": 800,
-                "allowResizeX": false,
-                "allowResizeY": false,
-                //"buttons": "paragraph,brush,|,bold,strikethrough,underline,italic,eraser,|,outdent,indent,|,image,file,video,table,link,|,align,undo,redo,hr",
-                "buttons": "paragraph,brush,|,bold,strikethrough,underline,italic,eraser,|,outdent,indent,|,image,file,video,table,link,|,align,undo,redo,hr,fullsize",
-                uploader: {
-                    url: '/Home/Edit_UPload'
-                },
+        init: function () {
+            $('#EmergencyLevel').rating({
+                onRate: function (value) {
+                    $(this).removeClass('teal blue violet purple red');
+                    switch (value) {
+                        case 1:
+                            $(this).addClass('teal');
+                            break;
+                        case 2:
+                            $(this).addClass('blue');
+                            break;
+                        case 3:
+                            $(this).addClass('violet');
+                            break;
+                        case 4:
+                            $(this).addClass('purple');
+                            break;
+                        case 5:
+                            $(this).addClass('red');
+                            break;
+                    }
+                }
             });
         },
-        save: function (tp) {
-            if (event && event.currentTarget) {
-                var target = event.currentTarget;
-                var data = $('.req_add').getdata();
-                data['EmergencyLevel'] = $('#EmergencyLevel').rating('get rating');
-                data['Content'] = page_action.edit_obj.getEditorValue();
-                data['SaveType'] = tp;
-                ajax.post('/Requirement/Add', data, function () { $(target).load_show(); },
-                    function (success, data) {
-                        $(target).load_hide();
-                        if (success && data.Success) {
-                            //window.location.href = '/';
-                        }
-                    });
-            }
+        sealUP: function (id) {
+            modal.ask('确认归档此需求？', function () {
+                ajax.post('/Requirement/SealUP', { RequirementID: id }, null, function (s, d) {
+                    if (s && d.Success) {
+                        window.location.reload();
+                    }
+                });
+            });
         }
     };
-    page_action.edit();
-    $(window).scroll(function () {
-        if ($(window).scrollTop() >= 100) {
-            $('#c_right_l').addClass('s_top');
-        }
-        else {
-            $('#c_right_l').removeClass('s_top');
-        }
-    });
+    page_action.init();
 </script>

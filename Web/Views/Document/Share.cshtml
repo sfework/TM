@@ -4,13 +4,13 @@
 }
 @model TMT_Documents
 <style>
-    .a_ctr { width: 600px; margin: auto; padding-top: 50px; }
-    .a_ctr .header_text { padding: 0px 20px 20px 0px; text-align: center; font-size: 18px; font-weight: bold; }
-    .c_bg { background: #f9f9f9; padding-top: 20px; padding-bottom: 20px; }
-    .c_bg > .c_ctr { width: 1000px; margin: auto; background: #fff; padding: 40px; margin-top: 10px; margin-bottom: 10px; }
-    .c_bg > .c_ctr > .c_header { font-size: 26px; font-weight: bold; padding-bottom: 10px;  }
+    .a_ctr { width: 350px; margin-left:auto;margin-right:auto;margin-top:15%; }
+
+    .c_bg { background: #f9f9f9; width: 100%; overflow: auto; }
+    .c_bg > .c_ctr { width: 1000px; margin: auto; background: #fff; padding: 40px; margin-top: 20px; margin-bottom: 20px; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
+    .c_bg > .c_ctr > .c_header { font-size: 28px; font-weight: bold; padding-bottom: 20px;  }
     .c_bg > .c_ctr > .c_con { padding-top: 10px; }
-    .c_bg > .c_ctr > .c_av { position: relative; height: 45px; border-bottom: solid 1px #eaeaea; line-height: 35px;}
+    .c_bg > .c_ctr > .c_av { position: relative; height: 45px; border-bottom: solid 1px #eaeaea;margin-bottom:10px; line-height: 35px;}
     .c_bg > .c_ctr > .c_av > .c_av_a { position: absolute; left: 0; }
     .c_bg > .c_ctr > .c_av > .c_av_b { position: absolute; right: 0; }
 </style>
@@ -37,18 +37,27 @@
 }
 @if (Model.DocumentType == 2)
 {
-    <div class="a_ctr">
-        <div class="ui placeholder segment">
-            <div class="ui icon header">
-                <div class="f_icon @Model.Class" style="margin: auto; "></div>
+<div class="a_ctr">
+    <div class="ui raised card centered basic small" id="view_att" style="width:100%;border:0;box-shadow:none;">
+        <div class="content" style="padding-top:0;">
+            <div class="description" style="text-align:center;">
+                <div class="f_icon cen @Model.Class"></div>
+                <div class="header" style="font-weight:bold;">@Model.DocumentName</div>
             </div>
-            <div class="header_text">
-                @Model.DocumentName
+        </div>
+        <div class="extra content" style="padding:0.75em 0em;">
+            <div class="ui image label left floated basic">
+                <img src="@Model.User.Avatar">
+                @Model.User.UserName
             </div>
-            <a class="ui labeled icon button blue" href="@Model.Content" download="@Model.DocumentName">
-                <i class="download icon"></i>
-                下载
-            </a>
+            <div class="right floated author" style="font-size: 12px; margin-top: 5px;">
+                <i class="clock outline icon"></i>
+                @Model.CreateDate
+            </div>
+        </div>
+        <div style="margin-top:30px;">
+            <a class="ui button green left floated small fluid" href="@Model.Content" download="@Model.DocumentName">下载</a>
         </div>
     </div>
+</div>
 }

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Razor.Internal;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
@@ -13,18 +15,11 @@ namespace Web
 {
     public abstract class CustomRazorPage<TModel> : Microsoft.AspNetCore.Mvc.Razor.RazorPage<TModel>
     {
-        public new Command.UserModel User
+        public SystemModel.Model G
         {
             get
             {
-                return (Command.UserModel)Context.Items["Web_User"];
-            }
-        }
-        public IQueryable<Models.TMT_Projects> Projects
-        {
-            get
-            {
-                return (IQueryable<Models.TMT_Projects>)Context.Items["Web_Usable_Projects"];
+                return (SystemModel.Model)Context.Items["Web_System"];
             }
         }
     }
@@ -35,17 +30,40 @@ namespace Web
         [ControllerInject]
         public Models.DBContext DB { get; set; }
 
-        public new Command.UserModel User { get; set; }
-
-        public IQueryable<Models.TMT_Projects> Projects { get; set; }
+        public SystemModel.Model G { get; set; }
 
         public override void OnActionExecuting(ActionExecutingContext Context)
         {
-            User = (Command.UserModel)HttpContext.Items["Web_User"];
-            if (User != null)
+            G = (SystemModel.Model)HttpContext.Items["Web_System"];
+            if (G?.User != null)
             {
-                Projects = DB.TMT_Projects.Where(c => ("," + c.Users + ",").IndexOf("," + User.UserID.ToString() + ",") > -1 && c.State == 0);
-                Context.HttpContext.Items.Add("Web_Usable_Projects", Projects);
+                //查询可用项目
+                var Projects = DB.TMT_Projects.AsNoTracking().Where(c => ("," + c.Users + ",").IndexOf("," + G.User.UserID.ToString() + ",") > -1 && c.State == 0);
+                G.UsableProject = new List<SystemModel.UsableProjects>();
+                foreach (var item in Projects)
+                {
+                    G.UsableProject.Add(new SystemModel.UsableProjects { ProjectID = item.ProjectID, ProjectName = item.ProjectName });
+                }
+                //读取当前默认项目
+                var NowProject = DB.TMT_Projects.Find(G.User.DefaultProjectID);
+                if (NowProject != null)
+                {
+                    G.NowProject = new SystemModel.NowProjectModel
+                    {
+                        ProjectID = NowProject.ProjectID,
+                        ProjectName = NowProject.ProjectName
+                    };
+                    G.NowProject.ProjectUser = DB.TMT_Users.FromSqlRaw(string.Format("select * from TMT_Users where UserID in ({0}) and IsDelete=0", NowProject.Users)).Select(c => new SystemModel.ProjectUsers { UserID = c.UserID, UserName = c.UserName }).ToList();
+                    G.NowProject.Modules = DB.TMT_Modules.Where(c => c.ProjectID == NowProject.ProjectID).Select(c => new SystemModel.Modules { ModuleID = c.ModuleID, ModuleName = c.ModuleName }).ToList();
+                }
+                Context.HttpContext.Items["Web_System"] = G;
+            }
+            if (G?.NowProject == null && Context.Controller.GetType().IsDefined(typeof(NeedSetProject)))
+            {
+                Context.Result = new ViewResult
+                {
+                    ViewName = "_NoSetProject"
+                };
             }
         }
         public JsonResult Json()

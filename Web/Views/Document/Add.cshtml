@@ -10,7 +10,7 @@
             @(Model == null ? "新建文件夹" : "编辑文件夹")
         </div>
         <div class="content">
-            <div class="ui form mini" id="document_add">
+            <div class="ui form tiny" id="document_add">
                 <input type="hidden" id="PathID" value="@ViewBag.PathID">
                 <input type="hidden" id="DocumentType" value="@ViewBag.DocumentType">
                 <input type="hidden" id="DocumentID" value="@Model?.DocumentID">
@@ -45,7 +45,7 @@
             @(Model == null ? "新建文档" : "编辑文档")
         </div>
         <div class="content">
-            <div class="ui form mini" id="document_add">
+            <div class="ui form tiny" id="document_add">
                 <input type="hidden" id="PathID" value="@ViewBag.PathID">
                 <input type="hidden" id="DocumentType" value="@ViewBag.DocumentType">
                 <input type="hidden" id="DocumentID" value="@Model?.DocumentID">
@@ -96,7 +96,7 @@
             @(Model == null ? "新建附件" : "编辑附件")
         </div>
         <div class="content">
-            <div class="ui form mini" id="document_add">
+            <div class="ui form tiny" id="document_add">
                 <input type="hidden" id="PathID" value="@ViewBag.PathID">
                 <input type="hidden" id="DocumentType" value="@ViewBag.DocumentType">
                 <input type="hidden" id="DocumentID" value="@Model?.DocumentID">
@@ -142,8 +142,8 @@
                     <label>选择附件</label>
                     <div class="ui action input">
                         <input type="text" readonly="readonly">
-                        <input type="file" id="File" style="display:none;" onchange="model_action.sf()" />
-                        <button class="ui icon button" onclick="model_action.up()">
+                        <input type="file" id="File" style="display:none;" onchange="modal_action.sf()" />
+                        <button class="ui icon button" onclick="modal_action.up()">
                             <i class="upload icon"></i>
                         </button>
                     </div>
@@ -157,7 +157,7 @@
             @(Model == null ? "新建链接" : "编辑链接")
         </div>
         <div class="content">
-            <div class="ui form mini" id="document_add">
+            <div class="ui form tiny" id="document_add">
                 <input type="hidden" id="PathID" value="@ViewBag.PathID">
                 <input type="hidden" id="DocumentType" value="@ViewBag.DocumentType">
                 <input type="hidden" id="DocumentID" value="@Model?.DocumentID">
@@ -192,7 +192,7 @@
         break;
 }
 <script>
-    var model_action = {
+    var modal_action = {
         save: function () {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
@@ -204,7 +204,7 @@
                         $(target).load_hide();
                     };
                     if (success && data.Success) {
-                        page_action.reload();
+                        window.location.reload();
                     };
                 });
             }
@@ -226,6 +226,6 @@
     };
 </script>
 <div class="actions">
-    <button class="ui button green small" onclick="model_action.save()">保存</button>
+    <button class="ui button green small" onclick="modal_action.save()">保存</button>
     <button class="ui button cancel black small">取消</button>
 </div>

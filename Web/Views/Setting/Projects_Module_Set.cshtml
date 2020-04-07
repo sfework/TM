@@ -4,14 +4,14 @@
 @model IQueryable<TMT_Modules>
 <div class="header"><i class="settings icon"></i>项目模块设置</div>
 <div class="content scrolling">
-    <div class="ui form mini">
+    <div class="ui form tiny">
         <div id="project_module_set" style="width:419px;">
             @foreach (var item in Model)
             {
                 <div class="item" style="width:200px;float:left;margin-bottom:10px;">
                     <div class="ui action input mini">
                         <input type="text" data-value="@item.ModuleID" value="@item.ModuleName" style="width:150px;">
-                        <button class="ui icon button red" onclick="model_action.del()">
+                        <button class="ui icon button red" onclick="modal_action.del()">
                             <i class="trash alternate outline icon"></i>
                         </button>
                     </div>
@@ -21,7 +21,7 @@
     </div>
 </div>
 <script>
-    var model_action = {
+    var modal_action = {
         save: function () {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
@@ -55,12 +55,12 @@
             }
         },
         new: function () {
-            $('#project_module_set').append('<div class="item" style="width:200px;float:left;margin-bottom:10px;"><div class="ui action input mini"><input type="text" style="width:150px;"><button class="ui icon button red" onclick="model_action.del()"><i class="trash alternate outline icon"></i></button></div></div>');
+            $('#project_module_set').append('<div class="item" style="width:200px;float:left;margin-bottom:10px;"><div class="ui action input mini"><input type="text" style="width:150px;"><button class="ui icon button red" onclick="modal_action.del()"><i class="trash alternate outline icon"></i></button></div></div>');
         }
     };
 </script>
 <div class="actions">
-    <button class="ui button left floated teal small" onclick="model_action.new()">新增</button>
-    <button class="ui button green small" onclick="model_action.save()">保存</button>
+    <button class="ui button left floated teal small" onclick="modal_action.new()">新增</button>
+    <button class="ui button green small" onclick="modal_action.save()">保存</button>
     <button class="ui button cancel black small">取消</button>
 </div>

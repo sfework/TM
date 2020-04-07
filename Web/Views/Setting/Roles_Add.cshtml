@@ -4,10 +4,10 @@
 @model TMT_Roles
 <div class="header">
     <i class="user tag icon"></i>
-    @(Model==null? "新增角色" : "编辑角色")
+    @(Model == null ? "新增角色" : "编辑角色")
 </div>
 <div class="content">
-    <div class="ui form mini rolesM">
+    <div class="ui form tiny">
         <input type="hidden" id="RoleID" value="@Model?.RoleID">
         <div class="inline fields">
             <div class="field">
@@ -17,17 +17,30 @@
         </div>
     </div>
     <div class="ui form mini rolesA" id="rolesA" style="float:left;font-size:12px;">
-        <partial name="_Authority" model="new object[] { true, Model?.Auths }" />
+        @{
+            var Auths = string.IsNullOrWhiteSpace(Model?.Auths) ? new int[] { } : Array.ConvertAll(Model.Auths.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries), c => int.Parse(c));
+        }
+        @foreach (var T1 in Web.Command.AuthHelp.Get())
+        {
+            <div class="field left_clear">
+                <div class="grouped fields">
+                    <div class="header" style="font-weight:bold;">@T1.Tag</div>
+                    @foreach (var T2 in T1.Auths)
+                    {
+                        <div class="field">
+                            <div class="ui checkbox">
+                                <input type="checkbox" value="@T2.Value" @(Auths.Contains(T2.Value) ? "checked=\"\"" : "")>
+                                <label>@T2.Key</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
     </div>
 </div>
 <script>
-    var model_action = {
-        init: function () {
-            @*var auths = [@Model?.Auths];
-            for (var i = 0; i < auths.length; i++) {
-                $('.rolesA input:checkbox[value="' + auths[i] + '"]').attr("checked", true)
-            }*@
-        },
+    var modal_action = {
         getAuths: function () {
             var objs = $('#rolesA input:checkbox:checked');
             var auths = new Array();
@@ -37,30 +50,28 @@
             return auths.join(',');
         },
         save: function () {
-            var target = null;
-            if (event) {
-                target = event.currentTarget;
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                var data = {
+                    RoleID: $('#RoleID').val(),
+                    RoleName: $('#RoleName').val(),
+                    Auths: modal_action.getAuths()
+                };
+                ajax.post('/Setting/Roles_Add_Save', data, function () {
+                    if (target) { $(target).load_show(); }
+                }, function (success, data) {
+                    if (target) {
+                        $(target).load_hide();
+                    }
+                    if (success && data.Success) {
+                        window.location.reload();
+                    }
+                });
             }
-            let data = {
-                RoleID: $('.rolesM #RoleID').val(),
-                RoleName: $('.rolesM #RoleName').val(),
-                Auths: model_action.getAuths()
-            };
-            ajax.post('/Setting/Roles_Add_Save', data, function () {
-                if (target) { $(target).load_show(); }
-            }, function (success, data) {
-                if (target) {
-                    $(target).load_hide();
-                }
-                if (success && data.Success) {
-                    window.location.reload();
-                }
-            });
         }
     };
-    model_action.init();
 </script>
 <div class="actions" style="clear:left;">
-    <button class="ui button green small" onclick="model_action.save()">保存</button>
+    <button class="ui button green small" onclick="modal_action.save()">保存</button>
     <button class="ui button cancel black small">取消</button>
 </div>

@@ -15,7 +15,7 @@ namespace Web.Controllers
             {
                 Model.IsSearch = true;
                 Model.Paths = new List<(int, string, string, bool)>();
-                Model.List = DB.TMT_Documents.Where(c => c.DocumentName.Contains(Model.KeyWord) && c.DocumentType != 0 && (c.CreateUserID == User.UserID || c.IsPublic)).OrderBy(c => c.DocumentType);
+                Model.List = DB.TMT_Documents.Where(c => c.DocumentName.Contains(Model.KeyWord) && (c.CreateUserID == G.User.UserID || c.IsPublic)).OrderBy(c => c.DocumentType);
             }
             else
             {
@@ -30,7 +30,7 @@ namespace Web.Controllers
                     ID++;
                 }
                 Model.Paths = Paths.OrderByDescending(c => c.Item1).ToList();
-                Model.List = DB.TMT_Documents.Where(c => c.PathID == Model.DocumentID && (c.CreateUserID == User.UserID || c.IsPublic)).OrderBy(c => c.DocumentType);
+                Model.List = DB.TMT_Documents.Where(c => c.PathID == Model.DocumentID && (c.CreateUserID == G.User.UserID || c.IsPublic)).OrderBy(c => c.DocumentType);
             }
             Model.SharePath = HttpContext.Request.Scheme + "://" + HttpContext.Request.Host.ToString() + "/Document/Share?DocumentID=";
             return View(Model);
@@ -45,7 +45,7 @@ namespace Web.Controllers
             if (!string.IsNullOrWhiteSpace(DocumentID))
             {
                 Model = DB.TMT_Documents.Find(DocumentID);
-                if (Model.CreateUserID != User.UserID)
+                if (Model.CreateUserID != G.User.UserID)
                 {
                     return Json("无权编辑此文档，必须是文档的创建者！");
                 }
@@ -58,7 +58,7 @@ namespace Web.Controllers
             if (!string.IsNullOrWhiteSpace(Model.DocumentID))
             {
                 var TempModel = DB.TMT_Documents.Find(Model.DocumentID);
-                if (TempModel.CreateUserID != User.UserID)
+                if (TempModel.CreateUserID != G.User.UserID)
                 {
                     return Json("无权编辑此文档，必须是文档的创建者！");
                 }
@@ -88,7 +88,7 @@ namespace Web.Controllers
                         }
                         Model.DocumentID = Guid.NewGuid().ToString("N");
                         Model.Class = GetIcon(Model.DocumentType, Model.DocumentName);
-                        Model.CreateUserID = User.UserID;
+                        Model.CreateUserID = G.User.UserID;
                         DB.TMT_Documents.Add(Model);
                     }
                     DB.SaveChanges();
@@ -118,7 +118,7 @@ namespace Web.Controllers
                         Model.DocumentID = Guid.NewGuid().ToString("N");
                         Model.Class = GetIcon(Model.DocumentType, Model.DocumentName);
                         Model.Content = "";
-                        Model.CreateUserID = User.UserID;
+                        Model.CreateUserID = G.User.UserID;
                         Model.IsPublic = Model.IsPublic;
                         Model.IsShare = Model.IsShare;
                         DB.TMT_Documents.Add(Model);
@@ -161,7 +161,7 @@ namespace Web.Controllers
                         Model.DocumentID = Guid.NewGuid().ToString("N");
                         Model.Class = GetIcon(Model.DocumentType, Model.DocumentName);
                         Model.Content = ReFiles.First();
-                        Model.CreateUserID = User.UserID;
+                        Model.CreateUserID = G.User.UserID;
                         DB.TMT_Documents.Add(Model);
                     }
                     DB.SaveChanges();
@@ -194,7 +194,7 @@ namespace Web.Controllers
                         }
                         Model.DocumentID = Guid.NewGuid().ToString("N");
                         Model.Class = GetIcon(Model.DocumentType, Model.DocumentName);
-                        Model.CreateUserID = User.UserID;
+                        Model.CreateUserID = G.User.UserID;
                         DB.TMT_Documents.Add(Model);
                     }
                     DB.SaveChanges();
@@ -261,7 +261,7 @@ namespace Web.Controllers
         public IActionResult Delete(string DocumentID)
         {
             var Model = DB.TMT_Documents.Find(DocumentID);
-            if (Model.CreateUserID != User.UserID)
+            if (Model.CreateUserID != G.User.UserID)
             {
                 return Json("无权删除，必须是创建者！");
             }
@@ -274,7 +274,7 @@ namespace Web.Controllers
         public IActionResult Document_Save(string DocumentID, string Content)
         {
             var Model = DB.TMT_Documents.Find(DocumentID);
-            if (Model.CreateUserID != User.UserID)
+            if (Model.CreateUserID != G.User.UserID)
             {
                 return Json("无权编辑此文档，必须是文档的创建者才可编辑！");
             }
@@ -302,7 +302,7 @@ namespace Web.Controllers
         public IActionResult Document_View(string DocumentID)
         {
             var Model = DB.TMT_Documents.Find(DocumentID);
-            if (Model.CreateUserID == User.UserID || Model.IsPublic)
+            if (Model.CreateUserID == G.User.UserID || Model.IsPublic)
             {
                 return View(Model);
             }
@@ -314,7 +314,7 @@ namespace Web.Controllers
         public IActionResult Attachment_View(string DocumentID)
         {
             var Model = DB.TMT_Documents.Find(DocumentID);
-            if (Model.CreateUserID == User.UserID || Model.IsPublic)
+            if (Model.CreateUserID == G.User.UserID || Model.IsPublic)
             {
                 return View(Model);
             }

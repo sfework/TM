@@ -1,5 +1,5 @@
 ﻿@model PagingTagHelper
-<th colspan="@Model.LeftColspan" class="Paging" data-pagesize="@Model.PageSize" data-page="@Model.Page">
+<div class="paging" data-pagesize="@Model.PageSize">
     <div class="ui left labeled button small">
         <div class="ui basic right pointing label">
             @Model.Page / @Model.MaxPage
@@ -10,8 +10,8 @@
     </div>
     <div class="ui floating labeled icon dropdown button small">
         <i class="dropdown icon"></i>
-        <input type="hidden" value="@Model.PageSize" />
-        <span class="text">Menu</span>
+        <input type="hidden" value="@Model.PageSize">
+        <span class="text"></span>
         <div class="menu">
             <div class="item" data-value="10">10</div>
             <div class="item" data-value="15">15</div>
@@ -21,34 +21,34 @@
             <div class="item" data-value="100">100</div>
         </div>
     </div>
-</th>
-<th colspan="@Model.RightColspan" class="right aligned">
-    @if (Model.Page == 1)
-    {
-        <button class="ui labeled icon button disabled small">
-            <i class="left arrow icon"></i>
-            上一页
-        </button>
-    }
-    else
-    {
-        <button class="ui labeled icon button small" onclick="url.load('@(Model.Page-1)')">
-            <i class="left arrow icon"></i>
-            上一页
-        </button>
-    }
     @if (Model.Page == Model.MaxPage)
     {
-        <button class="ui right labeled icon button disabled small">
+        <button class="ui right labeled icon button disabled small right floated">
             <i class="right arrow icon"></i>
             下一页
         </button>
     }
     else
     {
-        <button class="ui right labeled icon button small" onclick="url.load('@(Model.Page+1)')">
+        <button class="ui right labeled icon button small right floated" onclick="url.load('@(Model.Page+1)')">
             <i class="right arrow icon"></i>
             下一页
         </button>
     }
-</th>
+    @if (Model.Page == 1)
+    {
+        <button class="ui labeled icon button disabled small right floated">
+            <i class="left arrow icon"></i>
+            上一页
+        </button>
+    }
+    else
+    {
+        <button class="ui labeled icon button small right floated" onclick="url.load('@(Model.Page-1)')">
+            <i class="left arrow icon"></i>
+            上一页
+        </button>
+    }
+
+</div>
+    

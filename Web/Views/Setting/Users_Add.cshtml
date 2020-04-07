@@ -7,31 +7,31 @@
     @(Model == null ? "新增用户" : "编辑用户")
 </div>
 <div class="content">
-    <div class="ui form mini">
+    <div class="ui form tiny">
         <input type="hidden" id="UserID" value="@Model?.UserID">
         <div class="two fields">
             <div class="field">
-                <img class="ui tiny image" id="av_img" style="border-radius:3px;" src="@(Model==null?"/Avatar/00.jpg":Model.Avatar)">
+                <img class="ui small image" id="av_img" style="border-radius:3px;" src="@(Model==null?"/Avatar/00.jpg":Model.Avatar)">
             </div>
             <div class="field">
                 <label>头像</label>
-                <AvatarSelect Clearable="false" ID="Avatar" Default="@(Model==null?"\\Avatar\\00.jpg":Model.Avatar)"></AvatarSelect>
+                <SelectAvatars RandomSet="true" Clearable="false" ID="Avatar" Default="@Model?.Avatar"></SelectAvatars>
             </div>
         </div>
         <div class="two fields">
             <div class="field">
                 <label>姓名</label>
-                <input type="text" id="UserName" value="@Model?.UserName">
+                <input type="text" id="UserName" value="@Model?.UserName" autocomplete="off">
             </div>
             <div class="field">
                 <label>角色</label>
-                <RoleSelect ID="RoleID" Clearable="false" Default="Model?.RoleID"></RoleSelect>
+                <SelectRoles ID="RoleID" Clearable="false" Default="Model?.RoleID"></SelectRoles>
             </div>
         </div>
         <div class="two fields">
             <div class="field">
                 <label>账号</label>
-                <input type="text" id="Account" value="@Model?.Account">
+                <input type="text" id="Account" value="@Model?.Account" autocomplete="off">
             </div>
             <div class="field">
                 <label>密码</label>
@@ -57,13 +57,14 @@
     </div>
 </div>
 <script>
-    var model_action = {
+    var modal_action = {
         init: function () {
             $('#Avatar').parents('.ui.dropdown').dropdown({
                 onChange: function (value, text, e) {
                     $('#av_img').attr('src', value);
                 }
             });
+            $('#av_img').attr('src', $('#Avatar').parents('.ui.dropdown').dropdown('get value'));
         },
         save: function () {
             if (event && event.currentTarget) {
@@ -82,9 +83,9 @@
             }
         }
     };
-    model_action.init();
+    modal_action.init();
 </script>
 <div class="actions">
-    <button class="ui button small green" onclick="model_action.save()">保存</button>
+    <button class="ui button small green" onclick="modal_action.save()">保存</button>
     <button class="ui button small cancel black">取消</button>
 </div>

@@ -7,14 +7,15 @@ namespace Web.ParamModels
 {
     public class Setting
     {
-        public class UsersManagementList : PageModel<Models.TMT_Users>
+        public class UsersList
         {
             public string KeyWord { get; set; }
             public int? RoleID { get; set; }
             public bool? Enable { get; set; }
+            public IQueryable<Models.TMT_Users> List { get; set; }
         }
 
-        public class RolesManagementList
+        public class RolesList
         {
             public string KeyWord { get; set; }
             public IQueryable<Models.TMT_Roles> List { get; set; }

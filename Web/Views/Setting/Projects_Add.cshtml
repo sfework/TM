@@ -4,12 +4,12 @@
 @model TMT_Projects
 <div class="header"><i class="briefcase icon"></i>@(Model == null ? "新增项目" : "编辑项目")</div>
 <div class="content">
-    <div class="ui form mini" id="project_add">
+    <div class="ui form tiny">
         <input type="hidden" id="ProjectID" value="@Model?.ProjectID">
         <div class="ui fields two">
             <div class="field">
                 <label>项目名称</label>
-                <input type="text" id="ProjectName" value="@Model?.ProjectName">
+                <input type="text" autocomplete="off" id="ProjectName" value="@Model?.ProjectName">
             </div>
             <div class="field">
                 <label>状态</label>
@@ -24,15 +24,9 @@
                 </div>
             </div>
         </div>
-        
         <div class="field">
             <label>项目人员</label>
-            <select class="ui fluid search five column dropdown" multiple="">
-                @foreach (var item in ViewBag.User)
-                {
-                    <option value="@item.UserID">@item.UserName</option>
-                }
-            </select>
+            <SelectUsers Columns="5" ID="ProjectUsers"></SelectUsers>
         </div>
         <div class="field">
             <label>项目描述</label>
@@ -41,16 +35,16 @@
     </div>
 </div>
 <script>
-    var model_action = {
+    var modal_action = {
         init: function () {
             var users = '@Model?.Users';
-            $('#project_add .field .ui.five.column.dropdown').dropdown('set selected',users.split(','));
+            $('#ProjectUsers').dropdown('set selected',users.split(','));
         },
         save: function () {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
-                var data = $('#project_add').getdata();
-                var users = $('#project_add .field .ui.five.column.dropdown').dropdown('get value');
+                var data = $(target).parents('.ui.modal').find('.ui.form').getdata();
+                var users = $('#ProjectUsers').dropdown('get value');
                 if (users !== null) {
                     data['Users'] = users.join(',');
                 }
@@ -67,9 +61,9 @@
             }
         }
     };
-    model_action.init();
+    modal_action.init();
 </script>
 <div class="actions">
-    <button class="ui button green small" onclick="model_action.save()">保存</button>
+    <button class="ui button green small" onclick="modal_action.save()">保存</button>
     <button class="ui button cancel black small">取消</button>
 </div>

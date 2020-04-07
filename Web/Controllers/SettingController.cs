@@ -9,16 +9,12 @@ namespace Web.Controllers
 {
     public class SettingController : ControllersBase
     {
-        #region 用户管理
-        public IActionResult UsersManagement(ParamModels.Setting.UsersManagementList Model)
+        public IActionResult Users(ParamModels.Setting.UsersList Model)
         {
+            Model.List = DB.TMT_Users;
             if (!string.IsNullOrWhiteSpace(Model.KeyWord))
             {
                 Model.List = DB.TMT_Users.Where(c => c.UserName.Contains(Model.KeyWord));
-            }
-            else
-            {
-                Model.List = DB.TMT_Users;
             }
             if (Model.RoleID.HasValue)
             {
@@ -29,7 +25,6 @@ namespace Web.Controllers
                 Model.List = Model.List.Where(c => c.Enable == Model.Enable);
             }
             Model.List = Model.List.OrderByDescending(m => m.UserID);
-            Model.Create();
             return View(Model);
         }
         public IActionResult Users_Add(int? UserID)
@@ -44,35 +39,35 @@ namespace Web.Controllers
         [HttpPost]
         public IActionResult Users_Add_Save(Models.TMT_Users Model)
         {
+            if (!Check.IsStr(Model.UserName, 2, 10))
+            {
+                return Json("[姓名]不能为空或格式不正确!");
+            }
             if (!Check.IsStr(Model.Account))
             {
-                return Json("[Account]Format error!");
-            }
-            if (!Check.IsStr(Model.UserName))
-            {
-                return Json("[UserName]Format error!");
+                return Json("[账号]不能为空或格式不正确!");
             }
             if (string.IsNullOrEmpty(Model.Avatar))
             {
-                return Json("[Avatar]Format error!");
+                return Json("[头像]不可为空!");
             }
             if (Model.RoleID < 1)
             {
-                return Json("[Role]Setting error!");
+                return Json("[角色]必须选择!");
             }
             if (Model.UserID > 0)
             {
                 if (!string.IsNullOrEmpty(Model.PassWord) && !Check.IsPassWord(Model.PassWord))
                 {
-                    return Json("[PassWord]Format error!");
+                    return Json("[密码]不能为空或格式不正确!");
                 }
                 if (DB.TMT_Users.Any(c => c.UserID != Model.UserID && c.UserName == Model.UserName))
                 {
-                    return Json("UserName已存在！");
+                    return Json("[姓名]已存在相同数据!");
                 }
                 if (DB.TMT_Users.Any(c => c.UserID != Model.UserID && c.Account == Model.Account))
                 {
-                    return Json("Account已存在！");
+                    return Json("[账号]已存在相同数据!");
                 }
                 var TUser = DB.TMT_Users.Find(Model.UserID);
                 TUser.UserName = Model.UserName;
@@ -89,15 +84,15 @@ namespace Web.Controllers
             {
                 if (!Check.IsPassWord(Model.PassWord))
                 {
-                    return Json("[PassWord]Format error!");
+                    return Json("[密码]不能为空或格式不正确!");
                 }
                 if (DB.TMT_Users.Any(c => c.UserName == Model.UserName))
                 {
-                    return Json("UserName已存在！");
+                    return Json("[姓名]已存在相同数据!");
                 }
                 if (DB.TMT_Users.Any(c => c.Account == Model.Account))
                 {
-                    return Json("Account已存在！");
+                    return Json("[账号]已存在相同数据!");
                 }
                 Model.PassWord = Command.Helper.GenerateMD5(Model.PassWord);
                 DB.TMT_Users.Add(Model);
@@ -105,10 +100,8 @@ namespace Web.Controllers
             DB.SaveChanges();
             return Json();
         }
-        #endregion
 
-        #region 角色管理
-        public IActionResult RolesManagement(ParamModels.Setting.RolesManagementList Model)
+        public IActionResult Roles(ParamModels.Setting.RolesList Model)
         {
             if (!string.IsNullOrWhiteSpace(Model.KeyWord))
             {
@@ -174,9 +167,9 @@ namespace Web.Controllers
             DB.SaveChanges();
             return Json();
         }
-        #endregion
+
         #region 项目管理
-        public IActionResult ProjectsManagement(ParamModels.Setting.ProjectsManagementList Model)
+        public IActionResult Projects(ParamModels.Setting.ProjectsManagementList Model)
         {
             if (!string.IsNullOrWhiteSpace(Model.KeyWord))
             {
@@ -189,13 +182,12 @@ namespace Web.Controllers
             Model.List = Model.List.OrderByDescending(m => m.ProjectID);
             foreach (var item in Model.List)
             {
-                item.D_Users = DB.TMT_Users.FromSqlRaw(string.Format("select * from TMT_Users where UserID in ({0})", item.Users));
+                item.D_Users = DB.TMT_Users.FromSqlRaw(string.Format("select * from TMT_Users where UserID in ({0}) and IsDelete=0", item.Users));
             }
             return View(Model);
         }
         public IActionResult Projects_Add(int? ProjectID)
         {
-            ViewBag.User = DB.TMT_Users.Where(c => c.Enable);
             Models.TMT_Projects Model = null;
             if (ProjectID.HasValue)
             {

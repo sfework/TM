@@ -1,197 +1,4 @@
-﻿
-//$(document).ready(function () {
-//    $('#search').click(function () {
-//        var _url = url.parseParam($(this).parents('.searchbox').getdata());
-//        if (_url.length > 0) {
-//            window.location.href = window.location.pathname + '?' + _url;
-//        }
-//        else {
-//            window.location.href = window.location.pathname;
-//        }
-//    });
-//    $('#search_inter').click(function () {
-//        var _url = url.parseParam($(this).parents('.searchbox').getdata());
-//        if (_url.length > 0) {
-//            window.location.href = window.location.pathname + '?' + _url + '&History=' + $('#History').checkbox('is checked').toString();
-//        }
-//        else {
-//            window.location.href = window.location.pathname;
-//        }
-//    });
-//    $('.paging .ui.dropdown').dropdown({
-//        onChange: function (value, text, $choice) {
-//            var URL = window.location.search;
-//            URL = url.delParam(URL, 'PageSize');
-//            URL += URL.indexOf('?') > -1 ? '&' : '?';
-//            URL += 'PageSize=' + value;
-//            window.location.href = window.location.pathname + URL;
-//        }
-//    });
-//    //顶部菜单下拉框初始化
-//    $('.Top .ui.dropdown[tabindex!="0"]').dropdown({ 'action': 'hide' });
-//    control_init();
-//});
-//var control_init = () => {
-//    //带有可清除标记的下拉框初始化
-//    $('.ui.dropdown.clearable[tabindex!="0"]').dropdown({ clearable: true });
-//    //其他普通下拉框初始化
-//    $('.ui.dropdown[tabindex!="0"]').dropdown();
-
-//    $('.date-ymd input').attr('readonly', true);
-
-
-//    $('.date-ymd').calendar({
-//        firstDayOfWeek: 1,
-//        monthFirst: false,
-//        type: 'date',
-//        formatter: {
-//            date: function (date, settings) {
-//                if (!date) return '';
-//                var day = date.getDate().toString();
-//                day = (Array(2).join('0') + day).slice(-2);
-//                var month = (date.getMonth() + 1).toString();
-//                month = (Array(2).join('0') + month).slice(-2);
-//                var year = date.getFullYear();
-//                return year + '/' + month + '/' + day;
-//            }
-//        },
-//        text: {
-//            days: ['日', '一', '二', '三', '四', '五', '六'],
-//            months: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
-//            monthsShort: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-//            today: '今天',
-//            now: '当前',
-//            am: '上午',
-//            pm: '下午'
-//        }
-//    });
-
-
-//    //laydate.render({
-//    //    elem: '.date', //指定元素
-//    //    format: 'yyyy/MM/dd',
-//    //    showBottom: false,
-//    //    theme: '#393D49'
-//    //});
-//    $('.CardNo').bind("input", function () {
-//        $(this).val($(this).val().replace(/[ \f\t\v]/g, '').replace(/(\d{4})(?=\d)/g, "$1  "));
-//    });
-//};
-
-
-////异步弹窗
-//class Modal {
-//    constructor(url, size, id, callback) {
-//        this.url = url;
-//        if (!size) {
-//            this.size = 'mini';
-//        }
-//        else {
-//            this.size = size;
-//        }
-//        this.dom = null;
-//        this.callback = callback;
-//        this.id = id;
-//    }
-//    load() {
-//        ajax.get(this.url, $.proxy(this.init, this), $.proxy(this.done, this));
-//    }
-//    done(r) {
-//        $(this.dom).children('.header,.content,.actions').remove();
-//        $(this.dom).append(r).removeClass('mini').addClass(this.size);
-//        control_init();
-//    }
-//    init() {
-//        if ($('.ui.dimmer.modals.page.transition').length === 0) {
-//            $('body').append($('<div class="ui dimmer modals page transition"></div>'));
-//        }
-//        var html = $('<div class="ui mini modal"><i class="close icon"></i><div class="header">加载中...</div><div class="content"><div class="ui icon header" style="width:100%;margin:0;"><i class="big spinner loading icon icon"></i><div class="content" style="margin-top:25px;"><div class="sub header">请稍后，弹窗页面正在加载.</div></div></div></div><div class="actions"><div class="ui cancel black button">取消</div></div></div>');
-//        if (this.id) {
-//            html.attr('id', this.id);
-//        }
-//        var seting = {
-//            allowMultiple: true, closable: false,
-//            onHidden: function () {
-//                $(this).remove();
-//            },
-//            autofocus: false
-//        };
-//        if (this.callback) {
-//            seting.onApprove = this.callback;
-//        }
-//        this.dom = $(html).modal(seting).modal('show');
-//    }
-//}
-//var modal = {
-//    load: function (url, width, id, callback) { new Modal(url, width, id, callback).load(); },
-//    ask: function (message, callback) {
-//        if ($('.ui.dimmer.modals.page.transition').length === 0) {
-//            $('body').append($('<div class="ui dimmer modals page transition"></div>'));
-//        }
-//        var html = $('<div class="ui mini modal"><i class="close icon"></i><div class="header"><i class="icon exclamation triangle"></i>操作确认</div><div class="content">' + message + '</div><div class="actions"><div class="ui ok green button">确定</div><div class="ui cancel black button">取消</div></div></div>');
-//        var seting = {
-//            allowMultiple: true, closable: false,
-//            onHidden: function () {
-//                $(this).remove();
-//            },
-//            autofocus: false
-//        };
-//        if (callback) {
-//            seting.onApprove = callback;
-//        }
-//        this.dom = $(html).modal(seting).modal('show');
-//    }
-//};
-
-
-//jQuery.fn.modal_hide = function () {
-//    $(this).modal('hide');
-//};
-
-//var url = {
-//    delParam: (url, ref) => {
-//        if (url.indexOf(ref) === -1) {
-//            return url;
-//        }
-//        var arr_url = url.split('?');
-//        var base = arr_url[0];
-//        var arr_param = arr_url[1].split('&');
-//        var index = -1;
-//        for (i = 0; i < arr_param.length; i++) {
-//            var paired = arr_param[i].split('=');
-//            if (paired[0] === ref) {
-
-//                index = i;
-//                break;
-//            }
-//        }
-//        if (index === -1) {
-//            return url;
-//        } else {
-//            arr_param.splice(index, 1);
-//            return base + "?" + arr_param.join('&');
-//        }
-//    },
-//    parseParam: function (params) {
-//        var queryAry = [], val = undefined;
-//        for (var query in params) {
-//            val = params[query];
-//            if (val !== '' && typeof val !== 'undefined' && val !== null) {
-//                queryAry.push(query + '=' + val);
-//            }
-//        }
-//        return queryAry.join('&');
-//    },
-//    load(page) {
-//        var URL = window.location.search;
-//        URL = this.delParam(URL, 'Page');
-//        URL += URL.indexOf('?') > -1 ? '&' : '?';
-//        URL += 'Page=' + page;
-//        window.location.href = window.location.pathname + URL;
-//    }
-//};
-
-jQuery.fn.getdata = function () {
+﻿jQuery.fn.getdata = function () {
     var objs = $(this).find('input[type="text"],input[type="file"],input[type="checkbox"],input[type="hidden"],input[type="password"],input[type="number"],textarea');
     var qid = "id", result = {};
     for (var i = 0; i < objs.length; i++) {
@@ -230,7 +37,7 @@ $(document).ready(function () {
         $(this).load_show();
         url.search($(this));
     });
-    $('.Paging>.ui.dropdown').dropdown({
+    $('.paging>.ui.dropdown').dropdown({
         onChange: function (value, text, e) {
             url.resize(value);
         }
@@ -238,12 +45,13 @@ $(document).ready(function () {
     init();
 });
 var init = function () {
+    //项目设置下拉框
     $('.projectset[tabindex!="0"]').dropdown({
         action: 'hide',
         onChange: function (value, text, $choice) {
-            ajax.post('/Home/ProjectSet', { ProjectID: value }, function () {}, function (success, data) {
+            ajax.post('/Home/ProjectSet', { ProjectID: value }, function () { }, function (success, data) {
                 if (success && data.Success) {
-                    window.location.reload();
+                    window.location.href = window.location.pathname;
                 }
             });
         }
@@ -277,6 +85,8 @@ var init = function () {
             $(this).next().css('display', 'none');
         }
     });
+    //左栏菜单头像部分的隐藏操作
+    $('.menubox>.blurring>.info').dimmer({ on: 'hover' });
 };
 var ajax = new ajaxhelp();
 function ajaxhelp() {
@@ -401,9 +211,9 @@ var modal = {
         if ($('.ui.dimmer.modals.page.transition').length === 0) {
             $('body').append($('<div class="ui dimmer modals page transition"></div>'));
         }
-        var html = $('<div class="ui inverted mini modal"><i class="close icon"></i><div class="header"><i class="icon exclamation triangle"></i>操作确认</div><div class="content">' + message + '</div><div class="actions"><div class="ui ok red button">确定</div><div class="ui cancel black button">取消</div></div></div>');
+        var html = $('<div class="ui mini modal"><i class="close icon"></i><div class="header"><i class="icon exclamation triangle"></i>操作确认</div><div class="content">' + message + '</div><div class="actions"><div class="ui right labeled icon button negative positive">确定<i class="checkmark icon"></i></div><div class="ui button green cancel">取消</div></div></div>');
         var seting = {
-            allowMultiple: true, closable: false, inverted: true,
+            allowMultiple: true, closable: false,
             onHidden: function () {
                 $(this).remove();
             },
@@ -486,11 +296,12 @@ var url = {
     },
     search: function (el) {
         var data = $(el).parents('.searchbox').getdata();
-        var tag = $(el).parents('.searchbox').data('tag');
-        var pagesize = $('.Paging[data-tag="' + tag + '"]').data('pagesize');
-        data['Page'] = 1;
-        data['PageSize'] = pagesize;
-        var _url = "?" + url.parseParam(data);
+        data = url.parseParam(data);
+        data = data.replace('#', '%23');
+        var _url = "";
+        if (data) {
+            _url = "?" + data;
+        }
         window.location.href = window.location.pathname + _url;
     },
     load: function (p) {
@@ -504,11 +315,8 @@ var url = {
     },
     resize: function (s) {
         var oUrl = window.location.search.substr(1);
-        console.log(oUrl);
         oUrl = url.replaceParamVal(oUrl, 'Page', '1');
-        console.log(oUrl);
         oUrl = url.replaceParamVal(oUrl, 'PageSize', s);
-        console.log(oUrl);
         window.location.href = window.location.pathname + oUrl;
     }
 };

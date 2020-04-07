@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,8 +16,15 @@ namespace Web.Models
         public int? TargetUserID { get; set; }
 
         public string Content { get; set; }
-        public DateTime CreateDate { get; set; }
+        public DateTime CreateDate { get; set; } = DateTime.Now;
 
-        public bool IsDelete { get; set; }
+        public bool IsDelete { get; set; } = false;
+
+        [ForeignKey("TagID")]
+        public virtual TMT_Requirements Requirement { get; set; }
+        [ForeignKey("TriggerUserID")]
+        public virtual TMT_Users TriggerUser { get; set; }
+        [ForeignKey("TargetUserID")]
+        public virtual TMT_Users TargetUser { get; set; }
     }
 }

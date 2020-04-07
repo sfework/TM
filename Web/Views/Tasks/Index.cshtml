@@ -1,1 +1,45 @@
 ﻿<h2>Tasks</h2>
+
+
+@*@switch (item.EmergencyLevel)
+{
+    case 1:
+        <i class="star icon teal"></i>
+        break;
+    case 2:
+        <i class="star icon blue"></i>
+        break;
+    case 3:
+        <i class="star icon violet"></i>
+        break;
+    case 4:
+        <i class="star icon purple"></i>
+        break;
+    case 5:
+        <i class="star icon red"></i>
+        break;
+}*@
+<script>
+    $('.ui.rating').rating({
+        onRate: function (value) {
+            $(this).removeClass('teal blue violet purple red');
+            switch (value) {
+                case 1:
+                    $(this).addClass('teal');
+                    break;
+                case 2:
+                    $(this).addClass('blue');
+                    break;
+                case 3:
+                    $(this).addClass('violet');
+                    break;
+                case 4:
+                    $(this).addClass('purple');
+                    break;
+                case 5:
+                    $(this).addClass('red');
+                    break;
+            }
+        }
+    });
+</script>
