@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Web.Controllers
 {
     [NeedSetProject]
-    public class CodeController : ControllersBase
+    public class VersionController : ControllersBase
     {
         public IActionResult Index()
         {

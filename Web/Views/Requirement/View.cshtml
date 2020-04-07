@@ -66,9 +66,23 @@
             @Model.Title
             @if (Model.Status != DBEnums.RequirementStatus.草稿)
             {
-                <span class="ui label basic">@Model.NowVersion</span>
+                <span style="font-size:12px;color:rgba(0,0,0,.4);margin-left:15px;">
+                    版本：
+                    <div class="ui inline dropdown" id="setVersion">
+                        <input type="hidden" value="@Model.NowVersion">
+                        <div class="default text"></div>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            @foreach (var item in Model.Detailes)
+                            {
+                                <div class="item" data-value="@item.Version">@item.Version</div>
+                            }
+                        </div>
+                    </div>
+                </span>
             }
         </h1>
+
         <div class="strbox">
             @Html.Raw(Model.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
         </div>
@@ -121,6 +135,11 @@
                             $(this).addClass('red');
                             break;
                     }
+                }
+            });
+            $('#setVersion').dropdown({
+                onChange: function (value, text, $choice) {
+                    window.location.href = "/Requirement/View?RequirementID=@Model.RequirementID&Version=" + value;
                 }
             });
         },

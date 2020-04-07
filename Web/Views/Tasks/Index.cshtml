@@ -1,24 +1,197 @@
-﻿<h2>Tasks</h2>
+﻿@{
+    ViewData["Title"] = "需求管理";
+}
+@model Web.ParamModels.Tasks.Tasks_Index
+<div class="searchbox">
+    <div class="ui form tiny">
+        <div class="inline fields">
+            <div class="field">
+                <label>关键字</label>
+                <div class="ui input clearable">
+                    <input type="text" id="KeyWord" value="@Model.KeyWord">
+                    <i class="close icon"></i>
+                </div>
+            </div>
+            <div class="field">
+                <label>模块</label>
+                <div class="ui selection dropdown  clearable" style="min-width:150px !important;">
+                    <input type="hidden" id="ModuleID" value="@Model.ModuleID">
+                    <i class="dropdown icon"></i>
+                    <div class="default text"></div>
+                    <div class="menu">
+                        @foreach (var item in G.NowProject.Modules)
+                        {
+                            <div class="item" data-value="@item.ModuleID">@item.ModuleName</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label>关联</label>
+                <div class="ui selection dropdown  clearable" style="min-width:120px !important;">
+                    <input type="hidden" id="Tag" value="@Model.Tag">
+                    <i class="dropdown icon"></i>
+                    <div class="default text"></div>
+                    <div class="menu">
+                        <div class="item" data-value="1">由我创建</div>
+                        <div class="item" data-value="2">由我执行</div>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label>状态</label>
+                <SelectEnums Fluid="false" ID="Status" Default="@(Model.Status.HasValue?((int)Model.Status).ToString():"")" Width="100" Enum="typeof(DBEnums.TasksStatus)"></SelectEnums>
+            </div>
+            <div class="field">
+                <button class="ui button orange mini icon" id="search"><i class="icon search"></i></button>
+            </div>
+            <div class="field right">
+                <a class="ui floating teal labeled icon button tiny" href="/Requirement/Add">
+                    <i class="plus icon"></i>新增
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="Context_Scroll">
+    <div class="Context_Scroll">
+        <table class="ui table very compact selectable very basic">
+            <thead>
+                <tr>
+                    <th width="50">ID</th>
+                    <th>标题</th>
+                    <th width="60">状态</th>
+                    <th width="80">任务</th>
+                    <th width="160">模块</th>
+                    <th width="120">创建人</th>
+                    <th width="120">评审人</th>
+                    <th width="90" class="right aligned">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.List)
+                {
+                    @*<tr>
+                        <td><span class="ui text grey horizontal">#@item.RequirementID</span></td>
+                        <td>
+                            @switch (item.EmergencyLevel)
+                            {
+                                case 1:
+                                    <i class="exclamation icon green"></i> break;
+                                case 2:
+                                    <i class="exclamation icon olive"></i> break;
+                                case 3:
+                                    <i class="exclamation icon yellow"></i> break;
+                                case 4:
+                                    <i class="exclamation icon orange"></i> break;
+                                case 5:
+                                    <i class="exclamation icon red"></i>break;
+                            }
+                            <a style="color:rgba(0,0,0,.8);" href="/Requirement/View?RequirementID=@item.RequirementID">@item.Title</a>
+                            @if (item.Status != DBEnums.RequirementStatus.草稿)
+                            {
+                                <div class="ui mini label horizontal basic">
+                                    @item.NowVersion
+                                </div>
+                            }
+                        </td>
+                        <td>
+                            @switch (item.Status)
+                            {
+                                case DBEnums.RequirementStatus.草稿:
+                                    <div class="ui tiny label blue basic horizontal">
+                                        @item.Status
+                                    </div>
+                                    break;
+                                case DBEnums.RequirementStatus.待审:
+                                    <div class="ui tiny label teal basic horizontal">
+                                        @item.Status
+                                    </div>
+                                    break;
+                                case DBEnums.RequirementStatus.拒绝:
+                                    <div class="ui tiny label red basic horizontal">
+                                        @item.Status
+                                    </div>
+                                    break;
+                                case DBEnums.RequirementStatus.通过:
+                                    <div class="ui tiny label green basic horizontal">
+                                        @item.Status
+                                    </div>
+                                    break;
+                                case DBEnums.RequirementStatus.归档:
+                                    <div class="ui tiny label grey basic horizontal">
+                                        @item.Status
+                                    </div>
+                                    break;
+                            }
+                        </td>
+                        <td>
+                            <div class="ui mini label basic">
+                                <i class="hourglass half icon grey"></i> 23
+                            </div>
+                            hourglass half
+                                play
+                                check square
+                        </td>
+                        <td>
+                            @item.Module.ModuleName
+                        </td>
+                        <td>
+                            <div class="ui image label mini basic">
+                                <img src="@item.CreateUser.Avatar"> @item.CreateUser.UserName
+                            </div>
+                        </td>
+                        <td>
+                            <div class="ui image label mini basic">
+                                <img src="@item.AuditorUser.Avatar"> @item.AuditorUser.UserName
+                            </div>
+                        </td>
+                        <td class="right aligned">
+                            <div class="ui blue icon buttons mini">
+                                @if ((item.Status == DBEnums.RequirementStatus.草稿 || item.Status == DBEnums.RequirementStatus.拒绝) && item.CreateUserID == G.User.UserID)
+                                {
+                                    <a class="ui button" href="/Requirement/Add?RequirementID=@item.RequirementID">
+                                        <i class="edit icon"></i>
+                                    </a>
+                                    <button class="ui button" onclick="page_action.del(@item.RequirementID)">
+                                        <i class="trash alternate outline icon"></i>
+                                    </button>
+                                }
+                                @if (item.Status == DBEnums.RequirementStatus.通过)
+                                {
+                                    <a class="ui button" href="/Requirement/Add?RequirementID=@item.RequirementID">
+                                        <i class="add icon"></i>
+                                    </a>
+                                }
+                            </div>
+                        </td>
+                    </tr>*@
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<Paging Page="Model.Page" PageSize="Model.PageSize" TotalCount="Model.TotalCount"></Paging>
 
 
 @*@switch (item.EmergencyLevel)
-{
-    case 1:
-        <i class="star icon teal"></i>
-        break;
-    case 2:
-        <i class="star icon blue"></i>
-        break;
-    case 3:
-        <i class="star icon violet"></i>
-        break;
-    case 4:
-        <i class="star icon purple"></i>
-        break;
-    case 5:
-        <i class="star icon red"></i>
-        break;
-}*@
+    {
+        case 1:
+            <i class="star icon teal"></i>
+            break;
+        case 2:
+            <i class="star icon blue"></i>
+            break;
+        case 3:
+            <i class="star icon violet"></i>
+            break;
+        case 4:
+            <i class="star icon purple"></i>
+            break;
+        case 5:
+            <i class="star icon red"></i>
+            break;
+    }*@
 <script>
     $('.ui.rating').rating({
         onRate: function (value) {

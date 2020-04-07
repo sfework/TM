@@ -6,11 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers
 {
+    [NeedSetProject]
     public class TasksController : ControllersBase
     {
-        public IActionResult Index()
+        public IActionResult Index(ParamModels.Tasks.Tasks_Index Model)
         {
-            return View();
+            return View(Model);
         }
     }
 }

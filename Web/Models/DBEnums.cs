@@ -15,6 +15,13 @@ namespace Web.Models
             通过 = 3,
             归档 = 4
         }
+        public enum TasksStatus
+        {
+            等待 = 0,
+            进行 = 1,
+            完成 = 2,
+            关闭 = 3
+        }
         public enum LogType
         {
             需求 = 0,

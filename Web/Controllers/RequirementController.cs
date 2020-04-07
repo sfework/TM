@@ -51,18 +51,10 @@ namespace Web.Controllers
             if (RequirementID.HasValue)
             {
                 Model = DB.TMT_Requirements.Find(RequirementID.Value);
-                if (Model.Status != Models.DBEnums.RequirementStatus.草稿 && Model.Status != Models.DBEnums.RequirementStatus.拒绝 && Model.Status != Models.DBEnums.RequirementStatus.通过)
-                {
-                    throw new Exception("当前状态不能进行编辑操作!");
-                }
-                if (Model.CreateUserID != G.User.UserID)
-                {
-                    throw new Exception("无权");
-                }
             }
             return View(Model);
         }
-        public IActionResult View(int RequirementID)
+        public IActionResult View(int RequirementID, int? Version)
         {
             var Model = DB.TMT_Requirements.Find(RequirementID);
             if ((Model.Status == Models.DBEnums.RequirementStatus.草稿 || Model.Status == Models.DBEnums.RequirementStatus.拒绝) && Model.CreateUserID != G.User.UserID)
@@ -72,6 +64,10 @@ namespace Web.Controllers
             if (Model.Status == Models.DBEnums.RequirementStatus.待审 && (Model.CreateUserID != G.User.UserID && Model.AuditorUserID != G.User.UserID))
             {
                 throw new Exception("无权");
+            }
+            if (Version.HasValue)
+            {
+                Model.NowVersion = Version.Value;
             }
             return View(Model);
         }
@@ -123,7 +119,7 @@ namespace Web.Controllers
                 {
                     throw new Exception("此需求已归档或正在评审中，无法进行编辑！");
                 }
-                if (Re.Status == Models.DBEnums.RequirementStatus.草稿 || Re.Status == Models.DBEnums.RequirementStatus.拒绝)
+                if (Re.Status == Models.DBEnums.RequirementStatus.草稿)
                 {
                     var Detaile = Re.Detailes.FirstOrDefault(c => c.Version == Re.NowVersion);
                     if (Detaile != null)
@@ -132,7 +128,7 @@ namespace Web.Controllers
                         Detaile.CreateDate = DateTime.Now;
                     }
                 }
-                else if (Re.Status == Models.DBEnums.RequirementStatus.通过)
+                else if (Re.Status == Models.DBEnums.RequirementStatus.通过 || Re.Status == Models.DBEnums.RequirementStatus.拒绝)
                 {
                     Re.NowVersion += 1;
                     Re.Detailes.Add(new Models.TMT_Requirements_Detaile
@@ -183,9 +179,12 @@ namespace Web.Controllers
             try
             {
                 var Re = SaveModel(Model);
-                if (!Model.RequirementID.HasValue)
+                if (Re.Status == Models.DBEnums.RequirementStatus.草稿 || Re.Status == Models.DBEnums.RequirementStatus.拒绝)
                 {
                     Re.Status = Models.DBEnums.RequirementStatus.待审;
+                }
+                if (!Model.RequirementID.HasValue)
+                {
                     Re.Logs.Add(new Models.TMT_Logs
                     {
                         TagID = Re.RequirementID,
@@ -195,10 +194,6 @@ namespace Web.Controllers
                         Content = "发布第<div class=\"ui label horizontal mini\">" + Re.NowVersion + "</div>版本需求！",
                     });
                     DB.TMT_Requirements.Add(Re);
-                }
-                if (Re.Status == Models.DBEnums.RequirementStatus.草稿 || Re.Status == Models.DBEnums.RequirementStatus.拒绝)
-                {
-                    Re.Status = Models.DBEnums.RequirementStatus.待审;
                 }
                 DB.SaveChanges();
                 return Json();
