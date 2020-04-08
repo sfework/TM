@@ -46,7 +46,7 @@
                 <button class="ui button orange mini icon" id="search"><i class="icon search"></i></button>
             </div>
             <div class="field right">
-                <a class="ui floating teal labeled icon button tiny" href="/Requirement/Add">
+                <a class="ui floating teal labeled icon button tiny" href="/Tasks/Add">
                     <i class="plus icon"></i>新增
                 </a>
             </div>
@@ -58,7 +58,6 @@
         <table class="ui table very compact selectable very basic">
             <thead>
                 <tr>
-                    <th width="50">ID</th>
                     <th>标题</th>
                     <th width="60">状态</th>
                     <th width="80">任务</th>
@@ -72,7 +71,6 @@
                 @foreach (var item in Model.List)
                 {
                     @*<tr>
-                        <td><span class="ui text grey horizontal">#@item.RequirementID</span></td>
                         <td>
                             @switch (item.EmergencyLevel)
                             {

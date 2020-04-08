@@ -8,8 +8,8 @@ namespace Web.Models
 {
     public class TMT_Logs
     {
-        public int LogID { get; set; }
-        public int? TagID { get; set; }
+        public int ID { get; set; }
+        public string TagID { get; set; }
         public DBEnums.LogType LogType { get; set; }
 
         public int TriggerUserID { get; set; }
@@ -22,6 +22,8 @@ namespace Web.Models
 
         [ForeignKey("TagID")]
         public virtual TMT_Requirements Requirement { get; set; }
+        [ForeignKey("TagID")]
+        public virtual TMT_Tasks Task { get; set; }
         [ForeignKey("TriggerUserID")]
         public virtual TMT_Users TriggerUser { get; set; }
         [ForeignKey("TargetUserID")]

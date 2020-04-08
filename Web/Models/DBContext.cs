@@ -36,10 +36,13 @@ namespace Web.Models
             Builder.Entity<TMT_Requirements>().HasKey(c => c.RequirementID);
             Builder.Entity<TMT_Requirements>().HasQueryFilter(c => !c.IsDelete);
 
-            Builder.Entity<TMT_Requirements_Detaile>().HasKey(c => c.DetaileID);
+            Builder.Entity<TMT_Detaile>().HasKey(c => c.ID);
 
-            Builder.Entity<TMT_Logs>().HasKey(c => c.LogID);
+            Builder.Entity<TMT_Logs>().HasKey(c => c.ID);
             Builder.Entity<TMT_Logs>().HasQueryFilter(c => !c.IsDelete);
+
+            Builder.Entity<TMT_Tasks>().HasKey(c => c.TaskID);
+            Builder.Entity<TMT_Tasks>().HasQueryFilter(c => !c.IsDelete);
         }
         public DbSet<TMT_Users> TMT_Users { get; set; }
         public DbSet<TMT_Roles> TMT_Roles { get; set; }
@@ -48,7 +51,9 @@ namespace Web.Models
         public DbSet<TMT_Documents> TMT_Documents { get; set; }
 
         public DbSet<TMT_Requirements> TMT_Requirements { get; set; }
-        public DbSet<TMT_Requirements_Detaile> TMT_Requirements_Detaile { get; set; }
+
+        public DbSet<TMT_Tasks> TMT_Tasks { get; set; }
+        public DbSet<TMT_Detaile> TMT_Detaile { get; set; }
         public DbSet<TMT_Logs> TMT_Logs { get; set; }
 
     }

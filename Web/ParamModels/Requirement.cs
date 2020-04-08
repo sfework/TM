@@ -19,7 +19,7 @@ namespace Web.ParamModels
         }
         public class Requirement_Add_Model
         {
-            public int? RequirementID { get; set; }
+            public string RequirementID { get; set; }
             public string Title { get; set; }
             public int ModuleID { get; set; }
             public int AuditorUserID { get; set; }

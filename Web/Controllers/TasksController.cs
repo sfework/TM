@@ -11,7 +11,20 @@ namespace Web.Controllers
     {
         public IActionResult Index(ParamModels.Tasks.Tasks_Index Model)
         {
+            Model.List = DB.TMT_Tasks;
             return View(Model);
+        }
+
+        public IActionResult Add(string TaskID, string RequirementID)
+        {
+
+            return View();
+        }
+        [HttpPost]
+        public IActionResult Publish()
+        {
+
+            return Json();
         }
     }
 }

@@ -8,13 +8,13 @@ namespace Web.Models
 {
     public class TMT_Tasks
     {
-        public int TaskID { get; set; }
+        public string TaskID { get; set; }
         public string Title { get; set; }
         public int EmergencyLevel { get; set; }
         public DBEnums.TasksStatus Status { get; set; }
         public int ProjectID { get; set; }
         public int ModuleID { get; set; }
-        public int AuditorUserID { get; set; }
+
         public DateTime LastUPDate { get; set; }
         public int CreateUserID { get; set; }
         public int NowVersion { get; set; }
@@ -25,9 +25,8 @@ namespace Web.Models
         public virtual TMT_Modules Module { get; set; }
         [ForeignKey("CreateUserID")]
         public virtual TMT_Users CreateUser { get; set; }
-        [ForeignKey("AuditorUserID")]
-        public virtual TMT_Users AuditorUser { get; set; }
-        public virtual ICollection<TMT_Requirements_Detaile> Detailes { get; set; }
+
+        public virtual ICollection<TMT_Detaile> Detailes { get; set; }
 
         public virtual ICollection<TMT_Logs> Logs { get; set; }
     }

@@ -55,7 +55,7 @@
         }
         @if (Model.Status == DBEnums.RequirementStatus.通过 && Model.CreateUserID == G.User.UserID)
         {
-            <div class="ui button red small" onclick="page_action.sealUP(@Model.RequirementID)">归档</div>
+            <div class="ui button red small" onclick="page_action.sealUP('@Model.RequirementID')">归档</div>
         }
     </div>
 </div>
@@ -90,7 +90,7 @@
     @if (Model.Status != DBEnums.RequirementStatus.草稿)
     {
         <div class="cright">
-            <div class="ui comments small">
+            <div class="ui comments mini">
                 @foreach (var item in Model.Logs)
                 {
                     <div class="comment">
@@ -120,23 +120,23 @@
                     $(this).removeClass('teal blue violet purple red');
                     switch (value) {
                         case 1:
-                            $(this).addClass('teal');
+                            $(this).addClass('green');
                             break;
                         case 2:
-                            $(this).addClass('blue');
+                            $(this).addClass('olive');
                             break;
                         case 3:
-                            $(this).addClass('violet');
+                            $(this).addClass('yellow');
                             break;
                         case 4:
-                            $(this).addClass('purple');
+                            $(this).addClass('orange');
                             break;
                         case 5:
                             $(this).addClass('red');
                             break;
                     }
                 }
-            });
+            }).rating('set rating', $('#EmergencyLevel').rating('get rating'));;
             $('#setVersion').dropdown({
                 onChange: function (value, text, $choice) {
                     window.location.href = "/Requirement/View?RequirementID=@Model.RequirementID&Version=" + value;

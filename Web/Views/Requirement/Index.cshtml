@@ -57,7 +57,6 @@
     <table class="ui table very compact selectable very basic">
         <thead>
             <tr>
-                <th width="50">ID</th>
                 <th>标题</th>
                 <th width="60">状态</th>
                 <th width="80">任务</th>
@@ -71,7 +70,6 @@
             @foreach (var item in Model.List)
             {
             <tr>
-                <td><span class="ui text grey horizontal">#@item.RequirementID</span></td>
                 <td>
                     @switch (item.EmergencyLevel)
                     {
@@ -152,13 +150,13 @@
                             <a class="ui button" href="/Requirement/Add?RequirementID=@item.RequirementID">
                                 <i class="edit icon"></i>
                             </a>
-                            <button class="ui button" onclick="page_action.del(@item.RequirementID)">
+                            <button class="ui button" onclick="page_action.del('@item.RequirementID')">
                                 <i class="trash alternate outline icon"></i>
                             </button>
                         }
                         @if (item.Status == DBEnums.RequirementStatus.通过)
                         {
-                            <a class="ui button" href="/Requirement/Add?RequirementID=@item.RequirementID">
+                            <a class="ui button" href="/Tasks/Add?RequirementID=@item.RequirementID">
                                 <i class="add icon"></i>
                             </a>
                         }

@@ -8,7 +8,7 @@ namespace Web.Models
 {
     public class TMT_Requirements
     {
-        public int RequirementID { get; set; }
+        public string RequirementID { get; set; }
         public string Title { get; set; }
         public int EmergencyLevel { get; set; }
         public DBEnums.RequirementStatus Status { get; set; }
@@ -27,7 +27,7 @@ namespace Web.Models
         public virtual TMT_Users CreateUser { get; set; }
         [ForeignKey("AuditorUserID")]
         public virtual TMT_Users AuditorUser { get; set; }
-        public virtual ICollection<TMT_Requirements_Detaile> Detailes { get; set; }
+        public virtual ICollection<TMT_Detaile> Detailes { get; set; }
 
         public virtual ICollection<TMT_Logs> Logs { get; set; }
     }

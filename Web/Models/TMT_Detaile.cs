@@ -6,15 +6,18 @@ using System.Threading.Tasks;
 
 namespace Web.Models
 {
-    public class TMT_Requirements_Detaile
+    public class TMT_Detaile
     {
-        public int DetaileID { get; set; }
-        public int RequirementID { get; set; }
+        public int ID { get; set; }
+        public string TagID { get; set; }
         public string Content { get; set; }
         public int Version { get; set; }
         public DateTime CreateDate { get; set; }
 
-        [ForeignKey("RequirementID")]
+        [ForeignKey("TagID")]
         public virtual TMT_Requirements Requirement { get; set; }
+
+        [ForeignKey("TagID")]
+        public virtual TMT_Tasks Task { get; set; }
     }
 }
