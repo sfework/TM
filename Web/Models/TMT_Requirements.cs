@@ -30,5 +30,7 @@ namespace Web.Models
         public virtual ICollection<TMT_Detaile> Detailes { get; set; }
 
         public virtual ICollection<TMT_Logs> Logs { get; set; }
+
+        public virtual ICollection<TMT_Tasks> Tasks { get; set; }
     }
 }

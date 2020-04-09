@@ -2,94 +2,104 @@
     ViewData["Title"] = "新增需求";
 }
 @model TMT_Requirements
-<link href="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.css" rel="stylesheet">
-<script src="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.js"></script>
 <style>
-    .segments.basic { margin: 0 !important; }
-    .segments.basic > .segment.basic { padding: 0 !important; margin: 0 !important; }
-    .Context { background: #f9f9f9; }
     .context_box { flex: 1; overflow: hidden; display: flex; flex-direction: row; }
-    .context_box > .cleft { flex: 1; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; background: #fff; padding: 40px; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
-    .context_box > .cright { width: 300px; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; margin-left: 2%; padding: 20px; background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
-    .context_box111 { display: flex; flex-direction: column; flex: 1; overflow: hidden; padding: 40px; width: 985px; margin-left: auto; margin-right: auto; background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
+    .context_box > .cleft { border-radius: 4px; flex: 1; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; background: #fff; padding: 40px; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
+    .context_box > .cright { border-radius: 4px; width: 300px; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; margin-left: 20px; padding: 20px; background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
     .strbox p { margin-bottom: 1px !important }
 </style>
-<div class="ui segments basic">
-    <div class="ui left floated segment basic">
-        <div class="ui form tiny">
-            <div class="inline fields" style="margin-bottom:0;">
-                <div class="field">
-                    <label>项目</label>
-                    <div class="ui label basic">
-                        <i class="briefcase icon"></i> @G.NowProject.ProjectName
-                    </div>
-                </div>
-                <div class="field">
-                    <label>所属模块</label>
-                    <div class="ui label basic">
-                        <i class="archive icon"></i> @Model.Module.ModuleName
-                    </div>
-                </div>
-                <div class="field">
-                    <label>评审人</label>
-                    <div class="ui image label basic">
-                        <img src="@Model.AuditorUser.Avatar">
-                        @Model.AuditorUser.UserName
-                    </div>
-                </div>
-                <div class="field">
-                    <label>优先级</label>
-                    <div class="ui red rating disabled" id="EmergencyLevel" data-icon="star" data-rating="@Model.EmergencyLevel" data-max-rating="5"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="ui right floated segment basic">
-        @if ((Model.Status == DBEnums.RequirementStatus.草稿 || Model.Status == DBEnums.RequirementStatus.拒绝 || Model.Status == DBEnums.RequirementStatus.通过) && Model.CreateUserID == G.User.UserID)
-        {
-            <a class="ui button green small" href="/Requirement/Add?RequirementID=@Model.RequirementID">编辑</a>
-        }
-        @if (Model.Status == DBEnums.RequirementStatus.待审 && Model.AuditorUserID == G.User.UserID)
-        {
-            <div class="ui button orange small" onclick="modal.load('/Requirement/Review?RequirementID=@Model.RequirementID',400)">评审</div>
-        }
-        @if (Model.Status == DBEnums.RequirementStatus.通过 && Model.CreateUserID == G.User.UserID)
-        {
-            <div class="ui button red small" onclick="page_action.sealUP('@Model.RequirementID')">归档</div>
-        }
-    </div>
-</div>
-<div class="ui divider" style="margin-top: 10px;"></div>
 <div class="context_box">
     <div class="cleft">
         <h1 class="ui header">
             @Model.Title
+        </h1>
+        <div class="strbox">
+            @Html.Raw(Model.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
+        </div>
+    </div>
+    <div class="cright">
+        <div class="ui form tiny">
+            @if (Model.Status != DBEnums.RequirementStatus.归档)
+            {
+                <div class="field">
+                    <div class="ui buttons icon  blue compact">
+                        @if ((Model.Status == DBEnums.RequirementStatus.草稿 || Model.Status == DBEnums.RequirementStatus.拒绝 || Model.Status == DBEnums.RequirementStatus.通过) && Model.CreateUserID == G.User.UserID)
+                        {
+                            <a class="ui button" href="/Requirement/Add?RequirementID=@Model.RequirementID"><i class="edit icon"></i></a>
+                        }
+                        @if (Model.Status == DBEnums.RequirementStatus.待审 && Model.AuditorUserID == G.User.UserID)
+                        {
+                            <button class="ui button" onclick="modal.load('/Requirement/Review?RequirementID=@Model.RequirementID',400)"><i class="hard hat icon"></i></button>
+                        }
+                        @if (Model.Status == DBEnums.RequirementStatus.通过 && Model.CreateUserID == G.User.UserID)
+                        {
+                            <button class="ui button" onclick="page_action.sealUP('@Model.RequirementID')"><i class="archive icon"></i></button>
+                            <a class="ui button" href="/Tasks/Add?RequirementID=@Model.RequirementID"><i class="plus square icon"></i></a>
+                        }
+                    </div>
+                </div>
+            }
+            <div class="field inline">
+                <label>优先级</label>
+                <div style="margin-top:7px;" class="ui rating disabled" id="EmergencyLevel" data-icon="star" data-rating="@Model.EmergencyLevel" data-max-rating="5"></div>
+            </div>
             @if (Model.Status != DBEnums.RequirementStatus.草稿)
             {
-                <span style="font-size:12px;color:rgba(0,0,0,.4);margin-left:15px;">
-                    版本：
-                    <div class="ui inline dropdown" id="setVersion">
+                <div class="field inline">
+                    <label>版本</label>
+                    <div class="ui inline dropdown" id="setVersion" style="width:80px;">
                         <input type="hidden" value="@Model.NowVersion">
+
                         <div class="default text"></div>
                         <i class="dropdown icon"></i>
                         <div class="menu">
                             @foreach (var item in Model.Detailes)
                             {
-                                <div class="item" data-value="@item.Version">@item.Version</div>
+                                <div class="item" data-value="@item.Version"># @(item.Version)</div>
                             }
                         </div>
                     </div>
-                </span>
+                </div>
             }
-        </h1>
-
-        <div class="strbox">
-            @Html.Raw(Model.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
+            <div class="field inline">
+                <label>项目</label>
+                <div class="ui label basic">
+                    <i class="briefcase icon"></i> @G.NowProject.ProjectName
+                </div>
+            </div>
+            <div class="field inline">
+                <label>评审</label>
+                <div class="ui image label basic">
+                    <img src="@Model.AuditorUser.Avatar">
+                    @Model.AuditorUser.UserName
+                </div>
+            </div>
+            <div class="field inline">
+                <label>模块</label>
+                <div class="ui label basic">
+                    @Model.Module.ModuleName
+                </div>
+            </div>
         </div>
-    </div>
-    @if (Model.Status != DBEnums.RequirementStatus.草稿)
-    {
-        <div class="cright">
+        @if (Model.Tasks.Count > 0)
+        {
+            <div class="ui horizontal divider">
+                <i class="tasks icon"></i>
+                相关任务
+            </div>
+            <div class="ui list tiny">
+                @foreach (var item in Model.Tasks)
+                {
+                    <a class="item">@item.Title</a>
+                }
+            </div>
+        }
+        @if (Model.Status != DBEnums.RequirementStatus.草稿)
+        {
+            <div class="ui horizontal divider">
+                <i class="history icon"></i>
+                历史记录
+            </div>
             <div class="ui comments mini">
                 @foreach (var item in Model.Logs)
                 {
@@ -109,15 +119,15 @@
                     </div>
                 }
             </div>
-        </div>
-    }
+        }
+    </div>
 </div>
 <script>
     var page_action = {
         init: function () {
             $('#EmergencyLevel').rating({
                 onRate: function (value) {
-                    $(this).removeClass('teal blue violet purple red');
+                    $(this).removeClass('green olive yellow orange red');
                     switch (value) {
                         case 1:
                             $(this).addClass('green');

@@ -17,5 +17,13 @@ namespace Web.ParamModels
             public string KeyWord { get; set; }
             public int? ModuleID { get; set; }
         }
+
+        public class Tasks_Add_View
+        {
+            public string TaskID { get; set; }
+            public string RequirementID { get; set; }
+            public IQueryable<Models.TMT_Requirements> Requirements { get; set; }
+            public Models.TMT_Tasks Task { get; set; }
+        }
     }
 }

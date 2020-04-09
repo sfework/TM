@@ -14,7 +14,7 @@
             </div>
             <div class="field">
                 <label>模块</label>
-                <div class="ui selection dropdown  clearable" style="min-width:150px !important;">
+                <div class="ui selection dropdown  clearable" style="min-width: 150px !important; ">
                     <input type="hidden" id="ModuleID" value="@Model.ModuleID">
                     <i class="dropdown icon"></i>
                     <div class="default text"></div>
@@ -62,8 +62,7 @@
                 <th width="80">任务</th>
                 <th width="160">模块</th>
                 <th width="120">创建人</th>
-                <th width="120">评审人</th>
-                <th width="90" class="right aligned">操作</th>
+                <th width="120" class="right aligned">评审人</th>
             </tr>
         </thead>
         <tbody>
@@ -84,7 +83,7 @@
                         case 5:
                             <i class="exclamation icon red"></i>break;
                     }
-                    <a style="color:rgba(0,0,0,.8);" href="/Requirement/View?RequirementID=@item.RequirementID">@item.Title</a>
+                    <a style="color:rgba(0,0,0,.8);font-weight:bold;" href="/Requirement/View?RequirementID=@item.RequirementID">@item.Title</a>
                     @if (item.Status != DBEnums.RequirementStatus.草稿)
                     {
                         <div class="ui mini label horizontal basic">
@@ -134,16 +133,16 @@
                     @item.Module.ModuleName
                 </td>
                 <td>
-                    <div class="ui image label mini basic">
+                    <div class="ui image label mini">
                         <img src="@item.CreateUser.Avatar"> @item.CreateUser.UserName
                     </div>
                 </td>
-                <td>
-                    <div class="ui image label mini basic">
+                <td class="right aligned">
+                    <div class="ui image label mini">
                         <img src="@item.AuditorUser.Avatar"> @item.AuditorUser.UserName
                     </div>
                 </td>
-                <td class="right aligned">
+                @*<td class="right aligned">
                     <div class="ui blue icon buttons mini">
                         @if ((item.Status == DBEnums.RequirementStatus.草稿 || item.Status == DBEnums.RequirementStatus.拒绝) && item.CreateUserID == G.User.UserID)
                         {
@@ -161,7 +160,7 @@
                             </a>
                         }
                     </div>
-                </td>
+                </td>*@
             </tr>
             }
         </tbody>

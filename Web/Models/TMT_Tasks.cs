@@ -9,6 +9,7 @@ namespace Web.Models
     public class TMT_Tasks
     {
         public string TaskID { get; set; }
+        public string RequirementID { get; set; }
         public string Title { get; set; }
         public int EmergencyLevel { get; set; }
         public DBEnums.TasksStatus Status { get; set; }
@@ -26,8 +27,13 @@ namespace Web.Models
         [ForeignKey("CreateUserID")]
         public virtual TMT_Users CreateUser { get; set; }
 
+        [ForeignKey("RequirementID")]
+        public virtual TMT_Requirements Requirement { get; set; }
+
         public virtual ICollection<TMT_Detaile> Detailes { get; set; }
 
         public virtual ICollection<TMT_Logs> Logs { get; set; }
+
+
     }
 }

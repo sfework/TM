@@ -146,16 +146,16 @@ namespace Web.Controllers
                 {
                     return Json("[需求标题]不可为空！");
                 }
-                if (Model.ModuleID < 1)
-                {
-                    return Json("[模块]必须选择！");
-                }
-                if (Model.AuditorUserID < 1)
-                {
-                    return Json("[评审人]必须选择！");
-                }
                 if (string.IsNullOrWhiteSpace(Model.RequirementID))
                 {
+                    if (Model.ModuleID < 1)
+                    {
+                        return Json("[模块]必须选择！");
+                    }
+                    if (Model.AuditorUserID < 1)
+                    {
+                        return Json("[评审人]必须选择！");
+                    }
                     Models.TMT_Requirements Re = new Models.TMT_Requirements
                     {
                         RequirementID = Guid.NewGuid().ToString("N"),
@@ -220,8 +220,6 @@ namespace Web.Controllers
                         return Json("当前状态无法进行发布！");
                     }
                     Re.Title = Model.Title;
-                    Re.ModuleID = Model.ModuleID;
-                    Re.AuditorUserID = Model.AuditorUserID;
                     Re.EmergencyLevel = Model.EmergencyLevel;
                     Re.LastUPDate = DateTime.Now;
                 }

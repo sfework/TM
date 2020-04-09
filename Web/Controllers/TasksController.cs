@@ -17,8 +17,21 @@ namespace Web.Controllers
 
         public IActionResult Add(string TaskID, string RequirementID)
         {
-
-            return View();
+            var Model = new ParamModels.Tasks.Tasks_Add_View
+            {
+                TaskID = TaskID,
+                RequirementID = RequirementID,
+                Requirements = DB.TMT_Requirements.Where(c => c.Status == Models.DBEnums.RequirementStatus.通过)
+            };
+            if (!string.IsNullOrWhiteSpace(RequirementID) && !Model.Requirements.Any(c => c.RequirementID == RequirementID))
+            {
+                Model.RequirementID = null;
+            }
+            if (!string.IsNullOrWhiteSpace(TaskID))
+            {
+                Model.Task = DB.TMT_Tasks.Find(TaskID);
+            }
+            return View(Model);
         }
         [HttpPost]
         public IActionResult Publish()
