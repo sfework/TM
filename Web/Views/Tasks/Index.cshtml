@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "需求管理";
+    ViewData["Title"] = "任务管理";
 }
 @model Web.ParamModels.Tasks.Tasks_Index
 <div class="searchbox">
@@ -60,17 +60,16 @@
                 <tr>
                     <th>标题</th>
                     <th width="60">状态</th>
-                    <th width="80">任务</th>
+                    <th width="120">版本</th>
                     <th width="160">模块</th>
                     <th width="120">创建人</th>
-                    <th width="120">评审人</th>
-                    <th width="90" class="right aligned">操作</th>
+                    <th width="120" class="right aligned">负责人</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model.List)
                 {
-                    @*<tr>
+                    <tr>
                         <td>
                             @switch (item.EmergencyLevel)
                             {
@@ -85,39 +84,26 @@
                                 case 5:
                                     <i class="exclamation icon red"></i>break;
                             }
-                            <a style="color:rgba(0,0,0,.8);" href="/Requirement/View?RequirementID=@item.RequirementID">@item.Title</a>
-                            @if (item.Status != DBEnums.RequirementStatus.草稿)
-                            {
-                                <div class="ui mini label horizontal basic">
-                                    @item.NowVersion
-                                </div>
-                            }
+                            <a style="color:rgba(0,0,0,.8);font-weight:bold;" href="/Tasks/View?TaskID=@item.TaskID">@item.Title</a>
+                            <div class="ui mini label horizontal basic">
+                                @item.NowVersion
+                            </div>
                         </td>
                         <td>
                             @switch (item.Status)
                             {
-                                case DBEnums.RequirementStatus.草稿:
-                                    <div class="ui tiny label blue basic horizontal">
-                                        @item.Status
-                                    </div>
-                                    break;
-                                case DBEnums.RequirementStatus.待审:
+                                case DBEnums.TasksStatus.进行:
                                     <div class="ui tiny label teal basic horizontal">
                                         @item.Status
                                     </div>
                                     break;
-                                case DBEnums.RequirementStatus.拒绝:
-                                    <div class="ui tiny label red basic horizontal">
-                                        @item.Status
-                                    </div>
-                                    break;
-                                case DBEnums.RequirementStatus.通过:
+                                case DBEnums.TasksStatus.完成:
                                     <div class="ui tiny label green basic horizontal">
                                         @item.Status
                                     </div>
                                     break;
-                                case DBEnums.RequirementStatus.归档:
-                                    <div class="ui tiny label grey basic horizontal">
+                                case DBEnums.TasksStatus.取消:
+                                    <div class="ui tiny label orange basic horizontal">
                                         @item.Status
                                     </div>
                                     break;
@@ -125,11 +111,8 @@
                         </td>
                         <td>
                             <div class="ui mini label basic">
-                                <i class="hourglass half icon grey"></i> 23
+                                <i class="tag icon grey"></i> 20200408
                             </div>
-                            hourglass half
-                                play
-                                check square
                         </td>
                         <td>
                             @item.Module.ModuleName
@@ -139,78 +122,18 @@
                                 <img src="@item.CreateUser.Avatar"> @item.CreateUser.UserName
                             </div>
                         </td>
-                        <td>
-                            <div class="ui image label mini basic">
-                                <img src="@item.AuditorUser.Avatar"> @item.AuditorUser.UserName
-                            </div>
-                        </td>
                         <td class="right aligned">
-                            <div class="ui blue icon buttons mini">
-                                @if ((item.Status == DBEnums.RequirementStatus.草稿 || item.Status == DBEnums.RequirementStatus.拒绝) && item.CreateUserID == G.User.UserID)
-                                {
-                                    <a class="ui button" href="/Requirement/Add?RequirementID=@item.RequirementID">
-                                        <i class="edit icon"></i>
-                                    </a>
-                                    <button class="ui button" onclick="page_action.del(@item.RequirementID)">
-                                        <i class="trash alternate outline icon"></i>
-                                    </button>
-                                }
-                                @if (item.Status == DBEnums.RequirementStatus.通过)
-                                {
-                                    <a class="ui button" href="/Requirement/Add?RequirementID=@item.RequirementID">
-                                        <i class="add icon"></i>
-                                    </a>
-                                }
+                            <div class="ui image label mini basic">
+                                <img src="@item.ExecutorUser.Avatar"> @item.ExecutorUser.UserName
                             </div>
                         </td>
-                    </tr>*@
+                    </tr>
                 }
             </tbody>
         </table>
     </div>
 </div>
 <Paging Page="Model.Page" PageSize="Model.PageSize" TotalCount="Model.TotalCount"></Paging>
-
-
-@*@switch (item.EmergencyLevel)
-    {
-        case 1:
-            <i class="star icon teal"></i>
-            break;
-        case 2:
-            <i class="star icon blue"></i>
-            break;
-        case 3:
-            <i class="star icon violet"></i>
-            break;
-        case 4:
-            <i class="star icon purple"></i>
-            break;
-        case 5:
-            <i class="star icon red"></i>
-            break;
-    }*@
 <script>
-    $('.ui.rating').rating({
-        onRate: function (value) {
-            $(this).removeClass('teal blue violet purple red');
-            switch (value) {
-                case 1:
-                    $(this).addClass('teal');
-                    break;
-                case 2:
-                    $(this).addClass('blue');
-                    break;
-                case 3:
-                    $(this).addClass('violet');
-                    break;
-                case 4:
-                    $(this).addClass('purple');
-                    break;
-                case 5:
-                    $(this).addClass('red');
-                    break;
-            }
-        }
-    });
+
 </script>

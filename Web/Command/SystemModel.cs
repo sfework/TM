@@ -12,6 +12,7 @@ namespace Web
             public UserModel User { get; set; }
             public List<UsableProjects> UsableProject { get; set; }
             public NowProjectModel NowProject { get; set; }
+            public RequestActionModel Request { get; set; }
         }
         public class UsableProjects
         {

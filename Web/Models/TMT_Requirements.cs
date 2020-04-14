@@ -21,6 +21,9 @@ namespace Web.Models
 
         public bool IsDelete { get; set; } = false;
 
+        [ForeignKey("ProjectID")]
+        public virtual TMT_Projects Project { get; set; }
+
         [ForeignKey("ModuleID")]
         public virtual TMT_Modules Module { get; set; }
         [ForeignKey("CreateUserID")]

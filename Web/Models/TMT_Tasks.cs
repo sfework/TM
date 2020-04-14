@@ -16,12 +16,16 @@ namespace Web.Models
         public int ProjectID { get; set; }
         public int ModuleID { get; set; }
 
+        public int ExecutorUserID { get; set; }
+
         public DateTime LastUPDate { get; set; }
         public int CreateUserID { get; set; }
         public int NowVersion { get; set; }
 
         public bool IsDelete { get; set; } = false;
 
+        [ForeignKey("ProjectID")]
+        public virtual TMT_Projects Project { get; set; }
         [ForeignKey("ModuleID")]
         public virtual TMT_Modules Module { get; set; }
         [ForeignKey("CreateUserID")]
@@ -29,6 +33,8 @@ namespace Web.Models
 
         [ForeignKey("RequirementID")]
         public virtual TMT_Requirements Requirement { get; set; }
+        [ForeignKey("ExecutorUserID")]
+        public virtual TMT_Users ExecutorUser { get; set; }
 
         public virtual ICollection<TMT_Detaile> Detailes { get; set; }
 

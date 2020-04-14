@@ -1,12 +1,12 @@
 ﻿@{
-    ViewData["Title"] = "新增需求";
+    ViewData["Title"] = Model.Task == null ? "新增任务" : "编辑任务：" + Model.Task.Title;
 }
 @model Web.ParamModels.Tasks.Tasks_Add_View
 <link href="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.css" rel="stylesheet">
 <script src="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.js"></script>
 <style>
     .context_box { flex: 1; overflow: hidden; display: flex; flex-direction: row; }
-    .context_box > .cleft { border-radius: 4px; flex: 1; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; background: #fff; padding: 40px; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
+    .context_box > .cleft { border-radius: 4px; flex: 1; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; background: #fff; padding: 20px 40px 40px 40px; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
     .context_box > .cright { border-radius: 4px; width: 300px; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; margin-left: 20px; padding: 20px; background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
 
     .jodit_workplace { border: 0 !important; margin-top: 10px; flex: 1; }
@@ -19,11 +19,12 @@
 </style>
 <div class="context_box">
     <div class="cleft">
-        <div class="" style="display:flex;flex-direction:row;margin-bottom:15px;font-size:12px;">
-            需求：
-            <div class="ui dropdown tiny search" style="flex:1;">
-                <input type="hidden" value="@Model.RequirementID" />
-                <span class="default text">选择需求</span>
+        <div class="" style="width:100%; display:flex;flex-direction:row;margin-bottom:15px;font-size:12px;">
+            <span style="line-height:32.84px;font-weight:bold;">需求：</span>
+            <div class="ui selection dropdown tiny" style="flex:1;" id="Requirement">
+                <input type="hidden" value="@Model.RequirementID" id="RequirementID" />
+                <i class="dropdown icon"></i>
+                <div class="default text">选择关联需求</div>
                 <div class="menu">
                     @foreach (var item in Model.Requirements)
                     {
@@ -33,13 +34,18 @@
                     }
                 </div>
             </div>
+            <span style="margin-left:10px;display:inline-block;height:31px;width:31px;">
+                <button class="ui icon button mini" style="margin-top:2px;@(string.IsNullOrWhiteSpace(Model.RequirementID)?"display:none;":"")">
+                    <i class="eye icon"></i>
+                </button>
+            </span>
         </div>
-        <input type="hidden" id="RequirementID" value="@Model.Task?.TaskID" />
+        <input type="hidden" id="TaskID" value="@Model.Task?.TaskID" />
         <div class="ui transparent input fluid" style="margin-bottom:20px;">
             <input type="text" id="Title" placeholder="任务标题..." value="@Model.Task?.Title" style="font-size:28px;font-weight:bold !important;" autocomplete="off">
         </div>
         <div class="strbox">
-            @(Model.Task==null?null: Html.Raw(Model.Task.Detailes.FirstOrDefault(c=>c.Version==Model.Task.NowVersion).Content))
+            @(Model.Task==null?null: Html.Raw(Model.Task.Detailes?.FirstOrDefault(c=>c.Version==Model.Task.NowVersion).Content))
         </div>
     </div>
     <div class="cright">
@@ -59,7 +65,7 @@
             </div>
             <div class="field inline dfluid">
                 <label>指派</label>
-                <SelectUsers Placeholder="指派任务负责人" Clearable="false" ID="AuditorUserID"></SelectUsers>
+                <SelectUsers Placeholder="指派任务负责人" Default="Model?.Task?.ExecutorUserID" Clearable="false" ID="ExecutorUserID"></SelectUsers>
             </div>
             <div class="field inline dfluid">
                 <label>模块</label>
@@ -105,6 +111,26 @@
                     }
                 }
             }).rating('set rating', $('#EmergencyLevel').rating('get rating'));
+            $('#Requirement').dropdown({
+                onChange: function (value, text, $choice) {
+                    if (value) {
+                        var target = $(this);
+                        ajax.post('/Tasks/GetRequirement', { RequirementID: value }, function () { $(target).load_show(); }, function (success, data) {
+                            $(target).load_hide();
+                            if (success && data.Success) {
+                                $('#EmergencyLevel').rating('set rating', data.Result.EmergencyLevel);
+                                $('#Title').val(data.Result.Title);
+                                $('#ModuleID').parent().dropdown('set selected', data.Result.ModuleID);
+                            }
+                        });
+                        $(this).next('span').children('button').show();
+                    }
+                    else {
+                        $(this).next('span').children('button').hide();
+                    }
+                },
+                clearable: true
+            });
         },
         edit: function () {
             modal_action.edit_obj = new Jodit(".strbox", {
@@ -133,44 +159,26 @@
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
                 var data = {
+                    TaskID: $('#TaskID').val(),
                     RequirementID: $('#RequirementID').val(),
-                    AuditorUserID: $('#AuditorUserID').val(),
+                    ExecutorUserID: $('#ExecutorUserID').val(),
                     ModuleID: $('#ModuleID').val(),
                     EmergencyLevel: $('#EmergencyLevel').rating('get rating'),
                     Content: modal_action.edit_obj.getEditorValue(),
                     Title: $('#Title').val()
                 };
-                var _url = '/Requirement/Save';
-                if (tp == 0) {
-                    ajax.post(_url, data, function () { $(target).load_show(); },
-                        function (success, data) {
-                            $(target).load_hide();
-                            if (success && data.Success) {
-                                if (document.referrer) {
-                                    window.location.href = document.referrer;
-                                }
-                                else {
-                                    window.location.href = '/Requirement/Index';
-                                }
+                ajax.post('/Tasks/Add', data, function () { $(target).load_show(); },
+                    function (success, data) {
+                        $(target).load_hide();
+                        if (success && data.Success) {
+                            if (document.referrer) {
+                                window.location.href = document.referrer;
                             }
-                        });
-                }
-                else {
-                    _url = '/Requirement/Publish';
-                    modal.ask('发布后将进行需求版本控制，确认发布此需求？', function () {
-                        ajax.post(_url, data, function () { $(target).load_show(); }, function (success, data) {
-                            $(target).load_hide();
-                            if (success && data.Success) {
-                                if (document.referrer) {
-                                    window.location.href = document.referrer;
-                                }
-                                else {
-                                    window.location.href = '/Requirement/Index';
-                                }
+                            else {
+                                window.location.href = '/Requirement/Index';
                             }
-                        });
+                        }
                     });
-                }
             }
         }
     };

@@ -12,7 +12,8 @@ namespace Web.Controllers
     {
         public IActionResult Index(ParamModels.Requirement.Requirement_Index Model)
         {
-            Model.List = DB.TMT_Requirements.Where(c => c.ProjectID == G.NowProject.ProjectID && c.Status == Models.DBEnums.RequirementStatus.通过 || c.Status == Models.DBEnums.RequirementStatus.归档 || c.CreateUserID == G.User.UserID || (c.Status == Models.DBEnums.RequirementStatus.待审 && c.AuditorUserID == G.User.UserID));
+            Model.List = DB.TMT_Requirements.Where(c => c.ProjectID == G.NowProject.ProjectID);
+            Model.List = Model.List.Where(c => c.Status == Models.DBEnums.RequirementStatus.通过 || c.Status == Models.DBEnums.RequirementStatus.归档 || c.CreateUserID == G.User.UserID);
             if (Model.Tag == 1)
             {
                 Model.List = Model.List.Where(c => c.CreateUserID == G.User.UserID);
@@ -33,7 +34,7 @@ namespace Web.Controllers
             {
                 Model.List = Model.List.Where(c => c.ModuleID == Model.ModuleID);
             }
-            Model.List = Model.List.OrderByDescending(m => m.ProjectID);
+            Model.List = Model.List.OrderByDescending(m => m.RequirementID);
             Model.Create();
             return View(Model);
         }
@@ -44,19 +45,23 @@ namespace Web.Controllers
             if (!string.IsNullOrWhiteSpace(RequirementID))
             {
                 Model = DB.TMT_Requirements.Find(RequirementID);
+                if (Model.CreateUserID != G.User.UserID)
+                {
+                    return View("_NoRight");
+                }
             }
             return View(Model);
         }
         public IActionResult View(string RequirementID, int? Version)
         {
             var Model = DB.TMT_Requirements.Find(RequirementID);
-            if ((Model.Status == Models.DBEnums.RequirementStatus.草稿 || Model.Status == Models.DBEnums.RequirementStatus.拒绝) && Model.CreateUserID != G.User.UserID)
+            if (Model.Status == Models.DBEnums.RequirementStatus.拒绝 && Model.CreateUserID != G.User.UserID)
             {
-                throw new Exception("无权");
+                return View("_NoRight");
             }
-            if (Model.Status == Models.DBEnums.RequirementStatus.待审 && (Model.CreateUserID != G.User.UserID && Model.AuditorUserID != G.User.UserID))
+            if (Model.Status == Models.DBEnums.RequirementStatus.待审 && Model.CreateUserID != G.User.UserID && Model.AuditorUserID != G.User.UserID)
             {
-                throw new Exception("无权");
+                return View("_NoRight");
             }
             if (Version.HasValue)
             {
@@ -64,81 +69,8 @@ namespace Web.Controllers
             }
             return View(Model);
         }
-
         [HttpPost]
         public IActionResult Save(ParamModels.Requirement.Requirement_Add_Model Model)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(Model.Title))
-                {
-                    return Json("[需求标题]不可为空！");
-                }
-                if (Model.ModuleID < 1)
-                {
-                    return Json("[模块]必须选择！");
-                }
-                if (Model.AuditorUserID < 1)
-                {
-                    return Json("[评审人]必须选择！");
-                }
-                if (string.IsNullOrWhiteSpace(Model.RequirementID))
-                {
-                    Models.TMT_Requirements Re = new Models.TMT_Requirements
-                    {
-                        RequirementID = Guid.NewGuid().ToString("N"),
-                        Title = Model.Title,
-                        EmergencyLevel = Model.EmergencyLevel,
-                        Status = Models.DBEnums.RequirementStatus.草稿,
-                        ProjectID = G.NowProject.ProjectID,
-                        ModuleID = Model.ModuleID,
-                        AuditorUserID = Model.AuditorUserID,
-                        CreateUserID = G.User.UserID,
-                        LastUPDate = DateTime.Now,
-                        NowVersion = 1,
-                        Detailes = new List<Models.TMT_Detaile>()
-                    };
-                    Re.Detailes.Add(new Models.TMT_Detaile()
-                    {
-                        Content = string.IsNullOrWhiteSpace(Model.Content) ? "" : Model.Content,
-                        Version = Re.NowVersion,
-                        CreateDate = DateTime.Now
-                    });
-                    DB.TMT_Requirements.Add(Re);
-                }
-                else
-                {
-                    var Re = DB.TMT_Requirements.Find(Model.RequirementID);
-                    if (Re.CreateUserID != G.User.UserID)
-                    {
-                        return Json("无权对此数据进行编辑！");
-                    }
-                    if (Re.Status != Models.DBEnums.RequirementStatus.草稿 && Re.Status != Models.DBEnums.RequirementStatus.拒绝)
-                    {
-                        return Json("当前状态无法进行编辑！");
-                    }
-                    var Detaile = Re.Detailes.FirstOrDefault(c => c.Version == Re.NowVersion);
-                    if (Detaile != null)
-                    {
-                        Detaile.Content = string.IsNullOrWhiteSpace(Model.Content) ? "" : Model.Content;
-                        Detaile.CreateDate = DateTime.Now;
-                    }
-                    Re.Title = Model.Title;
-                    Re.ModuleID = Model.ModuleID;
-                    Re.AuditorUserID = Model.AuditorUserID;
-                    Re.EmergencyLevel = Model.EmergencyLevel;
-                    Re.LastUPDate = DateTime.Now;
-                }
-                DB.SaveChanges();
-                return Json();
-            }
-            catch (Exception Ex)
-            {
-                return Json(Ex.Message);
-            }
-        }
-        [HttpPost]
-        public IActionResult Publish(ParamModels.Requirement.Requirement_Add_Model Model)
         {
             try
             {
@@ -168,13 +100,22 @@ namespace Web.Controllers
                         CreateUserID = G.User.UserID,
                         LastUPDate = DateTime.Now,
                         NowVersion = 1,
-                        Detailes = new List<Models.TMT_Detaile>()
+                        Detailes = new List<Models.TMT_Detaile>(),
+                        Logs = new List<Models.TMT_Logs>()
                     };
                     Re.Detailes.Add(new Models.TMT_Detaile()
                     {
                         Content = string.IsNullOrWhiteSpace(Model.Content) ? "" : Model.Content,
                         Version = Re.NowVersion,
                         CreateDate = DateTime.Now
+                    });
+                    Re.Logs.Add(new Models.TMT_Logs
+                    {
+                        TagID = Re.RequirementID,
+                        LogType = Models.DBEnums.LogType.需求,
+                        TriggerUserID = G.User.UserID,
+                        TargetUserID = null,
+                        Content = "发布第<div class=\"ui label horizontal mini\">" + Re.NowVersion + "</div>版本需求！",
                     });
                     DB.TMT_Requirements.Add(Re);
                 }
@@ -185,16 +126,14 @@ namespace Web.Controllers
                     {
                         return Json("无权对此数据进行操作！");
                     }
-                    if (Re.Status == Models.DBEnums.RequirementStatus.草稿 || Re.Status == Models.DBEnums.RequirementStatus.拒绝)
+                    if (Re.Status == Models.DBEnums.RequirementStatus.拒绝)
                     {
-                        Re.Logs.Add(new Models.TMT_Logs
+                        var Detaile = Re.Detailes.FirstOrDefault(c => c.Version == Re.NowVersion);
+                        if (Detaile != null)
                         {
-                            TagID = Re.RequirementID,
-                            LogType = Models.DBEnums.LogType.需求,
-                            TriggerUserID = G.User.UserID,
-                            TargetUserID = null,
-                            Content = "发布第<div class=\"ui label horizontal mini\">" + Re.NowVersion + "</div>版本需求！",
-                        });
+                            Detaile.Content = string.IsNullOrWhiteSpace(Model.Content) ? "" : Model.Content;
+                            Detaile.CreateDate = DateTime.Now;
+                        }
                         Re.Status = Models.DBEnums.RequirementStatus.待审;
                     }
                     else if (Re.Status == Models.DBEnums.RequirementStatus.通过)
@@ -280,6 +219,14 @@ namespace Web.Controllers
             {
                 return Json("无权归档!");
             }
+            Model.Logs.Add(new Models.TMT_Logs
+            {
+                TagID = Model.RequirementID,
+                LogType = Models.DBEnums.LogType.需求,
+                TriggerUserID = G.User.UserID,
+                TargetUserID = null,
+                Content = "归档需求！",
+            });
             Model.Status = Models.DBEnums.RequirementStatus.归档;
             DB.SaveChanges();
             return Json();
@@ -289,7 +236,7 @@ namespace Web.Controllers
         public IActionResult Delete(string RequirementID)
         {
             var Model = DB.TMT_Requirements.Find(RequirementID);
-            if (Model.Status != Models.DBEnums.RequirementStatus.草稿 && Model.Status != Models.DBEnums.RequirementStatus.拒绝)
+            if (Model.Status != Models.DBEnums.RequirementStatus.拒绝)
             {
                 return Json("当前状态不可删除!");
             }
@@ -306,6 +253,83 @@ namespace Web.Controllers
                 Content = "删除需求！",
             });
             Model.IsDelete = true;
+            DB.SaveChanges();
+            return Json();
+        }
+
+        [HttpGet]
+        public IActionResult HandOver(string RequirementID)
+        {
+            ViewBag.RequirementID = RequirementID;
+            return View();
+        }
+        [HttpPost]
+        public IActionResult HandOver(string RequirementID, int UserID, string Remark)
+        {
+            var Model = DB.TMT_Requirements.Find(RequirementID);
+            if (Model.Status != Models.DBEnums.RequirementStatus.待审)
+            {
+                return Json("当前状态不能进行评审转交!");
+            }
+            if (Model.AuditorUserID != G.User.UserID)
+            {
+                return Json("无权转交!");
+            }
+            if (Model.AuditorUserID == UserID)
+            {
+                return Json("原评审人与转交人相同!");
+            }
+            var _User = DB.TMT_Users.Find(UserID);
+            var Content = "将需求转交给：<div class=\"ui label horizontal mini\">" + _User.UserName + "</div>进行评审";
+            if (!string.IsNullOrWhiteSpace(Remark))
+            {
+                Content += "<br />" + Remark;
+            }
+            Model.Logs.Add(new Models.TMT_Logs
+            {
+                TagID = Model.RequirementID,
+                LogType = Models.DBEnums.LogType.需求,
+                TriggerUserID = G.User.UserID,
+                TargetUserID = null,
+                Content = Content
+            });
+            Model.AuditorUserID = UserID;
+            DB.SaveChanges();
+            return Json();
+        }
+
+        [HttpGet]
+        public IActionResult Cancel(string RequirementID)
+        {
+            ViewBag.RequirementID = RequirementID;
+            return View();
+        }
+        [HttpPost]
+        public IActionResult Cancel(string RequirementID, string Remark)
+        {
+            var Model = DB.TMT_Requirements.Find(RequirementID);
+            if (Model.Status != Models.DBEnums.RequirementStatus.通过)
+            {
+                return Json("当前状态不能取消需求!");
+            }
+            if (Model.CreateUserID != G.User.UserID)
+            {
+                return Json("无权取消需求!");
+            }
+            var Content = "取消需求！";
+            if (!string.IsNullOrWhiteSpace(Remark))
+            {
+                Content += "<br />" + Remark;
+            }
+            Model.Logs.Add(new Models.TMT_Logs
+            {
+                TagID = Model.RequirementID,
+                LogType = Models.DBEnums.LogType.需求,
+                TriggerUserID = G.User.UserID,
+                TargetUserID = null,
+                Content = Content
+            });
+            Model.Status = Models.DBEnums.RequirementStatus.取消;
             DB.SaveChanges();
             return Json();
         }

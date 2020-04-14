@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "新增需求";
+    ViewData["Title"] = Model.Title;
 }
 @model TMT_Requirements
 <style>
@@ -19,52 +19,29 @@
     </div>
     <div class="cright">
         <div class="ui form tiny">
-            @if (Model.Status != DBEnums.RequirementStatus.归档)
-            {
-                <div class="field">
-                    <div class="ui buttons icon  blue compact">
-                        @if ((Model.Status == DBEnums.RequirementStatus.草稿 || Model.Status == DBEnums.RequirementStatus.拒绝 || Model.Status == DBEnums.RequirementStatus.通过) && Model.CreateUserID == G.User.UserID)
-                        {
-                            <a class="ui button" href="/Requirement/Add?RequirementID=@Model.RequirementID"><i class="edit icon"></i></a>
-                        }
-                        @if (Model.Status == DBEnums.RequirementStatus.待审 && Model.AuditorUserID == G.User.UserID)
-                        {
-                            <button class="ui button" onclick="modal.load('/Requirement/Review?RequirementID=@Model.RequirementID',400)"><i class="hard hat icon"></i></button>
-                        }
-                        @if (Model.Status == DBEnums.RequirementStatus.通过 && Model.CreateUserID == G.User.UserID)
-                        {
-                            <button class="ui button" onclick="page_action.sealUP('@Model.RequirementID')"><i class="archive icon"></i></button>
-                            <a class="ui button" href="/Tasks/Add?RequirementID=@Model.RequirementID"><i class="plus square icon"></i></a>
-                        }
-                    </div>
-                </div>
-            }
             <div class="field inline">
                 <label>优先级</label>
                 <div style="margin-top:7px;" class="ui rating disabled" id="EmergencyLevel" data-icon="star" data-rating="@Model.EmergencyLevel" data-max-rating="5"></div>
             </div>
-            @if (Model.Status != DBEnums.RequirementStatus.草稿)
-            {
-                <div class="field inline">
-                    <label>版本</label>
-                    <div class="ui inline dropdown" id="setVersion" style="width:80px;">
-                        <input type="hidden" value="@Model.NowVersion">
+            <div class="field inline">
+                <label>版本</label>
+                <div class="ui inline dropdown" id="setVersion" style="width:80px;">
+                    <input type="hidden" value="@Model.NowVersion">
 
-                        <div class="default text"></div>
-                        <i class="dropdown icon"></i>
-                        <div class="menu">
-                            @foreach (var item in Model.Detailes)
-                            {
-                                <div class="item" data-value="@item.Version"># @(item.Version)</div>
-                            }
-                        </div>
+                    <div class="default text"></div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        @foreach (var item in Model.Detailes)
+                        {
+                            <div class="item" data-value="@item.Version"># @(item.Version)</div>
+                        }
                     </div>
                 </div>
-            }
+            </div>
             <div class="field inline">
                 <label>项目</label>
                 <div class="ui label basic">
-                    <i class="briefcase icon"></i> @G.NowProject.ProjectName
+                    <i class="briefcase icon"></i> @Model.Project.ProjectName
                 </div>
             </div>
             <div class="field inline">
@@ -80,6 +57,39 @@
                     @Model.Module.ModuleName
                 </div>
             </div>
+            @if (Model.Status == DBEnums.RequirementStatus.通过 && Model.CreateUserID == G.User.UserID)
+            {
+                <div class="field">
+                    <div class="ui buttons icon  blue compact">
+                        <a class="ui button" href="/Requirement/Add?RequirementID=@Model.RequirementID" title="编辑"><i class="edit icon"></i></a>
+                        <button class="ui button" onclick="page_action.sealUP('@Model.RequirementID')" title="归档"><i class="archive icon"></i></button>
+                        <a class="ui button" href="/Tasks/Add?RequirementID=@Model.RequirementID" title="新建任务"><i class="plus square icon"></i></a>
+                        <button class="ui button" onclick="modal.load('/Requirement/Cancel?RequirementID=@Model.RequirementID',400)" title="取消需求"><i class="times icon"></i></button>
+                    </div>
+                </div>
+            }
+            else if (Model.Status == DBEnums.RequirementStatus.拒绝 && Model.CreateUserID == G.User.UserID)
+            {
+                <div class="field">
+                    <a class="ui blue button tiny" href="/Requirement/Add?RequirementID=@Model.RequirementID">
+                        <i class="edit icon"></i>
+                        编辑
+                    </a>
+                </div>
+            }
+            else if (Model.Status == DBEnums.RequirementStatus.待审 && Model.AuditorUserID == G.User.UserID)
+            {
+                <div class="field">
+                    <button class="ui orange button tiny" onclick="modal.load('/Requirement/Review?RequirementID=@Model.RequirementID',400)">
+                        <i class="hard hat icon"></i>
+                        审核
+                    </button>
+                    <button class="ui teal button tiny" onclick="modal.load('/Requirement/HandOver?RequirementID=@Model.RequirementID',400)">
+                        <i class="random icon"></i>
+                        转交
+                    </button>
+                </div>
+            }
         </div>
         @if (Model.Tasks.Count > 0)
         {
@@ -87,39 +97,56 @@
                 <i class="tasks icon"></i>
                 相关任务
             </div>
-            <div class="ui list tiny">
+            <div class="ui list small">
                 @foreach (var item in Model.Tasks)
                 {
-                    <a class="item">@item.Title</a>
-                }
-            </div>
-        }
-        @if (Model.Status != DBEnums.RequirementStatus.草稿)
-        {
-            <div class="ui horizontal divider">
-                <i class="history icon"></i>
-                历史记录
-            </div>
-            <div class="ui comments mini">
-                @foreach (var item in Model.Logs)
-                {
-                    <div class="comment">
-                        <a class="avatar">
-                            <img src="@item.TriggerUser.Avatar">
-                        </a>
+                    <div class="item">
+                        <img class="ui avatar image" src="@item.ExecutorUser.Avatar">
                         <div class="content">
-                            <a class="author">@item.TriggerUser.UserName</a>
-                            <div class="metadata">
-                                <span class="date">@item.CreateDate</span>
-                            </div>
-                            <div class="text">
-                                @Html.Raw(item.Content)
+                            <span class="header">@item.ExecutorUser.UserName</span>
+                            <div class="description">
+                                @switch (item.Status)
+                                {
+                                    case DBEnums.TasksStatus.进行:
+                                        <i class="icon caret square right teal" style="font-size: 14px;margin: 0px;" title="@item.Status"></i>
+                                        break;
+                                    case DBEnums.TasksStatus.完成:
+                                        <i class="icon check square green" style="font-size: 14px;margin: 0px;" title="@item.Status"></i>
+                                        break;
+                                    case DBEnums.TasksStatus.取消:
+                                        <i class="icon window close red" style="font-size: 14px;margin: 0px;" title="@item.Status"></i>
+                                        break;
+                                }
+                                @item.Title
                             </div>
                         </div>
                     </div>
                 }
             </div>
         }
+        <div class="ui horizontal divider">
+            <i class="history icon"></i>
+            历史记录
+        </div>
+        <div class="ui comments mini">
+            @foreach (var item in Model.Logs)
+            {
+                <div class="comment">
+                    <a class="avatar">
+                        <img src="@item.TriggerUser.Avatar">
+                    </a>
+                    <div class="content">
+                        <a class="author">@item.TriggerUser.UserName</a>
+                        <div class="metadata">
+                            <span class="date">@item.CreateDate</span>
+                        </div>
+                        <div class="text">
+                            @Html.Raw(item.Content)
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
 </div>
 <script>

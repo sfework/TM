@@ -9,18 +9,17 @@ namespace Web.Models
     {
         public enum RequirementStatus
         {
-            草稿 = 0,
-            待审 = 1,
-            拒绝 = 2,
-            通过 = 3,
-            归档 = 4
+            待审 = 0,
+            拒绝 = 1,
+            通过 = 2,
+            归档 = 3,
+            取消 = 4
         }
         public enum TasksStatus
         {
-            等待 = 0,
-            进行 = 1,
-            完成 = 2,
-            关闭 = 3
+            进行 = 0,
+            完成 = 1,
+            取消 = 2
         }
         public enum LogType
         {

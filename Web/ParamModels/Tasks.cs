@@ -25,5 +25,16 @@ namespace Web.ParamModels
             public IQueryable<Models.TMT_Requirements> Requirements { get; set; }
             public Models.TMT_Tasks Task { get; set; }
         }
+
+        public class Tasks_Add
+        {
+            public string TaskID { get; set; }
+            public string RequirementID { get; set; }
+            public int ExecutorUserID { get; set; }
+            public int ModuleID { get; set; }
+            public int EmergencyLevel { get; set; }
+            public string Content { get; set; }
+            public string Title { get; set; }
+        }
     }
 }

@@ -38,43 +38,42 @@
     </div>
     <div class="menulist">
         <ul>
-            <li>
+            <li class="@(G.Request.ControllerName=="Home"?"active":"")">
                 <a href="/">
                     <i class="home icon"></i>
                     首 页
                 </a>
-            </li>
-            <li>
+            <li class="@(G.Request.ControllerName=="Requirement"?"active":"")">
                 <a href="/Requirement/Index">
                     <i class="file alternate icon"></i>
                     需 求
                 </a>
             </li>
-            <li>
+            <li class="@(G.Request.ControllerName=="Tasks"?"active":"")">
                 <a href="/Tasks/Index">
                     <i class="tasks icon"></i>
                     任 务
                 </a>
             </li>
-            <li>
+            <li class="@(G.Request.ControllerName=="Version"?"active":"")">
                 <a href="/Version/Index">
                     <i class="code branch icon"></i>
                     版 本
                 </a>
             </li>
-            <li>
+            <li class="@(G.Request.ControllerName=="Test"?"active":"")">
                 <a href="/Test/Index">
                     <i class="bug icon"></i>
                     测 试
                 </a>
             </li>
-            <li>
+            <li class="@(G.Request.ControllerName=="Document"?"active":"")">
                 <a href="/Document/Index">
                     <i class="file alternate outline icon"></i>
                     文 档
                 </a>
             </li>
-            <li>
+            <li class="@(G.Request.ControllerName=="Code"?"active":"")">
                 <a href="/Code/Index">
                     <i class="code icon"></i>
                     源 码

@@ -274,24 +274,25 @@ var url = {
         }
         return queryAry.join('&');
     },
-    replaceParamVal: function (oUrl, paramName, replaceWith) {
-        if (oUrl.length < 1) {
-            oUrl = "?" + paramName + '=' + replaceWith;
-            return oUrl;
+    replaceParamVal: function (paramName, replaceWith) {
+        var ourl = window.location.search;
+        if (ourl) {
+            ourl = ourl.replace('?', '');
+        }
+        else {
+            ourl = paramName + '=' + replaceWith;
+            return "?" + ourl;
         }
         var reg = new RegExp("(^|&)" + paramName + "=([^&]*)(&|$)", "i");
-        var r = oUrl.match(reg);
+        var r = ourl.match(reg);
         if (r === null) {
-            oUrl = oUrl + "&" + paramName + '=' + replaceWith;
-            return oUrl;
+            ourl = ourl + "&" + paramName + '=' + replaceWith;
+            return '?' + ourl;
         }
         else {
             var re = eval('/(' + paramName + '=)([^&]*)/gi');
-            var nUrl = oUrl.replace(re, paramName + '=' + replaceWith);
-            if (nUrl.substr(0, 1) !== '?') {
-                nUrl = '?' + nUrl;
-            }
-            return nUrl;
+            var nUrl = ourl.replace(re, paramName + '=' + replaceWith);
+            return '?' + nUrl;
         }
     },
     search: function (el) {
@@ -309,14 +310,12 @@ var url = {
             var target = event.currentTarget;
             $(target).load_show();
         }
-        var oUrl = window.location.search.substr(1);
-        oUrl = url.replaceParamVal(oUrl, 'Page', p);
+        oUrl = url.replaceParamVal('Page', p);
         window.location.href = window.location.pathname + oUrl;
     },
     resize: function (s) {
-        var oUrl = window.location.search.substr(1);
-        oUrl = url.replaceParamVal(oUrl, 'Page', '1');
-        oUrl = url.replaceParamVal(oUrl, 'PageSize', s);
+        oUrl = url.replaceParamVal('Page', '1');
+        oUrl = url.replaceParamVal('PageSize', s);
         window.location.href = window.location.pathname + oUrl;
     }
 };

@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "新增需求";
+    ViewData["Title"] = Model == null ? "新增需求" : "编辑需求：" + Model.Title;
 }
 @model TMT_Requirements
 <link href="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.css" rel="stylesheet">
@@ -30,15 +30,6 @@
     </div>
     <div class="cright">
         <div class="ui form tiny">
-            <div class="field">
-                <div class="ui buttons icon  blue compact">
-                    @if (Model == null || Model.Status == DBEnums.RequirementStatus.草稿)
-                    {
-                        <button class="ui button" onclick="modal_action.save(0)"><i class="save icon"></i></button>
-                    }
-                    <button class="ui button" onclick="modal_action.save(1)"><i class="external alternate icon"></i></button>
-                </div>
-            </div>
             <div class="field inline">
                 <label>优先级</label>
                 <div class="ui grey rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
@@ -92,6 +83,12 @@
                     </div>
                 </div>
             }
+            <div class="field">
+                <button class="ui labeled icon button teal tiny" onclick="modal_action.save()">
+                    <i class="save icon"></i>
+                    保存
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -146,7 +143,7 @@
                 },
             });
         },
-        save: function (tp) {
+        save: function () {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
                 var data = {
@@ -158,36 +155,19 @@
                     Title: $('#Title').val()
                 };
                 var _url = '/Requirement/Save';
-                if (tp == 0) {
-                    ajax.post(_url, data, function () { $(target).load_show(); },
-                        function (success, data) {
-                            $(target).load_hide();
-                            if (success && data.Success) {
-                                if (document.referrer) {
-                                    window.location.href = document.referrer;
-                                }
-                                else {
-                                    window.location.href = '/Requirement/Index';
-                                }
+                modal.ask('发布后将进行需求版本控制，确认发布此需求？', function () {
+                    ajax.post(_url, data, function () { $(target).load_show(); }, function (success, data) {
+                        $(target).load_hide();
+                        if (success && data.Success) {
+                            if (document.referrer) {
+                                window.location.href = document.referrer;
                             }
-                        });
-                }
-                else {
-                    _url = '/Requirement/Publish';
-                    modal.ask('发布后将进行需求版本控制，确认发布此需求？', function () {
-                        ajax.post(_url, data, function () { $(target).load_show(); }, function (success, data) {
-                            $(target).load_hide();
-                            if (success && data.Success) {
-                                if (document.referrer) {
-                                    window.location.href = document.referrer;
-                                }
-                                else {
-                                    window.location.href = '/Requirement/Index';
-                                }
+                            else {
+                                window.location.href = '/Requirement/Index';
                             }
-                        });
+                        }
                     });
-                }
+                });
             }
         }
     };

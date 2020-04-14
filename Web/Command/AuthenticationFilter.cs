@@ -19,13 +19,14 @@ namespace Web
         {
             var ReturnAction = Actions.Get(Context);
             var G = Session.Get<SystemModel.Model>("Web_System");
-            if (!ReturnAction.IsAllowAnonymous)
+            if (!ReturnAction.IsAllowAnonymous && G?.User == null)
             {
-                if (G?.User == null)
-                {
-                    Context.Result = new RedirectResult("/");
-                    return;
-                }
+                Context.Result = new RedirectResult("/");
+                return;
+            }
+            if (G != null)
+            {
+                G.Request = ReturnAction;
             }
             Context.HttpContext.Items.Add("Web_System", G);
         }
