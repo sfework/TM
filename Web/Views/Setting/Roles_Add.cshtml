@@ -14,9 +14,15 @@
                 <label>角色名称</label>
                 <input type="text" id="RoleName" value="@Model?.RoleName">
             </div>
+            @if (Model != null)
+            {
+                <div class="field">
+                    <i class="exclamation circle icon orange"></i><span class="ui orange text">调整权限后，相关角色的账号必须重新登录才会生效。</span>
+                </div>
+            }
         </div>
     </div>
-    <div class="ui form mini rolesA" id="rolesA" style="float:left;font-size:12px;">
+    <div class="ui form mini" style="float:left;font-size:12px;">
         @{
             var Auths = string.IsNullOrWhiteSpace(Model?.Auths) ? new int[] { } : Array.ConvertAll(Model.Auths.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries), c => int.Parse(c));
         }
@@ -41,28 +47,20 @@
 </div>
 <script>
     var modal_action = {
-        getAuths: function () {
-            var objs = $('#rolesA input:checkbox:checked');
-            var auths = new Array();
-            for (var i = 0; i < objs.length; i++) {
-                auths.push(Number($(objs[i]).val()));
-            }
-            return auths.join(',');
-        },
         save: function () {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
-                var data = {
-                    RoleID: $('#RoleID').val(),
-                    RoleName: $('#RoleName').val(),
-                    Auths: modal_action.getAuths()
-                };
+                var objs = $(target).parent().parent().children('.content').find('input:checkbox:checked');
+                var auths = new Array();
+                for (var i = 0; i < objs.length; i++) {
+                    auths.push(Number($(objs[i]).val()));
+                }
+                var data = $(target).parent().parent().children('.content').find('.ui.form:first-child').getdata();
+                data.Auths = auths;
                 ajax.post('/Setting/Roles_Add_Save', data, function () {
-                    if (target) { $(target).load_show(); }
+                    $(target).load_show();
                 }, function (success, data) {
-                    if (target) {
-                        $(target).load_hide();
-                    }
+                    $(target).load_hide();
                     if (success && data.Success) {
                         window.location.reload();
                     }
@@ -72,6 +70,6 @@
     };
 </script>
 <div class="actions" style="clear:left;">
-    <button class="ui button green small" onclick="modal_action.save()">保存</button>
-    <button class="ui button cancel black small">取消</button>
+    <button class="ui button green" onclick="modal_action.save()">保存</button>
+    <button class="ui button cancel black">取消</button>
 </div>

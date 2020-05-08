@@ -30,11 +30,11 @@ namespace Web.Controllers
         {
             if (!Check.IsStr(Account))
             {
-                return Json("[Account] Input Error!");
+                return Json("输入的账号格式错误!");
             }
             if (!Check.IsPassWord(PassWord))
             {
-                return Json("[PassWord] Input Error!");
+                return Json("输入的密码格式错误!");
             }
             var Temp = DB.TMT_Users.FirstOrDefault(c => c.Account == Account);
             if (Temp == null)
@@ -70,8 +70,6 @@ namespace Web.Controllers
             Session.Remove("Web_System");
             return Redirect("/");
         }
-
-
         [HttpPost]
         public IActionResult ProjectSet(int ProjectID)
         {
@@ -97,36 +95,8 @@ namespace Web.Controllers
         [HttpPost, AllowAnonymous]
         public async Task<IActionResult> UPLoad()
         {
-            return Json(await Command.Helper.SaveAsync(HttpContext.Request.Form.Files));
-        }
-        [HttpPost]
-        public async Task<IActionResult> Edit_UPload()
-        {
-            var Re = await Command.Helper.SaveAsync(HttpContext.Request.Form.Files);
-
-            var ImagesType = new string[] { ".gif", ".jpg", ".jpeg", ".bmp", ".png", ".ico" };
-
-            List<string> _Files = new List<string>();
-            List<bool> _IsImage = new List<bool>();
-            foreach (var item in Re)
-            {
-                _Files.Add(item);
-                _IsImage.Add(Array.IndexOf(ImagesType, System.IO.Path.GetExtension(item).ToLower()) > -1);
-            }
-            var Data = new
-            {
-                success = true,
-                time = DateTime.Now,
-                data = new
-                {
-                    baseurl = "",
-                    messages = new string[] { },
-                    files = _Files.ToArray(),
-                    isImages = _IsImage.ToArray(),
-                    code = 220
-                }
-            };
-            return new JsonResult(Data);
+            var (name, path) = await Command.Helper.SaveAsync(HttpContext.Request.Form.Files);
+            return Json(new { name, path });
         }
     }
 }

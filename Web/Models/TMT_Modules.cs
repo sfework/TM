@@ -12,5 +12,8 @@ namespace Web.Models
         public int ProjectID { get; set; }
         public string ModuleName { get; set; }
         public bool IsDelete { get; set; } = false;
+
+        [ForeignKey("ProjectID")]
+        public virtual TMT_Projects Project { get; set; }
     }
 }

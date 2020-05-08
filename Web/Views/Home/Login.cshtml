@@ -21,7 +21,7 @@
     </div>
     <div class="ui divider"></div>
     <div class="login_form">
-        <div class="ui form" id="loginform">
+        <div class="ui form">
             <div class="field">
                 <div class="ui left icon input">
                     <input type="text" placeholder="Account" id="Account" onkeydown="keydown()" autocomplete="off">
@@ -39,20 +39,21 @@
     </div>
 </div>
 <script>
-    function keydown(frm, event) {
-        var event = window.event ? window.event : event;
-        if (event.keyCode == 13) {
+    function keydown() {
+        if (event && event.keyCode === 13) {
             login();
         }
     }
     function login() {
-        var target = $('.login_form .ui.button');
-        var data = $('#loginform').getdata();
+        var target = $('.ui.button.orange.fluid');
+        var data = target.parent().getdata();
         data.PassWord = md5(data.PassWord);
         ajax.post('/Home/Login', data, function () { $(target).load_show(); }, function (success, data) {
-            $(target).load_hide();
             if (success && data.Success) {
                 window.location.href = '/';
+            }
+            else {
+                $(target).load_hide();
             }
         });
     }

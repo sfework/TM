@@ -32,9 +32,8 @@ namespace Web.Command
             return sb.ToString();
         }
 
-        public static async Task<List<string>> SaveAsync(IFormFileCollection Files)
+        public static async Task<(string name,string path)> SaveAsync(IFormFileCollection Files)
         {
-            List<string> RePath = new List<string>();
             if (Files.Count > 0)
             {
                 string UPath = string.Format("wwwroot/Files/{0}/{1}", DateTime.Now.Year, DateTime.Now.ToString("MMdd"));
@@ -42,15 +41,13 @@ namespace Web.Command
                 {
                     System.IO.Directory.CreateDirectory(UPath);
                 }
-                foreach (var item in Files)
-                {
-                    string FilePath = UPath + "/" + Guid.NewGuid().ToString("N") + System.IO.Path.GetExtension(item.FileName);
-                    using var stream = new System.IO.FileStream(FilePath, System.IO.FileMode.Create);
-                    await item.CopyToAsync(stream);
-                    RePath.Add(FilePath.Replace("wwwroot", ""));
-                }
+                var item = Files.First();
+                string FilePath = UPath + "/" + Guid.NewGuid().ToString("N") + System.IO.Path.GetExtension(item.FileName);
+                using var stream = new System.IO.FileStream(FilePath, System.IO.FileMode.Create);
+                await item.CopyToAsync(stream);
+                return (item.FileName, FilePath.Replace("wwwroot", ""));
             }
-            return RePath;
+            return (null, null);
         }
     }
 }

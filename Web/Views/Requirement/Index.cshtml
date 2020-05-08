@@ -2,6 +2,8 @@
     ViewData["Title"] = "需求管理";
 }
 @model Web.ParamModels.Requirement.Requirement_Index
+<link href="~/edit/edit.css" rel="stylesheet" />
+<script src="~/edit/edit.js"></script>
 <style>
     .wnone { font-weight: normal !important; }
 </style>
@@ -17,9 +19,8 @@
             </div>
             <div class="field">
                 <label>模块</label>
-                <div class="ui selection dropdown  clearable" style="min-width: 150px !important; ">
+                <div class="ui selection dropdown clearable" style="min-width: 150px !important; ">
                     <input type="hidden" id="ModuleID" value="@Model.ModuleID">
-                    <i class="dropdown icon"></i>
                     <div class="default text"></div>
                     <div class="menu">
                         @foreach (var item in G.NowProject.Modules)
@@ -31,9 +32,8 @@
             </div>
             <div class="field">
                 <label>关联</label>
-                <div class="ui selection dropdown  clearable" style="min-width:120px !important;">
+                <div class="ui selection dropdown clearable" style="min-width:120px !important;">
                     <input type="hidden" id="Tag" value="@Model.Tag">
-                    <i class="dropdown icon"></i>
                     <div class="default text"></div>
                     <div class="menu">
                         <div class="item" data-value="1">由我创建</div>
@@ -46,10 +46,10 @@
                 <SelectEnums Fluid="false" ID="Status" Default="@(Model.Status.HasValue?((int)Model.Status).ToString():"")" Width="100" Enum="typeof(DBEnums.RequirementStatus)"></SelectEnums>
             </div>
             <div class="field">
-                <button class="ui button orange mini icon" id="search"><i class="icon search"></i></button>
+                <button class="ui button orange icon" id="search"><i class="icon search"></i></button>
             </div>
             <div class="field right">
-                <a class="ui floating teal labeled icon button tiny" href="/Requirement/Add">
+                <a class="ui floating teal labeled icon button tiny" onclick="modal.load('/Requirement/Add', null,'overlay fullscreen')">
                     <i class="plus icon"></i>新增
                 </a>
             </div>
@@ -57,13 +57,14 @@
     </div>
 </div>
 <div class="Context_Scroll">
-    <table class="ui table very compact selectable very basic">
+    <table class="ui table very compact selectable very basic unstackable fixed single line">
         <thead>
             <tr>
+
                 <th>标题</th>
-                <th width="60">状态</th>
-                <th width="80">任务</th>
-                <th>模块</th>
+                <th width="50">状态</th>
+                <th width="62">任务</th>
+                <th width="150">模块</th>
                 <th width="110">创建人</th>
                 <th width="110">评审人</th>
                 <th width="120" class="right aligned">版本</th>
@@ -73,6 +74,8 @@
             @foreach (var item in Model.List)
             {
                 <tr>
+
+
                     <td>
                         @switch (item.EmergencyLevel)
                         {
@@ -87,7 +90,7 @@
                             case 5:
                                 <i class="exclamation icon red"></i>break;
                         }
-                        <a style="color:rgba(0,0,0,.8);font-weight:bold;" href="/Requirement/View?RequirementID=@item.RequirementID">@item.Title</a>
+                        <a style="color:rgba(0,0,0,.8);" onclick="modal.load('/Requirement/View?RequirementID=@item.RequirementID', null,'overlay fullscreen')">@item.Title</a>
                         <div class="ui mini label horizontal basic">
                             @item.NowVersion
                         </div>
@@ -126,21 +129,18 @@
                         <div class="ui mini label basic">
                             <i class="tasks icon grey"></i> @item.Tasks.Count()
                         </div>
-                        @*hourglass half
-                            play
-                            check square*@
                     </td>
 
                     <td>
                         @item.Module.ModuleName
                     </td>
                     <td>
-                        <div class="ui image basic label mini wnone">
+                        <div class="ui image noborder label mini wnone">
                             <img src="@item.CreateUser.Avatar"> @item.CreateUser.UserName
                         </div>
                     </td>
                     <td>
-                        <div class="ui image basic label mini wnone">
+                        <div class="ui image noborder label mini wnone">
                             <img src="@item.AuditorUser.Avatar"> @item.AuditorUser.UserName
                         </div>
                     </td>
@@ -156,15 +156,5 @@
 </div>
 <Paging Page="Model.Page" PageSize="Model.PageSize" TotalCount="Model.TotalCount"></Paging>
 <script>
-    var page_action = {
-        del: function (id) {
-            modal.ask('确认删除此文档？', function () {
-                ajax.post('/Requirement/Delete', { RequirementID: id }, null, function (s, d) {
-                    if (s && d.Success) {
-                        window.location.reload();
-                    }
-                });
-            });
-        }
-    };
+
 </script>

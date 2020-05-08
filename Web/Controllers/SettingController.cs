@@ -100,6 +100,14 @@ namespace Web.Controllers
             DB.SaveChanges();
             return Json();
         }
+        [HttpPost]
+        public IActionResult Users_Del(int UserID)
+        {
+            var Model = DB.TMT_Users.Find(UserID);
+            Model.IsDelete = true;
+            DB.SaveChanges();
+            return Json();
+        }
 
         public IActionResult Roles(ParamModels.Setting.RolesList Model)
         {
@@ -131,7 +139,7 @@ namespace Web.Controllers
                 var Role = DB.TMT_Roles.Find(Model.RoleID);
                 if (!Role.IsAllowDelete)
                 {
-                    return Json("此记录不可编辑！");
+                    return Json("此角色为系统预设，不可编辑！");
                 }
                 if (DB.TMT_Roles.Any(c => c.RoleName == Model.RoleName && c.RoleID != Role.RoleID))
                 {
@@ -157,7 +165,7 @@ namespace Web.Controllers
             var Role = DB.TMT_Roles.Find(RoleID);
             if (!Role.IsAllowDelete)
             {
-                return Json("此记录不可编辑！");
+                return Json("此角色为系统预设，不可编辑！");
             }
             if (DB.TMT_Users.Any(c => c.RoleID == RoleID))
             {
@@ -200,22 +208,22 @@ namespace Web.Controllers
         {
             if (!Check.IsStr(Model.ProjectName, 4, 50))
             {
-                return Json("[ProjectName] Format Error!");
+                return Json("[项目名称]不可为空或输入的格式不正确!");
             }
             if (string.IsNullOrEmpty(Model.Description))
             {
-                return Json("[Description] Format Error!");
+                return Json("[项目描述]不可为空!");
             }
             if (string.IsNullOrEmpty(Model.Users))
             {
-                return Json("[Users] Must Select!");
+                return Json("[项目用户]必须选择!");
             }
             if (Model.ProjectID > 0)
             {
                 var Project = DB.TMT_Projects.Find(Model.ProjectID);
                 if (DB.TMT_Projects.Any(c => c.ProjectName == Model.ProjectName && c.ProjectID != Project.ProjectID))
                 {
-                    return Json("项目名已存在！");
+                    return Json("[项目名称]已存在！");
                 }
                 Project.ProjectName = Model.ProjectName;
                 Project.Users = Model.Users;
@@ -226,7 +234,7 @@ namespace Web.Controllers
             {
                 if (DB.TMT_Projects.Any(c => c.ProjectName == Model.ProjectName))
                 {
-                    return Json("项目名已存在！");
+                    return Json("[项目名称]已存在！");
                 }
                 Model.Path = "Path";
                 DB.TMT_Projects.Add(Model);

@@ -53,7 +53,7 @@ namespace Web
                         ProjectID = NowProject.ProjectID,
                         ProjectName = NowProject.ProjectName
                     };
-                    G.NowProject.ProjectUser = DB.TMT_Users.FromSqlRaw(string.Format("select * from TMT_Users where UserID in ({0}) and IsDelete=0", NowProject.Users)).Select(c => new SystemModel.ProjectUsers { UserID = c.UserID, UserName = c.UserName }).ToList();
+                    G.NowProject.ProjectUsers = DB.TMT_Users.FromSqlRaw(string.Format("select * from TMT_Users where UserID in ({0}) and IsDelete=0", NowProject.Users)).Select(c => new SystemModel.ProjectUsers { UserID = c.UserID, UserName = c.UserName }).ToList();
                     G.NowProject.Modules = DB.TMT_Modules.Where(c => c.ProjectID == NowProject.ProjectID).Select(c => new SystemModel.Modules { ModuleID = c.ModuleID, ModuleName = c.ModuleName }).ToList();
                 }
                 Context.HttpContext.Items["Web_System"] = G;
@@ -73,6 +73,10 @@ namespace Web
         public override JsonResult Json(object Data)
         {
             return new JsonResult(new ResultModel() { Result = Data }, JsonHelp.Option);
+        }
+        public JsonResult Success(string SuccessMessage)
+        {
+            return new JsonResult(new ResultModel() { Result = SuccessMessage }, JsonHelp.Option);
         }
         public JsonResult Json(string ErrorMessage)
         {

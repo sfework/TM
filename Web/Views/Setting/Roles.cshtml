@@ -7,7 +7,7 @@
     .rolesA .ui.list { margin: .5em 0 !important; }
     .ui.form .grouped.fields .field { margin: 0px !important; }
 </style>
-<div class="searchbox" data-tag="roleM">
+<div class="searchbox">
     <div class="ui form tiny">
         <div class="inline fields">
             <div class="field">
@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="field">
-                <button class="ui button orange mini icon" id="search"><i class="icon search"></i></button>
+                <button class="ui button orange icon" id="search"><i class="icon search"></i></button>
             </div>
             <div class="field right">
                 <div class="ui floating teal labeled icon button tiny" onclick="modal.load('/Setting/Roles_Add',650)">
@@ -88,6 +88,9 @@
 
 <script>
     var page = {
+        init: () => {
+            $('.ui.accordion').accordion();
+        },
         edit: function (id) {
             event.stopPropagation();
             modal.load('/Setting/Roles_Add?RoleID=' + id, 650)
@@ -103,5 +106,5 @@
             });
         }
     };
-    $('.ui.accordion').accordion();
+    page.init();
 </script>

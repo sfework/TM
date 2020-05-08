@@ -115,7 +115,7 @@ namespace Web.Controllers
                         LogType = Models.DBEnums.LogType.需求,
                         TriggerUserID = G.User.UserID,
                         TargetUserID = null,
-                        Content = "发布第<div class=\"ui label horizontal mini\">" + Re.NowVersion + "</div>版本需求！",
+                        Content = "发布第<div class=\"ui label horizontal mini basic\">" + Re.NowVersion + "</div>版本需求！",
                     });
                     DB.TMT_Requirements.Add(Re);
                 }
@@ -135,6 +135,14 @@ namespace Web.Controllers
                             Detaile.CreateDate = DateTime.Now;
                         }
                         Re.Status = Models.DBEnums.RequirementStatus.待审;
+                        Re.Logs.Add(new Models.TMT_Logs
+                        {
+                            TagID = Re.RequirementID,
+                            LogType = Models.DBEnums.LogType.需求,
+                            TriggerUserID = G.User.UserID,
+                            TargetUserID = null,
+                            Content = "编辑后重新提交需求！",
+                        });
                     }
                     else if (Re.Status == Models.DBEnums.RequirementStatus.通过)
                     {
@@ -151,12 +159,12 @@ namespace Web.Controllers
                             LogType = Models.DBEnums.LogType.需求,
                             TriggerUserID = G.User.UserID,
                             TargetUserID = null,
-                            Content = "将需求更新至第<div class=\"ui label horizontal mini\">" + Re.NowVersion + "</div>版本！",
+                            Content = "将需求更新至第<div class=\"ui label horizontal mini basic\">" + Re.NowVersion + "</div>版本！",
                         });
                     }
                     else
                     {
-                        return Json("当前状态无法进行发布！");
+                        return Json("当前状态无法进行更新发布！");
                     }
                     Re.Title = Model.Title;
                     Re.EmergencyLevel = Model.EmergencyLevel;

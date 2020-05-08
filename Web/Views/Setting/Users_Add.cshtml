@@ -54,11 +54,15 @@
                 </div>
             }
         </div>
+        @if (Model != null)
+        {
+            <i class="exclamation circle icon orange"></i><span class="ui orange text">当编辑时，[密码]为空即不更改密码。</span>
+        }
     </div>
 </div>
 <script>
     var modal_action = {
-        init: function () {
+        init: () => {
             $('#Avatar').parents('.ui.dropdown').dropdown({
                 onChange: function (value, text, e) {
                     $('#av_img').attr('src', value);
@@ -66,19 +70,33 @@
             });
             $('#av_img').attr('src', $('#Avatar').parents('.ui.dropdown').dropdown('get value'));
         },
-        save: function () {
+        save: () => {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
                 var data = $(target).parents('.ui.modal').find('.ui.form').getdata();
                 ajax.post('/Setting/Users_Add_Save', data, function () {
-                    if (target) { $(target).load_show(); }
+                    $(target).load_show();
                 }, function (success, data) {
-                    if (target) {
-                        $(target).load_hide();
-                    }
+                    $(target).load_hide();
                     if (success && data.Success) {
                         window.location.reload();
                     }
+                });
+            }
+        },
+        del: (id) => {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                var data = { UserID: id };
+                modal.ask('确认删除此用户吗？删除后已存在的相关数据将会保留，但账号不可再被使用。', () => {
+                    ajax.post('/Setting/Users_Del', data, function () {
+                        $(target).load_show();
+                    }, function (success, data) {
+                        $(target).load_hide();
+                        if (success && data.Success) {
+                            window.location.reload();
+                        }
+                    });
                 });
             }
         }
@@ -86,6 +104,10 @@
     modal_action.init();
 </script>
 <div class="actions">
-    <button class="ui button small green" onclick="modal_action.save()">保存</button>
-    <button class="ui button small cancel black">取消</button>
+    @if (Model != null)
+    {
+        <button class="ui button red left floated" onclick="modal_action.del(@Model.UserID)">删除</button>
+    }
+    <button class="ui button green" onclick="modal_action.save()">保存</button>
+    <button class="ui button cancel black">取消</button>
 </div>

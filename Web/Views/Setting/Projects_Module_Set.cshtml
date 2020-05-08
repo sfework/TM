@@ -5,7 +5,7 @@
 <div class="header"><i class="settings icon"></i>项目模块设置</div>
 <div class="content scrolling">
     <div class="ui form tiny">
-        <div id="project_module_set" style="width:419px;">
+        <div id="project_module_set" style="width:419px;overflow:hidden;">
             @foreach (var item in Model)
             {
                 <div class="item" style="width:200px;float:left;margin-bottom:10px;">
@@ -18,34 +18,33 @@
                 </div>
             }
         </div>
+        <i class="exclamation circle icon orange"></i> <span class="ui orange text">如果模块被删除，使用此模块的相关数据还会存在。</span>
     </div>
 </div>
 <script>
     var modal_action = {
-        save: function () {
+        save: function (id) {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
                 var data = {
-                ProjectID:@ViewBag.ProjectID,
-                Modules:new Array()
-            };
-            $('#project_module_set .ui.action.input>input').each((i, e) => {
-                var t1 = $(e).data('value'), t2 = $(e).val();
-                if (!t1) {
-                    t1 = 0;
-                }
-                data.Modules.push({ ModuleID: t1, ProjectID: data.ProjectID, ModuleName: t2 });
-            });
-            ajax.post('/Setting/Projects_Module_Set', data, function () {
-                if (target) { $(target).load_show(); }
-            }, function (success, data) {
-                if (target) {
+                    ProjectID: id,
+                    Modules: new Array()
+                };
+                $('#project_module_set .ui.action.input>input').each((i, e) => {
+                    var t1 = $(e).data('value'), t2 = $(e).val();
+                    if (!t1) {
+                        t1 = 0;
+                    }
+                    data.Modules.push({ ModuleID: t1, ProjectID: data.ProjectID, ModuleName: t2 });
+                });
+                ajax.post('/Setting/Projects_Module_Set', data, function () {
+                    $(target).load_show();
+                }, function (success, data) {
                     $(target).load_hide();
-                }
-                if (success && data.Success) {
-                    window.location.reload();
-                }
-            });
+                    if (success && data.Success) {
+                        window.location.reload();
+                    }
+                });
             }
         },
         del: function () {
@@ -61,6 +60,6 @@
 </script>
 <div class="actions">
     <button class="ui button left floated teal small" onclick="modal_action.new()">新增</button>
-    <button class="ui button green small" onclick="modal_action.save()">保存</button>
+    <button class="ui button green small" onclick="modal_action.save(@ViewBag.ProjectID)">保存</button>
     <button class="ui button cancel black small">取消</button>
 </div>

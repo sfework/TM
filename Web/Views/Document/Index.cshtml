@@ -14,8 +14,8 @@
     .files_box > .file:hover { box-shadow: inset 0px 0px 4px 1px #ececec; }
     .files_box > .file > .text { text-align: center; width: 75px; line-height: 14px; height: 42px; overflow: hidden; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; text-overflow: ellipsis; }
 </style>
-<link href="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.css" rel="stylesheet">
-<script src="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.js"></script>
+<link href="~/edit/edit.css" rel="stylesheet" />
+<script src="~/edit/edit.js"></script>
 <div class="searchbox">
     <div class="ui form tiny">
         <div class="inline fields">
@@ -27,7 +27,7 @@
                 </div>
             </div>
             <div class="field">
-                <button class="ui button orange mini icon" id="search"><i class="icon search"></i></button>
+                <button class="ui button orange icon" id="search"><i class="icon search"></i></button>
             </div>
             @if (!Model.IsSearch)
             {
@@ -53,6 +53,8 @@
         <div class="ui breadcrumb" style="height:25px;">
             @if (Model.IsSearch)
             {
+                <a class="section" href="/Document/Index"><i class="icon home"></i>Home</a>
+                <div class="divider"> - </div>
                 <div class="section"><i class="icon search"></i>搜索："@Model.KeyWord"</div>
             }
             else
@@ -82,13 +84,6 @@
         <div class="ui divider" style="margin-top:5px;margin-bottom:10px;"></div>
     </div>
     <div class="files_box" style="overflow-x: hidden;overflow-y: auto;flex: 1;position:relative;">
-        <div id="s_test" class="transition hidden" style="position:absolute;width:100%;height:100%;background:#fff;z-index:10;">
-            <h2 class="ui header">测试在线文档</h2>
-            <div class="content">
-                121212
-                12312312
-            </div>
-        </div>
         @foreach (var item in Model.List)
         {
             <div class="file">
@@ -142,7 +137,6 @@
     </div>
     <div style="clear: both;"></div>
 </div>
-
 <script>
     var page_action = {
         new: function (pid, tp, id) {
@@ -166,7 +160,7 @@
             });
         },
         view_doc: function (did) {
-            modal.load('/Document/Document_View?DocumentID=' + did, 910)
+            modal.load('/Document/Document_View?DocumentID=' + did, null,'overlay fullscreen')
         },
         view_att: function (did) {
             modal.load('/Document/Attachment_View?DocumentID=' + did, 380)

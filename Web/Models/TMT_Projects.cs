@@ -21,5 +21,7 @@ namespace Web.Models
         public bool IsDelete { get; set; } = false;
         [NotMapped]
         public virtual IQueryable<TMT_Users> D_Users { get; set; }
+
+        public virtual ICollection<TMT_Modules> Modules { get; set; }
     }
 }

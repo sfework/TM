@@ -26,20 +26,38 @@ body, html { min-width: 1200px; position: relative; overflow-y: hidden; overflow
 .menubox > .menulist > .sets > .menu > .item.active { background: #3e3e3e !important; color: rgba(255,255,255,.9) !important; }
 .menubox > .menulist > .sets > .menu:after { background: #1b1c1d !important; }
 
+/*搜索区样式修正*/
+.searchbox .ui.button.orange.icon { padding: 0.65em !important; }
+.ui.form .field.right { position: absolute; right: 0; padding: 0 !important; }
+/*下拉框清除按钮样式修正*/
+.ui.dropdown > .remove.icon { right: 1.5em !important; }
+
+
+
+
 .Context { flex: 1; padding: 20px 30px; overflow: hidden; display: flex; flex-direction: column; }
 
 /*分页，searchbox-Context_Scroll-Paging*/
-.Context_Scroll { overflow-x: hidden; overflow-y: auto; flex: 1; padding-right: 10px; }
+.Context_Scroll { overflow-x: hidden; overflow-y: auto; flex: 1;}
 .Context_Scroll::-webkit-scrollbar { width: 12px; }
 .Context_Scroll::-webkit-scrollbar-thumb { border-radius: 3px; }
 .Context > .paging { height: 50px; padding-top: 15px; }
 
-.searchbox .field.right { position: absolute; right: 0; padding: 0 !important; }
+
 .ui.buttons > .ui.button:not(:last-child) { border-right: solid 1px rgba(255, 255, 255, .3); }
 .ui.modal > .close { color: #1d1b1b !important; top: .7rem !important; right: 0rem !important; }
 .jodit_wysiwyg p { margin: 0 !important; }
 
 .ui.image.label.mini img {height:22px !important; }
+
+.noborder.label { border: 0 !important; }
+
+/*弹窗头部降低高度样式修正*/
+.ui.modal > .header { padding: 1rem 1.5rem !important; }
+.ui.overlay.fullscreen.modal > .content { min-height: calc(100vh - 8.52rem) !important; }
+
+.ui.modal > .scrolling.content.edit { padding: 0 !important; background-color: #f9f9f9; }
+.ui.modal > .scrolling.content.edit > .context_con { margin: 10px auto; padding: 30px; width: 900px; background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
 /*.Context { }
 .Context > .context_box { padding: 15px 25px; }
 
@@ -77,6 +95,6 @@ body, html { min-width: 1200px; position: relative; overflow-y: hidden; overflow
 .clearable.input { position: relative; }
 .clearable.input > input { padding-right: 1.5em !important; }
 .clearable.input > input:focus + i.close { color: #272525; }
-.clearable.input > i.close { position: absolute; cursor: pointer; top: 6px; right: 3px; color: #a2a0a0; display: none; }
+.clearable.input > i.close { position: absolute; cursor: pointer; top: 7px; right: 3px; color: #a2a0a0; display: none; }
 /*带按钮的输入框边框修复*/
 .ui.action.input > input { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }

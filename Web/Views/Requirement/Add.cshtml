@@ -1,175 +1,112 @@
 ﻿@{
-    ViewData["Title"] = Model == null ? "新增需求" : "编辑需求：" + Model.Title;
+    Layout = null;
 }
 @model TMT_Requirements
-<link href="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.css" rel="stylesheet">
-<script src="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.js"></script>
-<style>
-    .context_box { flex: 1; overflow: hidden; display: flex; flex-direction: row; }
-    .context_box > .cleft { border-radius: 4px; flex: 1; overflow-x: hidden; overflow-y: hidden; height: 100%; float: left; background: #fff; padding: 40px; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
-    .context_box > .cright { border-radius: 4px; width: 300px; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; margin-left: 20px; padding: 20px; background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
-
-    .jodit_workplace { border: 0 !important; margin-top: 10px; flex: 1; }
-    .jodit_wysiwyg { padding: 0 !important; height: 100%; }
-    .jodit_container { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-
-    .ui.form.tiny .field.inline.dfluid { display: flex; flex-direction: row; }
-    .dfluid > .ui.dropdown { flex: 1; }
-    .dfluid > label { line-height: 33px; }
-</style>
-
-<div class="context_box">
-    <div class="cleft">
+<div class="header">
+    <i class="file alternate outline icon"></i>
+    新增需求文档
+</div>
+<div class="content scrolling edit">
+    <div class="ui form tiny" style="width: 900px; margin: 0px auto ;margin-top:10px;">
+        <div class="inline fields">
+            <div class="field">
+                <label>优先级</label>
+                <div class="ui grey rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
+            </div>
+            <div class="field">
+                <label>项目</label>
+                <div class="ui label basic">
+                    <i class="briefcase icon"></i> @G.NowProject.ProjectName
+                </div>
+            </div>
+            <div class="field">
+                <label>评审</label>
+                <SelectUsers Fluid="false" Width="150" Placeholder="选择评审人" Clearable="false" ID="AuditorUserID" Default="Model?.AuditorUserID"></SelectUsers>
+            </div>
+            <div class="field">
+                <label>模块</label>
+                <div class="ui selection dropdown" style="width: 200px;">
+                    <input type="hidden" id="ModuleID" value="@Model?.ModuleID">
+                    <div class="default text"></div>
+                    <div class="menu">
+                        @foreach (var item in G.NowProject.Modules)
+                        {
+                            <div class="item" data-value="@item.ModuleID">@item.ModuleName</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="context_con">
         <input type="hidden" id="RequirementID" value="@Model?.RequirementID" />
         <div class="ui transparent input fluid" style="margin-bottom: 20px; ">
             <input type="text" id="Title" placeholder="需求标题..." value="@Model?.Title" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
         </div>
-        <div class="strbox">
-            @(Model==null?null: Html.Raw(Model.Detailes.FirstOrDefault(c=>c.Version==Model.NowVersion).Content))
-        </div>
-    </div>
-    <div class="cright">
-        <div class="ui form tiny">
-            <div class="field inline">
-                <label>优先级</label>
-                <div class="ui grey rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
-            </div>
-            <div class="field inline">
-                <label>项目</label>
-                <div class="ui label basic" style="margin-top:3px;">
-                    <i class="briefcase icon"></i> @G.NowProject.ProjectName
-                </div>
-            </div>
-            @if (Model?.Status == DBEnums.RequirementStatus.通过)
-            {
-                <div class="field inline">
-                    <label>评审</label>
-                    <div class="ui image label basic">
-                        <img src="@Model.AuditorUser.Avatar">
-                        @Model.AuditorUser.UserName
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="field inline dfluid">
-                    <label>评审</label>
-                    <SelectUsers Fluid="false" Placeholder="选择评审人" Clearable="false" ID="AuditorUserID" Default="Model?.AuditorUserID"></SelectUsers>
-                </div>
-            }
-            @if (Model?.Status == DBEnums.RequirementStatus.通过)
-            {
-                <div class="field inline">
-                    <label>模块</label>
-                    <div class="ui label basic">
-                        <i class="archive icon"></i> @Model.Module.ModuleName
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="field inline dfluid">
-                    <label>模块</label>
-                    <div class="ui selection dropdown">
-                        <input type="hidden" id="ModuleID" value="@Model?.ModuleID">
-                        <i class="dropdown icon"></i>
-                        <div class="default text"></div>
-                        <div class="menu">
-                            @foreach (var item in G.NowProject.Modules)
-                            {
-                                <div class="item" data-value="@item.ModuleID">@item.ModuleName</div>
-                            }
-                        </div>
-                    </div>
-                </div>
-            }
-            <div class="field">
-                <button class="ui labeled icon button teal tiny" onclick="modal_action.save()">
-                    <i class="save icon"></i>
-                    保存
-                </button>
-            </div>
+        <div class="context_edit">
+            @Html.Raw(Model?.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
         </div>
     </div>
 </div>
 <script>
     var modal_action = {
         edit_obj: null,
-        init: function () {
+        EmergencyLevel: $('#EmergencyLevel'),
+        init: () => {
             modal_action.edit();
-            $('#EmergencyLevel').rating({
-                onRate: function (value) {
-                    $(this).removeClass('green olive yellow orange red grey');
+            modal_action.EmergencyLevel.rating({
+                onRate: (value) => {
+                    modal_action.EmergencyLevel.removeClass('green olive yellow orange red grey');
                     switch (value) {
                         case 1:
-                            $(this).addClass('green');
+                            modal_action.EmergencyLevel.addClass('green');
                             break;
                         case 2:
-                            $(this).addClass('olive');
+                            modal_action.EmergencyLevel.addClass('olive');
                             break;
                         case 3:
-                            $(this).addClass('yellow');
+                            modal_action.EmergencyLevel.addClass('yellow');
                             break;
                         case 4:
-                            $(this).addClass('orange');
+                            modal_action.EmergencyLevel.addClass('orange');
                             break;
                         case 5:
-                            $(this).addClass('red');
+                            modal_action.EmergencyLevel.addClass('red');
                             break;
                     }
                 }
-            }).rating('set rating', $('#EmergencyLevel').rating('get rating'));
+            }).rating('set rating', modal_action.EmergencyLevel.rating('get rating'));
         },
         edit: function () {
-            modal_action.edit_obj = new Jodit(".strbox", {
-                //"autofocus": true,
-                "language": "zh_cn",
-                "direction": "ltr",
-                "enter": "P",
-                "defaultMode": "1",
-                "showCharsCounter": false,
-                "showWordsCounter": false,
-                "showXPathInStatusbar": false,
-                "askBeforePasteHTML": false,
-                "askBeforePasteFromWord": false,
-                "placeholder": "",
-                "height": 800,
-                "allowResizeX": false,
-                "allowResizeY": false,
-                "buttons": "paragraph,brush,|,bold,strikethrough,underline,italic,eraser,|,outdent,indent,|,image,file,video,table,link,|,align,undo,redo,hr",
-                //"buttons": "paragraph,brush,|,bold,strikethrough,underline,italic,eraser,|,outdent,indent,|,image,file,video,table,link,|,align,undo,redo,hr,fullsize",
-                uploader: {
-                    url: '/Home/Edit_UPload'
-                },
+            modal_action.edit_obj = new editor('.context_edit', {
+                edit: true,
+                upload: {
+                    url: '/Home/UPload',
+                    success: (result) => { },
+                    error: (error) => { }
+                }
             });
         },
-        save: function () {
+        save: () => {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
-                var data = {
-                    RequirementID: $('#RequirementID').val(),
-                    AuditorUserID: $('#AuditorUserID').val(),
-                    ModuleID: $('#ModuleID').val(),
-                    EmergencyLevel: $('#EmergencyLevel').rating('get rating'),
-                    Content: modal_action.edit_obj.getEditorValue(),
-                    Title: $('#Title').val()
-                };
-                var _url = '/Requirement/Save';
-                modal.ask('发布后将进行需求版本控制，确认发布此需求？', function () {
-                    ajax.post(_url, data, function () { $(target).load_show(); }, function (success, data) {
-                        $(target).load_hide();
-                        if (success && data.Success) {
-                            if (document.referrer) {
-                                window.location.href = document.referrer;
-                            }
-                            else {
-                                window.location.href = '/Requirement/Index';
-                            }
-                        }
-                    });
+                var data = $(target).parent().parent().children('.content.scrolling.edit').getdata();
+                data.Content = modal_action.edit_obj.get();
+                ajax.post('/Requirement/Save', data, () => { $(target).load_show(); }, (success, data) => {
+                    $(target).load_hide();
+                    if (success && data.Success) {
+                        window.location.reload();
+                    }
                 });
             }
         }
     };
     modal_action.init();
 </script>
+<div class="actions">
+    <button class="ui labeled icon button teal left floated" onclick="modal_action.save()">
+        <i class="save icon"></i>
+        发布
+    </button>
+    <button class="ui button cancel black">关闭</button>
+</div>

@@ -30,6 +30,11 @@
             result[key] = val;
         }
     }
+    $(this).find('.ui.rating').each((i, e) => {
+        var key = $(e).attr(qid);
+        var val = $(e).rating('get rating');
+        result[key] = val;
+    });
     return result;
 };
 $(document).ready(function () {

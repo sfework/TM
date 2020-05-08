@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -142,7 +143,7 @@ namespace Web.Controllers
                         if (HttpContext.Request.Form.Files.Count > 0)
                         {
                             var ReFiles = await Command.Helper.SaveAsync(HttpContext.Request.Form.Files);
-                            Temp.Content = ReFiles.First();
+                            Temp.Content = ReFiles.path;
                             Temp.Class = GetIcon(Model.DocumentType, Model.DocumentName);
                         }
                         Temp.IsShare = Model.IsShare;
@@ -160,7 +161,7 @@ namespace Web.Controllers
                         var ReFiles = await Command.Helper.SaveAsync(HttpContext.Request.Form.Files);
                         Model.DocumentID = Guid.NewGuid().ToString("N");
                         Model.Class = GetIcon(Model.DocumentType, Model.DocumentName);
-                        Model.Content = ReFiles.First();
+                        Model.Content = ReFiles.path;
                         Model.CreateUserID = G.User.UserID;
                         DB.TMT_Documents.Add(Model);
                     }
@@ -280,7 +281,7 @@ namespace Web.Controllers
             }
             Model.Content = Content;
             DB.SaveChanges();
-            return Json();
+            return Success(Content);
         }
         [AllowAnonymous]
         public IActionResult Share(string DocumentID)

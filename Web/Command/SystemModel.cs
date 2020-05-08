@@ -23,7 +23,7 @@ namespace Web
         {
             public int ProjectID { get; set; }
             public string ProjectName { get; set; } = "选择项目";
-            public List<ProjectUsers> ProjectUser { get; set; }
+            public List<ProjectUsers> ProjectUsers { get; set; }
             public List<Modules> Modules { get; set; }
         }
         public class Modules
