@@ -32,11 +32,9 @@
                 var target = event.currentTarget;
                 var data = $(target).parents('.ui.modal').find('.ui.form').getdata();
                 ajax.post('/Requirement/Review', data, function () {
-                    if (target) { $(target).load_show(); }
+                    $(target).load_show();
                 }, function (success, data) {
-                    if (target) {
-                        $(target).load_hide();
-                    }
+                    $(target).load_hide();
                     if (success && data.Success) {
                         window.location.reload();
                     }

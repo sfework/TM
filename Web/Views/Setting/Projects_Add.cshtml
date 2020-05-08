@@ -36,11 +36,11 @@
 </div>
 <script>
     var modal_action = {
-        init: function () {
+        init: ()=> {
             var users = '@Model?.Users';
             $('#ProjectUsers').dropdown('set selected',users.split(','));
         },
-        save: function () {
+        save: ()=> {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
                 var data = $(target).parents('.ui.modal').find('.ui.form').getdata();
@@ -48,12 +48,10 @@
                 if (users !== null) {
                     data['Users'] = users.join(',');
                 }
-                ajax.post('/Setting/Projects_Add_Save', data, function () {
-                    if (target) { $(target).load_show(); }
-                }, function (success, data) {
-                    if (target) {
+                ajax.post('/Setting/Projects_Add_Save', data, ()=> {
+                    $(target).load_show();
+                }, (success, data)=> {
                         $(target).load_hide();
-                    }
                     if (success && data.Success) {
                         window.location.reload();
                     }
@@ -64,6 +62,6 @@
     modal_action.init();
 </script>
 <div class="actions">
-    <button class="ui button green small" onclick="modal_action.save()">保存</button>
-    <button class="ui button cancel black small">取消</button>
+    <button class="ui button green" onclick="modal_action.save()">保存</button>
+    <button class="ui button cancel black">取消</button>
 </div>

@@ -31,7 +31,7 @@
                 <button class="ui button orange icon" id="search"><i class="icon search"></i></button>
             </div>
             <div class="field right">
-                <div class="ui floating teal labeled icon button tiny" onclick="modal.load('/Setting/Users_Add',350)">
+                <div class="ui floating teal labeled icon button tiny" onclick="modal.load('/Setting/Users_Add',340)">
                     <i class="plus icon"></i>新增
                 </div>
             </div>
@@ -50,7 +50,7 @@
     <div class="newcards">
         @foreach (var item in Model.List)
         {
-            <div class="card@(!item.Enable?" disable":"")" onclick="modal.load('/Setting/Users_Add?UserID=@item.UserID',350)">
+            <div class="card@(!item.Enable?" disable":"")" onclick="modal.load('/Setting/Users_Add?UserID=@item.UserID',340)">
                 <img src="@item.Avatar" />
                 <div class="info">
                     <div style="font-weight:bold;">

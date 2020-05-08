@@ -2,87 +2,42 @@
     Layout = "_Layout";
 }
 <div class="menubox">
-    <div class="blurring dimmable">
-        <div class="info">
-            <img class="avatar" src="@G.User.Avatar" />
-            <h5 class="ui header">
-                @G.User.UserName
-                <span class="sub header">@G.User.RoleName</span>
-            </h5>
-            <div class="ui dimmer">
-                <div class="content">
-                    <button class="ui button teal tiny">
-                        <i class="setting icon"></i>
-                        设置
-                    </button>
-                    <a class="ui button red tiny" href="/Home/Logout">
-                        <i class="power icon"></i>
-                        退出
-                    </a>
-                </div>
-            </div>
+    <div class="ui secondary inverted menu small">
+        <div class="item fitted">
+            <i class="icon spider inverted big"></i>
         </div>
-    </div>
-    <div class="ui inverted divider" style="margin-top:0;"></div>
-    <div class="pro_set">
-        <div class="ui floating labeled icon dropdown button orange fluid projectset">
-            <i class="briefcase icon"></i>
-            <span class="text">@(string.IsNullOrWhiteSpace(G.NowProject?.ProjectName)? "选择默认项目" : G.NowProject?.ProjectName)</span>
-            <div class="menu">
-                @foreach (var item in G.UsableProject)
-                {
-                    <div class="item" data-value="@item.ProjectID">@item.ProjectName</div>
-                }
-            </div>
-        </div>
-    </div>
-    <div class="menulist">
-        <ul>
-            <li class="@(G.Request.ControllerName=="Home"?"active":"")">
-                <a href="/">
-                    <i class="home icon"></i>
-                    首 页
-                </a>
-            <li class="@(G.Request.ControllerName=="Requirement"?"active":"")">
-                <a href="/Requirement/Index">
-                    <i class="file alternate icon"></i>
-                    需 求
-                </a>
-            </li>
-            <li class="@(G.Request.ControllerName=="Tasks"?"active":"")">
-                <a href="/Tasks/Index">
-                    <i class="tasks icon"></i>
-                    任 务
-                </a>
-            </li>
-            <li class="@(G.Request.ControllerName=="Version"?"active":"")">
-                <a href="/Version/Index">
-                    <i class="code branch icon"></i>
-                    版 本
-                </a>
-            </li>
-            <li class="@(G.Request.ControllerName=="Test"?"active":"")">
-                <a href="/Test/Index">
-                    <i class="bug icon"></i>
-                    测 试
-                </a>
-            </li>
-            <li class="@(G.Request.ControllerName=="Document"?"active":"")">
-                <a href="/Document/Index">
-                    <i class="file alternate outline icon"></i>
-                    文 档
-                </a>
-            </li>
-            <li class="@(G.Request.ControllerName=="Code"?"active":"")">
-                <a href="/Code/Index">
-                    <i class="code icon"></i>
-                    源 码
-                </a>
-            </li>
-        </ul>
-        <div class="ui left pointing dropdown icon button fluid sets">
-            <i class="settings icon" style=" margin-right: 10px !important; "></i>设 置
-            <i class="caret right icon"></i>
+        <a class="item@(G.Request.ControllerName=="Home"?" active":"")" href="/">
+            <i class="home icon"></i>
+            首页
+        </a>
+        <a class="item@(G.Request.ControllerName=="Requirement"?" active":"")" href="/Requirement/Index">
+            <i class="file alternate icon"></i>
+            需求
+        </a>
+        <a class="item@(G.Request.ControllerName=="Tasks"?" active":"")" href="/Tasks/Index">
+            <i class="tasks icon"></i>
+            任务
+        </a>
+        <a class="item@(G.Request.ControllerName=="Version"?" active":"")" href="/Version/Index">
+            <i class="code branch icon"></i>
+            版本
+        </a>
+        <a class="item@(G.Request.ControllerName=="Test"?" active":"")" href="/Test/Index">
+            <i class="bug icon"></i>
+            测试
+        </a>
+        <a class="item@(G.Request.ControllerName=="Document"?" active":"")" href="/Document/Index">
+            <i class="file alternate outline icon"></i>
+            文档
+        </a>
+        <a class="item@(G.Request.ControllerName=="Code"?" active":"")" href="/Code/Index">
+            <i class="code icon"></i>
+            源码
+        </a>
+        <div class="ui dropdown item">
+            <i class="settings icon"></i>
+            设置
+            <i class="dropdown icon"></i>
             <div class="menu">
                 <a class="item" href="/Setting/Users">
                     <i class="users icon"></i>
@@ -96,6 +51,44 @@
                     <i class="briefcase icon"></i>
                     项目
                 </a>
+            </div>
+        </div>
+        <div class="right menu">
+            <div class="ui floating dropdown labeled icon button orange projectset">
+                <i class="briefcase icon"></i>
+                <span class="text">@(G.NowProject==null? "选择默认项目" : G.NowProject.ProjectName)</span>
+                <div class="menu">
+                    @foreach (var item in G.UsableProject)
+                    {
+                        <div class="item" data-value="@item.ProjectID">@item.ProjectName</div>
+                    }
+                </div>
+            </div>
+            <div class="ui dropdown item fitted userinfo">
+                <div class="ui comments">
+                    <div class="comment">
+                        <div class="avatar">
+                            <img src="@G.User.Avatar">
+                        </div>
+                        <div class="content">
+                            <div class="author">@G.User.UserName</div>
+                            <div class="text">
+                                @G.User.RoleName
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <i class="dropdown icon"></i>
+                <div class="menu" style="width:80px;">
+                    <a class="item" href="/Setting/Users">
+                        <i class="setting icon"></i>
+                        设置
+                    </a>
+                    <a class="item" href="/Home/Logout">
+                        <i class="power off icon"></i>
+                        退出
+                    </a>
+                </div>
             </div>
         </div>
     </div>

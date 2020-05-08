@@ -1,17 +1,39 @@
 ﻿@{
-    Layout = null;
+    ViewData["Title"] = Model == null ? "新增需求" : "编辑需求";
 }
 @model TMT_Requirements
-<div class="header">
-    <i class="file alternate outline icon"></i>
-    新增需求文档
-</div>
-<div class="content scrolling edit">
-    <div class="ui form tiny" style="width: 900px; margin: 0px auto ;margin-top:10px;">
-        <div class="inline fields">
+<link href="~/edit/edit.css" rel="stylesheet" />
+<script src="~/edit/edit.js"></script>
+<div class="document_body">
+    <div class="left">
+        <input type="hidden" id="RequirementID" value="@Model?.RequirementID" />
+        <div class="ui transparent input fluid" style="margin-bottom: 20px; ">
+            @if (Model != null && Model.Status != DBEnums.RequirementStatus.拒绝)
+            {
+                <input type="text" id="Title" placeholder="需求标题..." readonly="readonly" value="@Model?.Title" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
+            }
+            else
+            {
+                <input type="text" id="Title" placeholder="需求标题..." value="@Model?.Title" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
+            }
+
+        </div>
+        <div class="context_edit">
+            @Html.Raw(Model?.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
+        </div>
+    </div>
+    <div class="right">
+        <div class="ui form tiny">
             <div class="field">
                 <label>优先级</label>
-                <div class="ui grey rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
+                @if (Model != null && Model.Status != DBEnums.RequirementStatus.拒绝)
+                {
+                    <div class="ui disabled rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
+                }
+                else
+                {
+                    <div class="ui grey rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
+                }
             </div>
             <div class="field">
                 <label>项目</label>
@@ -21,64 +43,80 @@
             </div>
             <div class="field">
                 <label>评审</label>
-                <SelectUsers Fluid="false" Width="150" Placeholder="选择评审人" Clearable="false" ID="AuditorUserID" Default="Model?.AuditorUserID"></SelectUsers>
+                @if (Model != null && Model.Status != DBEnums.RequirementStatus.拒绝)
+                {
+                    <div class="ui image label basic">
+                        <img src="@Model.AuditorUser.Avatar">
+                        @Model.AuditorUser.UserName
+                    </div>
+                }
+                else
+                {
+                    <SelectUsers Fluid="false" Width="150" Placeholder="选择评审人" Clearable="false" ID="AuditorUserID" Default="Model?.AuditorUserID"></SelectUsers>
+                }
             </div>
             <div class="field">
                 <label>模块</label>
-                <div class="ui selection dropdown" style="width: 200px;">
-                    <input type="hidden" id="ModuleID" value="@Model?.ModuleID">
-                    <div class="default text"></div>
-                    <div class="menu">
-                        @foreach (var item in G.NowProject.Modules)
-                        {
-                            <div class="item" data-value="@item.ModuleID">@item.ModuleName</div>
-                        }
+                @if (Model != null && Model.Status != DBEnums.RequirementStatus.拒绝)
+                {
+                    <div class="ui label basic">
+                        @Model.Module.ModuleName
                     </div>
-                </div>
+                }
+                else
+                {
+                    <div class="ui selection dropdown" style="width: 200px;">
+                        <input type="hidden" id="ModuleID" value="@Model?.ModuleID">
+                        <div class="default text"></div>
+                        <div class="menu">
+                            @foreach (var item in G.NowProject.Modules)
+                            {
+                                <div class="item" data-value="@item.ModuleID">@item.ModuleName</div>
+                            }
+                        </div>
+                    </div>
+                }
             </div>
-        </div>
-    </div>
-    <div class="context_con">
-        <input type="hidden" id="RequirementID" value="@Model?.RequirementID" />
-        <div class="ui transparent input fluid" style="margin-bottom: 20px; ">
-            <input type="text" id="Title" placeholder="需求标题..." value="@Model?.Title" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
-        </div>
-        <div class="context_edit">
-            @Html.Raw(Model?.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
+            <div class="field">
+                <button class="ui tiny blue button" onclick="page_action.save()">
+                    <i class="save icon"></i>
+                    发布
+                </button>
+            </div>
         </div>
     </div>
 </div>
 <script>
-    var modal_action = {
+    var page_action = {
         edit_obj: null,
         EmergencyLevel: $('#EmergencyLevel'),
         init: () => {
-            modal_action.edit();
-            modal_action.EmergencyLevel.rating({
+            page_action.edit();
+            page_action.EmergencyLevel.rating({
                 onRate: (value) => {
-                    modal_action.EmergencyLevel.removeClass('green olive yellow orange red grey');
+                    page_action.EmergencyLevel.removeClass('green olive yellow orange red grey');
                     switch (value) {
                         case 1:
-                            modal_action.EmergencyLevel.addClass('green');
+                            page_action.EmergencyLevel.addClass('green');
                             break;
                         case 2:
-                            modal_action.EmergencyLevel.addClass('olive');
+                            page_action.EmergencyLevel.addClass('olive');
                             break;
                         case 3:
-                            modal_action.EmergencyLevel.addClass('yellow');
+                            page_action.EmergencyLevel.addClass('yellow');
                             break;
                         case 4:
-                            modal_action.EmergencyLevel.addClass('orange');
+                            page_action.EmergencyLevel.addClass('orange');
                             break;
                         case 5:
-                            modal_action.EmergencyLevel.addClass('red');
+                            page_action.EmergencyLevel.addClass('red');
                             break;
                     }
                 }
-            }).rating('set rating', modal_action.EmergencyLevel.rating('get rating'));
+            }).rating('set rating', page_action.EmergencyLevel.rating('get rating'));
         },
         edit: function () {
-            modal_action.edit_obj = new editor('.context_edit', {
+            page_action.edit_obj = new editor('.context_edit', {
                 edit: true,
                 upload: {
                     url: '/Home/UPload',
@@ -90,23 +128,16 @@
         save: () => {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
-                var data = $(target).parent().parent().children('.content.scrolling.edit').getdata();
-                data.Content = modal_action.edit_obj.get();
+                var data = $(target).parents('.document_body').getdata();
+                data.Content = page_action.edit_obj.get();
                 ajax.post('/Requirement/Save', data, () => { $(target).load_show(); }, (success, data) => {
                     $(target).load_hide();
                     if (success && data.Success) {
-                        window.location.reload();
+                        window.location.href = "/Requirement/View?RequirementID=" + data.Result;
                     }
                 });
             }
         }
     };
-    modal_action.init();
+    page_action.init();
 </script>
-<div class="actions">
-    <button class="ui labeled icon button teal left floated" onclick="modal_action.save()">
-        <i class="save icon"></i>
-        发布
-    </button>
-    <button class="ui button cancel black">关闭</button>
-</div>

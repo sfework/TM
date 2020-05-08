@@ -23,7 +23,7 @@
 </div>
 <script>
     var modal_action = {
-        save: function (id) {
+        save: (id) => {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
                 var data = {
@@ -37,9 +37,9 @@
                     }
                     data.Modules.push({ ModuleID: t1, ProjectID: data.ProjectID, ModuleName: t2 });
                 });
-                ajax.post('/Setting/Projects_Module_Set', data, function () {
+                ajax.post('/Setting/Projects_Module_Set', data, () => {
                     $(target).load_show();
-                }, function (success, data) {
+                }, (success, data) => {
                     $(target).load_hide();
                     if (success && data.Success) {
                         window.location.reload();
@@ -47,19 +47,19 @@
                 });
             }
         },
-        del: function () {
+        del: () => {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
                 $(target).parent().parent().remove();
             }
         },
-        new: function () {
+        new: () => {
             $('#project_module_set').append('<div class="item" style="width:200px;float:left;margin-bottom:10px;"><div class="ui action input mini"><input type="text" style="width:150px;"><button class="ui icon button red" onclick="modal_action.del()"><i class="trash alternate outline icon"></i></button></div></div>');
         }
     };
 </script>
 <div class="actions">
-    <button class="ui button left floated teal small" onclick="modal_action.new()">新增</button>
-    <button class="ui button green small" onclick="modal_action.save(@ViewBag.ProjectID)">保存</button>
-    <button class="ui button cancel black small">取消</button>
+    <button class="ui button left floated teal" onclick="modal_action.new()">新增</button>
+    <button class="ui button green" onclick="modal_action.save(@ViewBag.ProjectID)">保存</button>
+    <button class="ui button cancel black">取消</button>
 </div>

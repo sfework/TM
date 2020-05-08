@@ -13,7 +13,7 @@ namespace Web.Controllers
         public IActionResult Index(ParamModels.Requirement.Requirement_Index Model)
         {
             Model.List = DB.TMT_Requirements.Where(c => c.ProjectID == G.NowProject.ProjectID);
-            Model.List = Model.List.Where(c => c.Status == Models.DBEnums.RequirementStatus.通过 || c.Status == Models.DBEnums.RequirementStatus.归档 || c.CreateUserID == G.User.UserID);
+            Model.List = Model.List.Where(c => c.Status == Models.DBEnums.RequirementStatus.通过 || c.Status == Models.DBEnums.RequirementStatus.归档 || c.Status == Models.DBEnums.RequirementStatus.取消 || c.CreateUserID == G.User.UserID || c.AuditorUserID == G.User.UserID);
             if (Model.Tag == 1)
             {
                 Model.List = Model.List.Where(c => c.CreateUserID == G.User.UserID);
@@ -55,11 +55,7 @@ namespace Web.Controllers
         public IActionResult View(string RequirementID, int? Version)
         {
             var Model = DB.TMT_Requirements.Find(RequirementID);
-            if (Model.Status == Models.DBEnums.RequirementStatus.拒绝 && Model.CreateUserID != G.User.UserID)
-            {
-                return View("_NoRight");
-            }
-            if (Model.Status == Models.DBEnums.RequirementStatus.待审 && Model.CreateUserID != G.User.UserID && Model.AuditorUserID != G.User.UserID)
+            if ((Model.Status == Models.DBEnums.RequirementStatus.待审 || Model.Status == Models.DBEnums.RequirementStatus.拒绝) && Model.CreateUserID != G.User.UserID && Model.AuditorUserID != G.User.UserID)
             {
                 return View("_NoRight");
             }
@@ -74,6 +70,7 @@ namespace Web.Controllers
         {
             try
             {
+                Models.TMT_Requirements Re = null;
                 if (string.IsNullOrWhiteSpace(Model.Title))
                 {
                     return Json("[需求标题]不可为空！");
@@ -88,7 +85,7 @@ namespace Web.Controllers
                     {
                         return Json("[评审人]必须选择！");
                     }
-                    Models.TMT_Requirements Re = new Models.TMT_Requirements
+                    Re = new Models.TMT_Requirements
                     {
                         RequirementID = Guid.NewGuid().ToString("N"),
                         Title = Model.Title,
@@ -115,16 +112,16 @@ namespace Web.Controllers
                         LogType = Models.DBEnums.LogType.需求,
                         TriggerUserID = G.User.UserID,
                         TargetUserID = null,
-                        Content = "发布第<div class=\"ui label horizontal mini basic\">" + Re.NowVersion + "</div>版本需求！",
+                        Content = "发布第<div class=\"ui label horizontal mini basic\">" + Re.NowVersion + "</div>版本需求，等待审核！",
                     });
                     DB.TMT_Requirements.Add(Re);
                 }
                 else
                 {
-                    var Re = DB.TMT_Requirements.Find(Model.RequirementID);
+                    Re = DB.TMT_Requirements.Find(Model.RequirementID);
                     if (Re.CreateUserID != G.User.UserID)
                     {
-                        return Json("无权对此数据进行操作！");
+                        return Json("无权对此需求进行编辑操作！");
                     }
                     if (Re.Status == Models.DBEnums.RequirementStatus.拒绝)
                     {
@@ -135,13 +132,17 @@ namespace Web.Controllers
                             Detaile.CreateDate = DateTime.Now;
                         }
                         Re.Status = Models.DBEnums.RequirementStatus.待审;
+                        Re.Title = Model.Title;
+                        Re.EmergencyLevel = Model.EmergencyLevel;
+                        Re.AuditorUserID = Model.AuditorUserID;
+                        Re.ModuleID = Model.ModuleID;
                         Re.Logs.Add(new Models.TMT_Logs
                         {
                             TagID = Re.RequirementID,
                             LogType = Models.DBEnums.LogType.需求,
                             TriggerUserID = G.User.UserID,
                             TargetUserID = null,
-                            Content = "编辑后重新提交需求！",
+                            Content = "编辑后重新提交需求，等待审核！",
                         });
                     }
                     else if (Re.Status == Models.DBEnums.RequirementStatus.通过)
@@ -164,14 +165,12 @@ namespace Web.Controllers
                     }
                     else
                     {
-                        return Json("当前状态无法进行更新发布！");
+                        return Json("当前需求状态无法进行更新发布！");
                     }
-                    Re.Title = Model.Title;
-                    Re.EmergencyLevel = Model.EmergencyLevel;
                     Re.LastUPDate = DateTime.Now;
                 }
                 DB.SaveChanges();
-                return Json();
+                return Success(Re.RequirementID);
             }
             catch (Exception Ex)
             {
@@ -191,14 +190,14 @@ namespace Web.Controllers
             var Model = DB.TMT_Requirements.Find(RequirementID);
             if (Model.Status != Models.DBEnums.RequirementStatus.待审)
             {
-                return Json("当前状态不能进行评审!");
+                return Json("当前需求状态不能进行评审操作！");
             }
             if (Model.AuditorUserID != G.User.UserID)
             {
-                return Json("无权评审!");
+                return Json("无权对此需求进行评审操作！");
             }
             Model.Status = Agree ? Models.DBEnums.RequirementStatus.通过 : Models.DBEnums.RequirementStatus.拒绝;
-            var Content = "评审需求，评审结果为：<div class=\"ui label horizontal mini\">" + Model.Status + "</div>";
+            var Content = "评审需求，评审结果为：<div class=\"ui label horizontal mini basic\">" + Model.Status + "</div>";
             if (!string.IsNullOrWhiteSpace(Remark))
             {
                 Content += "<br />" + Remark;
@@ -219,13 +218,13 @@ namespace Web.Controllers
         public IActionResult SealUP(string RequirementID)
         {
             var Model = DB.TMT_Requirements.Find(RequirementID);
-            if (Model.Status != Models.DBEnums.RequirementStatus.通过)
+            if (Model.Status != Models.DBEnums.RequirementStatus.通过 && Model.Status != Models.DBEnums.RequirementStatus.取消)
             {
-                return Json("当前状态不能进行归档操作!");
+                return Json("当前需求状态不能进行归档操作！");
             }
-            if (Model.CreateUserID != G.User.UserID)
+            if (Model.AuditorUserID != G.User.UserID)
             {
-                return Json("无权归档!");
+                return Json("无权对此需求进行归档操作！");
             }
             Model.Logs.Add(new Models.TMT_Logs
             {
@@ -233,7 +232,7 @@ namespace Web.Controllers
                 LogType = Models.DBEnums.LogType.需求,
                 TriggerUserID = G.User.UserID,
                 TargetUserID = null,
-                Content = "归档需求！",
+                Content = "归档需求，锁定并存档！",
             });
             Model.Status = Models.DBEnums.RequirementStatus.归档;
             DB.SaveChanges();
@@ -246,11 +245,11 @@ namespace Web.Controllers
             var Model = DB.TMT_Requirements.Find(RequirementID);
             if (Model.Status != Models.DBEnums.RequirementStatus.拒绝)
             {
-                return Json("当前状态不可删除!");
+                return Json("当前需求状态不能进行删除操作！");
             }
             if (Model.CreateUserID != G.User.UserID)
             {
-                return Json("无权删除!");
+                return Json("无权对此需求进行删除操作！");
             }
             Model.Logs.Add(new Models.TMT_Logs
             {
@@ -277,18 +276,18 @@ namespace Web.Controllers
             var Model = DB.TMT_Requirements.Find(RequirementID);
             if (Model.Status != Models.DBEnums.RequirementStatus.待审)
             {
-                return Json("当前状态不能进行评审转交!");
+                return Json("当前需求状态不能进行转交操作！");
             }
             if (Model.AuditorUserID != G.User.UserID)
             {
-                return Json("无权转交!");
+                return Json("无权对此需求进行转交操作！");
             }
             if (Model.AuditorUserID == UserID)
             {
-                return Json("原评审人与转交人相同!");
+                return Json("原评审人不能与转交审核人相同！");
             }
             var _User = DB.TMT_Users.Find(UserID);
-            var Content = "将需求转交给：<div class=\"ui label horizontal mini\">" + _User.UserName + "</div>进行评审";
+            var Content = "需求转交给：<div class=\"ui label horizontal mini basic\">" + _User.UserName + "</div>进行评审！";
             if (!string.IsNullOrWhiteSpace(Remark))
             {
                 Content += "<br />" + Remark;
@@ -318,13 +317,13 @@ namespace Web.Controllers
             var Model = DB.TMT_Requirements.Find(RequirementID);
             if (Model.Status != Models.DBEnums.RequirementStatus.通过)
             {
-                return Json("当前状态不能取消需求!");
+                return Json("当前需求状态不能进行取消操作！");
             }
             if (Model.CreateUserID != G.User.UserID)
             {
-                return Json("无权取消需求!");
+                return Json("无权对此需求进行取消操作！");
             }
-            var Content = "取消需求！";
+            var Content = "取消需求，不再继续执行！";
             if (!string.IsNullOrWhiteSpace(Remark))
             {
                 Content += "<br />" + Remark;
@@ -338,6 +337,28 @@ namespace Web.Controllers
                 Content = Content
             });
             Model.Status = Models.DBEnums.RequirementStatus.取消;
+            DB.SaveChanges();
+            return Json();
+        }
+
+        [HttpGet]
+        public IActionResult AddLog(string RequirementID)
+        {
+            ViewBag.RequirementID = RequirementID;
+            return View();
+        }
+        [HttpPost]
+        public IActionResult AddLog(string RequirementID, string Remark)
+        {
+            var Model = DB.TMT_Requirements.Find(RequirementID);
+            Model.Logs.Add(new Models.TMT_Logs
+            {
+                TagID = Model.RequirementID,
+                LogType = Models.DBEnums.LogType.需求,
+                TriggerUserID = G.User.UserID,
+                TargetUserID = null,
+                Content = Remark
+            });
             DB.SaveChanges();
             return Json();
         }

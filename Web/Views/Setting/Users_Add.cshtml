@@ -9,26 +9,47 @@
 <div class="content">
     <div class="ui form tiny">
         <input type="hidden" id="UserID" value="@Model?.UserID">
-        <div class="two fields">
-            <div class="field">
-                <img class="ui small image" id="av_img" style="border-radius:3px;" src="@(Model==null?"/Avatar/00.jpg":Model.Avatar)">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <div class="field">
+                    <img class="ui image" id="av_img" style="border-radius:3px;width: 120px;" src="@(Model==null?"/Avatar/00.jpg":Model.Avatar)">
+                </div>
             </div>
-            <div class="field">
-                <label>头像</label>
-                <SelectAvatars RandomSet="true" Clearable="false" ID="Avatar" Default="@Model?.Avatar"></SelectAvatars>
+            <div class="eight wide column">
+                <div class="field">
+                    <label>头像</label>
+                    <SelectAvatars RandomSet="true" Clearable="false" ID="Avatar" Default="@Model?.Avatar"></SelectAvatars>
+                </div>
+
+                <div class="field">
+                    <label>角色</label>
+                    <SelectRoles ID="RoleID" Clearable="false" Default="Model?.RoleID"></SelectRoles>
+                </div>
             </div>
         </div>
-        <div class="two fields">
+        <div class="two fields" style="margin-top:10px;">
             <div class="field">
                 <label>姓名</label>
                 <input type="text" id="UserName" value="@Model?.UserName" autocomplete="off">
             </div>
             <div class="field">
-                <label>角色</label>
-                <SelectRoles ID="RoleID" Clearable="false" Default="Model?.RoleID"></SelectRoles>
+                @if (Model == null || (Model != null && Model.Enable))
+                {
+                    <div class="ui toggle checkbox checked">
+                        <input type="checkbox" id="Enable" checked="">
+                        <label>启用</label>
+                    </div>
+                }
+                else
+                {
+                    <div class="ui toggle checkbox">
+                        <input type="checkbox" id="Enable">
+                        <label>启用</label>
+                    </div>
+                }
             </div>
         </div>
-        <div class="two fields">
+        <div class="two fields" style="margin-top:10px;">
             <div class="field">
                 <label>账号</label>
                 <input type="text" id="Account" value="@Model?.Account" autocomplete="off">
@@ -38,22 +59,7 @@
                 <input type="password" id="PassWord">
             </div>
         </div>
-        <div class="field">
-            @if (Model != null && Model.Enable)
-            {
-                <div class="ui toggle checkbox checked">
-                    <input type="checkbox" id="Enable" checked="">
-                    <label>启用</label>
-                </div>
-            }
-            else
-            {
-                <div class="ui toggle checkbox">
-                    <input type="checkbox" id="Enable">
-                    <label>启用</label>
-                </div>
-            }
-        </div>
+
         @if (Model != null)
         {
             <i class="exclamation circle icon orange"></i><span class="ui orange text">当编辑时，[密码]为空即不更改密码。</span>
@@ -64,7 +70,7 @@
     var modal_action = {
         init: () => {
             $('#Avatar').parents('.ui.dropdown').dropdown({
-                onChange: function (value, text, e) {
+                onChange: (value, text, e) => {
                     $('#av_img').attr('src', value);
                 }
             });
@@ -74,9 +80,9 @@
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
                 var data = $(target).parents('.ui.modal').find('.ui.form').getdata();
-                ajax.post('/Setting/Users_Add_Save', data, function () {
+                ajax.post('/Setting/Users_Add_Save', data, () => {
                     $(target).load_show();
-                }, function (success, data) {
+                }, (success, data) => {
                     $(target).load_hide();
                     if (success && data.Success) {
                         window.location.reload();
@@ -89,9 +95,9 @@
                 var target = event.currentTarget;
                 var data = { UserID: id };
                 modal.ask('确认删除此用户吗？删除后已存在的相关数据将会保留，但账号不可再被使用。', () => {
-                    ajax.post('/Setting/Users_Del', data, function () {
+                    ajax.post('/Setting/Users_Del', data, () => {
                         $(target).load_show();
-                    }, function (success, data) {
+                    }, (success, data) => {
                         $(target).load_hide();
                         if (success && data.Success) {
                             window.location.reload();

@@ -1,39 +1,32 @@
 /*整体*/
-body, html { min-width: 1200px; position: relative; overflow-y: hidden; overflow-x: auto; display: flex; flex-direction: row; width: 100%; height: 100%; }
-/*左栏菜单*/
-.menubox { width: 200px; box-shadow: 2px 0px 4px #333333; background: #1b1c1d; }
-.menubox > .blurring > .info { padding: 15px 0px; }
-.menubox > .blurring > .info > .avatar { width: 80px; border-radius: 50%; margin-left: auto; margin-right: auto; display: inherit; }
-.menubox > .blurring > .info > .header { color: rgba(255,255,255,.9) !important; text-align: center; margin: 10px 0px 0px 0px !important; }
-.menubox > .blurring > .info > .header > .header { color: rgba(255,255,255,.7) !important; }
-.menubox > .pro_set { padding: 0px 15px; }
-.menubox > .menulist { }
-.menubox > .menulist > ul { padding: 0; margin-bottom: 0; }
-.menubox > .menulist > ul > li { list-style: none; padding: 0px 20px; border-bottom: solid 1px rgba(88, 88, 88, 0.3); }
-.menubox > .menulist > ul > li > a { color: rgba(255,255,255,.6); display: inline-block; width: 100%; height: 45px; line-height: 45px; cursor: pointer; }
-.menubox > .menulist > ul > li > a > i.icon { /*float: right;*/ margin-right: 10px; }
-.menubox > .menulist > ul > li:hover { background: #242627; }
-.menubox > .menulist > ul > li:hover > a { color: rgba(255,255,255,.8); }
-.menubox > .menulist > ul > li.active { background: #3e3e3e; }
-.menubox > .menulist > ul > li.active > a { color: rgba(255,255,255,.9); }
-/*左栏菜单-设置，二级菜单*/
-.menubox > .menulist > .sets { height: 45px; line-height: 45px !important; border-radius: 0 !important; padding: 0px 20px !important; font-size: 1em; background: #1b1c1d !important; color: rgba(255,255,255,.6) !important; font-weight: normal !important; }
-.menubox > .menulist > .sets:hover { background: #242627 !important; color: rgba(255,255,255,.8) !important; }
-.menubox > .menulist > .sets > .caret.right.icon { font-size: 1em; line-height: inherit !important; float: right; }
-.menubox > .menulist > .sets > .menu { background: #1b1c1d !important; margin: 0px 0 0px .5em !important; min-width: 130px !important; }
-.menubox > .menulist > .sets > .menu > .item { color: rgba(255,255,255,.6) !important; font-weight: normal !important; }
-.menubox > .menulist > .sets > .menu > .item:hover { background: #242627 !important; color: rgba(255,255,255,.8) !important; }
-.menubox > .menulist > .sets > .menu > .item.active { background: #3e3e3e !important; color: rgba(255,255,255,.9) !important; }
-.menubox > .menulist > .sets > .menu:after { background: #1b1c1d !important; }
+body, html { min-width: 1200px; position: relative; overflow-y: hidden; overflow-x: auto; display: flex; flex-direction: column; width: 100%; height: 100%; }
+/*顶部菜单样式修正*/
+.menubox { background: #1b1c1d; padding: 5px; box-shadow: 0px 2px 4px #333333; }
+.menubox > .menu { padding:0 20px;}
+.menubox > .menu > .dropdown.item { color: rgba(255,255,255,.7); }
+.userinfo { padding: 2px 2px !important; }
+.userinfo > .comments { margin: 0; }
+.userinfo > .ui.comments .comment .text { margin: 0 !important; }
+.userinfo .avatar img { width: 30px !important; }
+.userinfo .content { margin-left: 2.8em !important; padding: 2px 0px; }
+.userinfo .content .author, .userinfo .content .text { color: #dedede !important; font-size: 12px !important; }
+.userinfo > i.dropdown.icon { margin: 0 3px 0px 1em !important; }
+.userinfo .content .text { color: #a7a7a7 !important; }
+.userinfo > .menu { min-width: 95px !important; }
+.projectset { padding-top: .8em !important; height: 32px; margin-top: 4px !important; width:120px;}
+.projectset > .icon { padding: .78571429em 0 .78571429em 0 !important; }
 
 /*搜索区样式修正*/
 .searchbox .ui.button.orange.icon { padding: 0.65em !important; }
 .ui.form .field.right { position: absolute; right: 0; padding: 0 !important; }
 /*下拉框清除按钮样式修正*/
 .ui.dropdown > .remove.icon { right: 1.5em !important; }
+/*需求文档添加和编辑页的通用样式*/
+.document_body { width: 1200px; display: flex; flex-direction: row; margin: 0 auto; height: 100%; }
+.document_body > .left { overflow-x: hidden; overflow-y: auto; padding: 30px; width: 900px; height: 100%; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
+.document_body > .right { overflow-x: hidden; overflow-y: auto; flex: 1; height: 100%; padding: 20px; }
 
-
-
+textarea { resize:none !important;}
 
 .Context { flex: 1; padding: 20px 30px; overflow: hidden; display: flex; flex-direction: column; }
 

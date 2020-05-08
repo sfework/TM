@@ -2,8 +2,6 @@
     ViewData["Title"] = "需求管理";
 }
 @model Web.ParamModels.Requirement.Requirement_Index
-<link href="~/edit/edit.css" rel="stylesheet" />
-<script src="~/edit/edit.js"></script>
 <style>
     .wnone { font-weight: normal !important; }
 </style>
@@ -49,7 +47,7 @@
                 <button class="ui button orange icon" id="search"><i class="icon search"></i></button>
             </div>
             <div class="field right">
-                <a class="ui floating teal labeled icon button tiny" onclick="modal.load('/Requirement/Add', null,'overlay fullscreen')">
+                <a class="ui floating teal labeled icon button tiny" href="/Requirement/Add">
                     <i class="plus icon"></i>新增
                 </a>
             </div>
@@ -90,7 +88,7 @@
                             case 5:
                                 <i class="exclamation icon red"></i>break;
                         }
-                        <a style="color:rgba(0,0,0,.8);" onclick="modal.load('/Requirement/View?RequirementID=@item.RequirementID', null,'overlay fullscreen')">@item.Title</a>
+                        <a style="color:rgba(0,0,0,.8);" href="/Requirement/View?RequirementID=@item.RequirementID">@item.Title</a>
                         <div class="ui mini label horizontal basic">
                             @item.NowVersion
                         </div>

@@ -47,7 +47,7 @@
 </div>
 <script>
     var modal_action = {
-        save: function () {
+        save: () => {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
                 var objs = $(target).parent().parent().children('.content').find('input:checkbox:checked');
@@ -57,9 +57,9 @@
                 }
                 var data = $(target).parent().parent().children('.content').find('.ui.form:first-child').getdata();
                 data.Auths = auths;
-                ajax.post('/Setting/Roles_Add_Save', data, function () {
+                ajax.post('/Setting/Roles_Add_Save', data, () => {
                     $(target).load_show();
-                }, function (success, data) {
+                }, (success, data) => {
                     $(target).load_hide();
                     if (success && data.Success) {
                         window.location.reload();

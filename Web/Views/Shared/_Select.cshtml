@@ -30,7 +30,7 @@
 }
 else
 {
-    <div class="ui @(Model.Fluid?"fluid":"") selection @(Model.Search ? "search" : "") dropdown @(Model.Clearable ? "clearable" : "") @(Model.Multiple ? "multiple" : "") @Model.Class" @(Model.Width > 0 ? Html.Raw(string.Format("style=\"min-width:{0}px !important;\"", Model.Width)) : Html.Raw(""))>
+    <div class="ui @(Model.Fluid?"fluid":"") selection @(Model.Search ? "search" : "") dropdown @(Model.Clearable ? "clearable" : "") @(Model.Multiple ? "multiple" : "") @Model.Class" @(Model.Width > 0 ? Html.Raw(string.Format("style=\"width:{0}px !important;\"", Model.Width)) : Html.Raw(""))>
         <input type="hidden" id="@Model.ID" value="@Model.Default">
         <div class="default text">@Model.Placeholder</div>
         <div class="menu">

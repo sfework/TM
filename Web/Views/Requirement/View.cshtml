@@ -1,17 +1,38 @@
 ﻿@{
-    Layout = null;
+    ViewData["Title"] = "需求文档";
 }
 @model TMT_Requirements
-<div class="header">
-    <i class="file alternate outline icon"></i>
-    @Model?.Title
-</div>
-<div class="content scrolling edit">
-    <div class="ui form tiny" style="width: 900px; margin: 0px auto ;margin-top:10px;">
-        <div class="inline fields">
+<link href="~/edit/edit.css" rel="stylesheet" />
+<script src="~/edit/edit.js"></script>
+<div class="document_body">
+    <div class="left">
+        <input type="hidden" id="RequirementID" value="@Model.RequirementID" />
+        <div class="ui transparent input fluid" style="margin-bottom: 20px; ">
+            <input type="text" id="Title" placeholder="需求标题..." value="@Model.Title" readonly="readonly" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
+        </div>
+        <div class="context_edit">
+            @Html.Raw(Model.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
+        </div>
+    </div>
+    <div class="right">
+        <div class="ui form tiny">
+            <div class="field">
+                <label>版本</label>
+                <div class="ui inline dropdown" id="setVersion" data-value="@Model.RequirementID">
+                    <input type="hidden" value="@Model.NowVersion">
+                    <div class="default text"></div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        @foreach (var item in Model.Detailes)
+                        {
+                            <div class="item" data-value="@item.Version"># @(item.Version)</div>
+                        }
+                    </div>
+                </div>
+            </div>
             <div class="field">
                 <label>优先级</label>
-                <div class="ui grey rating disabled" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
+                <div class="ui disabled rating" id="EmergencyLevel" data-icon="star" data-rating="@Model.EmergencyLevel" data-max-rating="5"></div>
             </div>
             <div class="field">
                 <label>项目</label>
@@ -32,29 +53,45 @@
                     @Model.Module.ModuleName
                 </div>
             </div>
-            <div class="field">
-                <label>版本</label>
-                <div class="ui inline dropdown" id="setVersion">
-                    <input type="hidden" value="@Model.NowVersion">
-                    <div class="default text"></div>
-                    <i class="dropdown icon"></i>
-                    <div class="menu">
-                        @foreach (var item in Model.Detailes)
-                        {
-                            <div class="item" data-value="@item.Version"># @(item.Version)</div>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="context_con">
-        <div class="ui horizontal divider">
-            <i class="tasks icon"></i>
-            需求内容
-        </div>
-        <div class="context_edit">
-            @Html.Raw(Model.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
+            @if (Model.Status == DBEnums.RequirementStatus.待审 && Model.AuditorUserID == G.User.UserID)
+            {
+                <button class="ui tiny yellow button" onclick="page_action.review('@Model.RequirementID')">
+                    <i class="stamp icon"></i>
+                    审核
+                </button>
+                <button class="ui tiny brown button" onclick="page_action.handOver('@Model.RequirementID')">
+                    <i class="random icon"></i>
+                    转审
+                </button>
+            }
+            @if ((Model.Status == DBEnums.RequirementStatus.拒绝 || Model.Status == DBEnums.RequirementStatus.通过) && Model.CreateUserID == G.User.UserID)
+            {
+                <a class="ui tiny teal button" href="/Requirement/Add?RequirementID=@Model.RequirementID">
+                    <i class="edit icon"></i>
+                    编辑
+                </a>
+            }
+            @if (Model.Status == DBEnums.RequirementStatus.通过 && Model.CreateUserID == G.User.UserID)
+            {
+                <button class="ui tiny orange button" onclick="page_action.cancel('@Model.RequirementID')">
+                    <i class="times icon"></i>
+                    取消
+                </button>
+            }
+            @if ((Model.Status == DBEnums.RequirementStatus.通过 || Model.Status == DBEnums.RequirementStatus.取消) && Model.AuditorUserID == G.User.UserID)
+            {
+                <button class="ui tiny grey button" onclick="page_action.sealUP('@Model.RequirementID')">
+                    <i class="sign in alternate icon"></i>
+                    归档
+                </button>
+            }
+            @if (Model.Status == DBEnums.RequirementStatus.拒绝 && Model.CreateUserID == G.User.UserID)
+            {
+                <button class="ui tiny red button" onclick="page_action.delete('@Model.RequirementID')">
+                    <i class="trash alternate outline icon"></i>
+                    删除
+                </button>
+            }
         </div>
         <div class="ui horizontal divider">
             <i class="tasks icon"></i>
@@ -93,69 +130,74 @@
         {
             <span class="ui grey text">无</span>
         }
-    <div class="ui horizontal divider">
-        <i class="history icon"></i>
-        处理记录
-        <a class="ui label teal">
-            <i class="plus icon"></i> 新增备注
-        </a>
-    </div>
-        @if (Model.Logs.Count > 0)
-        {
-            <div class="ui comments mini">
-                @foreach (var item in Model.Logs)
-                {
-                    <div class="comment">
-                        <a class="avatar">
-                            <img src="@item.TriggerUser.Avatar">
-                        </a>
-                        <div class="content">
-                            <a class="author">@item.TriggerUser.UserName</a>
-                            <div class="metadata">
-                                <span class="date">@item.CreateDate</span>
-                            </div>
-                            <div class="text">
-                                @Html.Raw(item.Content)
-                            </div>
+        <div class="ui horizontal divider">
+            <i class="history icon"></i>
+            处理记录
+            @if (Model.CreateUserID == G.User.UserID || Model.AuditorUserID == G.User.UserID)
+            {
+                <a class="ui label mini" style="padding:.55em;" onclick="page_action.addlog('@Model.RequirementID')">
+                    <i class="plus icon" style="margin:0;"></i>
+                </a>
+            }
+        </div>
+        <div class="ui comments mini">
+            @foreach (var item in Model.Logs)
+            {
+                <div class="comment">
+                    <div class="avatar">
+                        <img src="@item.TriggerUser.Avatar">
+                    </div>
+                    <div class="content">
+                        <span class="author">@item.TriggerUser.UserName</span>
+                        <div class="metadata">
+                            <span class="date">@item.CreateDate</span>
+                        </div>
+                        <div class="text">
+                            @Html.Raw(item.Content)
                         </div>
                     </div>
-                }
-            </div>
-        }
-        else
-        {
-            <span class="ui grey text">无</span>
-        }
+                </div>
+            }
+        </div>
     </div>
 </div>
 <script>
-    var modal_action = {
+    var page_action = {
         edit_obj: null,
         EmergencyLevel: $('#EmergencyLevel'),
-        init: function () {
-            modal_action.EmergencyLevel.rating({
+        init: () => {
+            page_action.edit();
+            page_action.EmergencyLevel.rating({
                 onRate: (value) => {
-                    modal_action.EmergencyLevel.removeClass('green olive yellow orange red grey');
+                    page_action.EmergencyLevel.removeClass('green olive yellow orange red grey');
                     switch (value) {
                         case 1:
-                            modal_action.EmergencyLevel.addClass('green');
+                            page_action.EmergencyLevel.addClass('green');
                             break;
                         case 2:
-                            modal_action.EmergencyLevel.addClass('olive');
+                            page_action.EmergencyLevel.addClass('olive');
                             break;
                         case 3:
-                            modal_action.EmergencyLevel.addClass('yellow');
+                            page_action.EmergencyLevel.addClass('yellow');
                             break;
                         case 4:
-                            modal_action.EmergencyLevel.addClass('orange');
+                            page_action.EmergencyLevel.addClass('orange');
                             break;
                         case 5:
-                            modal_action.EmergencyLevel.addClass('red');
+                            page_action.EmergencyLevel.addClass('red');
                             break;
                     }
                 }
-            }).rating('set rating', modal_action.EmergencyLevel.rating('get rating'));
-            modal_action.edit_obj = new editor('.context_edit', {
+            }).rating('set rating', page_action.EmergencyLevel.rating('get rating'));
+            $('#setVersion').dropdown({
+                onChange: function (value, text, $choice) {
+                    var id = $choice.parents('.dropdown').data('value');
+                    window.location.href = "/Requirement/View?RequirementID=" + id + "&Version=" + value;
+                }
+            });
+        },
+        edit: () => {
+            page_action.edit_obj = new editor('.context_edit', {
                 edit: false,
                 upload: {
                     url: '/Home/UPload',
@@ -163,28 +205,55 @@
                     error: (error) => { }
                 }
             });
-            $('#setVersion').dropdown({
-                onChange: function (value, text, $choice) {
-                    window.location.href = "/Requirement/View?RequirementID=@Model.RequirementID&Version=" + value;
-                }
-            });
         },
-        sealUP: function (id) {
-            modal.ask('确认归档此需求？', function () {
-                ajax.post('/Requirement/SealUP', { RequirementID: id }, null, function (s, d) {
-                    if (s && d.Success) {
-                        window.location.reload();
-                    }
+        review: (id) => {
+            modal.load('/Requirement/Review?RequirementID=' + id, 400);
+        },
+        cancel: (id) => {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                modal.ask('确认取消此需求，不再继续执行吗？', () => {
+                    ajax.post('/Requirement/Cancel', { RequirementID: id }, () => { $(target).load_show(); }, (success, data) => {
+                        $(target).load_hide();
+                        if (success && data.Success) {
+                            window.location.reload();
+                        }
+                    });
                 });
-            });
-        }
+            }
+        },
+        sealUP: (id) => {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                modal.ask('确认归档此需求吗？归档后将锁定需求不再可编辑。', () => {
+                    ajax.post('/Requirement/SealUP', { RequirementID: id }, () => { $(target).load_show(); }, (success, data) => {
+                        $(target).load_hide();
+                        if (success && data.Success) {
+                            window.location.reload();
+                        }
+                    });
+                });
+            }
+        },
+        delete: (id) => {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                modal.ask('确认归档此需求吗？归档后将锁定需求不再可编辑。', () => {
+                    ajax.post('/Requirement/Delete', { RequirementID: id }, () => { $(target).load_show(); }, (success, data) => {
+                        $(target).load_hide();
+                        if (success && data.Success) {
+                            window.location.href = "/Requirement/Index";
+                        }
+                    });
+                });
+            }
+        },
+        handOver: (id) => {
+            modal.load('/Requirement/HandOver?RequirementID=' + id, 400);
+        },
+        addlog: (id) => {
+            modal.load('/Requirement/AddLog?RequirementID=' + id, 400);
+        },
     };
-    modal_action.init();
+    page_action.init();
 </script>
-<div class="actions">
-    <button class="ui labeled icon button teal left floated" onclick="modal_action.save()">
-        <i class="save icon"></i>
-        发布
-    </button>
-    <button class="ui button cancel black">关闭</button>
-</div>
