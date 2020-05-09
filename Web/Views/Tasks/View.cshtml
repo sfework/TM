@@ -2,70 +2,25 @@
     ViewData["Title"] = Model.Title;
 }
 @model TMT_Tasks
-<style>
-    .context_box { flex: 1; overflow: hidden; display: flex; flex-direction: row; }
-    .context_box > .cleft { border-radius: 4px; flex: 1; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; background: #fff; padding: 40px; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
-    .context_box > .cright { border-radius: 4px; width: 300px; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; margin-left: 20px; padding: 20px; background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
-    .strbox p { margin-bottom: 1px !important }
-</style>
-<div class="context_box">
-    <div class="cleft">
-        @if (Model.Requirement == null)
-        {
-            <h1 class="ui header">
-                @Model.Title
-            </h1>
-            <div class="strbox">
-                @Html.Raw(Model.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
-            </div>
-        }
-        else
-        {
-            <h1 class="ui header">
-                <span class="ui basic tiny label horizontal">任务</span>@Model.Title
-            </h1>
-            <div class="strbox">
-                @Html.Raw(Model.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
-            </div>
-            <div class="ui divider"></div>
-            <h1 class="ui header">
-                <span class="ui basic tiny label horizontal">需求</span>@Model.Requirement.Title
-            </h1>
-            <div class="strbox">
-                @Html.Raw(Model.Requirement.Detailes.FirstOrDefault(c => c.Version == Model.Requirement.NowVersion).Content)
-            </div>
-        }
+<link href="~/edit/edit.css" rel="stylesheet" />
+<script src="~/edit/edit.js"></script>
+<div class="document_body">
+    <div class="left">
+        <div class="ui transparent input fluid" style="margin-bottom: 20px; ">
+            <input type="text" id="Title" placeholder="需求标题..." value="@Model.Title" readonly="readonly" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
+        </div>
+        <div class="context_edit">
+            @Html.Raw(Model.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
+        </div>
     </div>
-    <div class="cright">
+    <div class="right">
         <div class="ui form tiny">
-            <div class="field inline">
-                <label>优先级</label>
-                <div style="margin-top:7px;" class="ui rating disabled" id="EmergencyLevel" data-icon="star" data-rating="@Model.EmergencyLevel" data-max-rating="5"></div>
-            </div>
-            @if (Model.Requirement != null)
-            {
-                <div class="field inline">
-                    <label>需求版本</label>
-                    <div class="ui inline dropdown" id="p_setVersion" style="width:80px;">
-                        <input type="hidden" value="@Model.Requirement.NowVersion">
-                        <div class="default text"></div>
-                        <i class="dropdown icon"></i>
-                        <div class="menu">
-                            @foreach (var item in Model.Requirement.Detailes)
-                            {
-                                <div class="item" data-value="@item.Version"># @(item.Version)</div>
-                            }
-                        </div>
-                    </div>
-                </div>
-            }
-            <div class="field inline">
-                <label>任务版本</label>
-                <div class="ui inline dropdown" id="t_setVersion" style="width:80px;">
+            <div class="field">
+                <label>版本</label>
+                <div class="ui floating labeled icon dropdown button" id="setVersion" data-value="@Model.TaskID">
                     <input type="hidden" value="@Model.NowVersion">
-
-                    <div class="default text"></div>
-                    <i class="dropdown icon"></i>
+                    <i class="code branch icon"></i>
+                    <span class="text">Add User</span>
                     <div class="menu">
                         @foreach (var item in Model.Detailes)
                         {
@@ -74,56 +29,97 @@
                     </div>
                 </div>
             </div>
-            <div class="field inline">
+            <div class="field">
+                <label>优先级</label>
+                <div class="ui disabled rating" id="EmergencyLevel" data-icon="star" data-rating="@Model.EmergencyLevel" data-max-rating="5"></div>
+            </div>
+            <div class="field">
                 <label>项目</label>
                 <div class="ui label basic">
-                    <i class="briefcase icon"></i> @Model.Project.ProjectName
+                    <i class="briefcase icon"></i> @G.NowProject.ProjectName
                 </div>
             </div>
-            <div class="field inline">
-                <label>指派</label>
-                <div class="ui image label basic">
-                    <img src="@Model.ExecutorUser.Avatar">
-                    @Model.ExecutorUser.UserName
+            <div class="field">
+                <label>类型</label>
+                <div class="ui label basic">
+                    @Model.MType
                 </div>
             </div>
-            <div class="field inline">
+            <div class="field">
                 <label>模块</label>
                 <div class="ui label basic">
                     @Model.Module.ModuleName
                 </div>
             </div>
-            @if (Model.Status == DBEnums.TasksStatus.进行 && (Model.CreateUserID == G.User.UserID || Model.ExecutorUserID == G.User.UserID))
-            {
-                <div class="field">
-                    <div class="ui buttons icon  blue compact">
-                        @if (Model.CreateUserID == G.User.UserID)
-                        {
-                            <a class="ui button" href="/Tasks/Add?TaskID=@Model.TaskID" title="编辑"><i class="edit icon"></i></a>
-                        }
-                        @if (Model.ExecutorUserID == G.User.UserID)
-                        {
-                            <button class="ui button" onclick="modal.load('/Tasks/HandOver?TaskID=@Model.TaskID',400)" title="转交"><i class="random icon"></i></button>
-                            <button class="ui button" onclick="modal.load('/Tasks/Done?TaskID=@Model.TaskID',400)" title="完成"><i class="check square icon"></i></button>
-                            <button class="ui button" onclick="modal.load('/Tasks/Cancel?TaskID=@Model.TaskID',400)" title="取消任务"><i class="times icon"></i></button>
-                        }
-                    </div>
+            <div class="field">
+                <label>负责人</label>
+                <div class="ui image label basic">
+                    <img src="@Model.ExecutorUser.Avatar">
+                    @Model.ExecutorUser.UserName
                 </div>
+            </div>
+            @if (Model.Status == DBEnums.TasksStatus.进行 && Model.CreateUserID == G.User.UserID)
+            {
+                <a class="ui tiny teal button" href="/Tasks/Add?TaskID=@Model.TaskID">
+                    <i class="edit icon"></i>
+                    编辑
+                </a>
+            }
+            @if (Model.Status == DBEnums.TasksStatus.进行 && Model.ExecutorUserID == G.User.UserID)
+            {
+                <button class="ui tiny brown button" onclick="page_action.handOver('@Model.RequirementID')">
+                    <i class="random icon"></i>
+                    转交
+                </button>
+                <button class="ui tiny orange button" onclick="page_action.review('@Model.RequirementID')">
+                    <i class="stamp icon"></i>
+                    结束
+                </button>
             }
         </div>
         <div class="ui horizontal divider">
+            <i class="file alternate icon"></i>
+            关联需求
+        </div>
+        @if (Model.Requirement != null)
+        {
+            <div class="ui comments mini">
+                <div class="comment">
+                    <div class="avatar">
+                        <img src="@Model.Requirement.CreateUser.Avatar">
+                    </div>
+                    <div class="content">
+                        <span class="author">@Model.Requirement.CreateUser.UserName</span>
+                        <div class="text" style="margin-top:.1em;">
+                            <a>@Model.Requirement.Title</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <span class="ui grey text">无</span>
+        }
+        <div class="ui horizontal divider">
             <i class="history icon"></i>
-            历史记录
+            记录
+            @if (Model.CreateUserID == G.User.UserID || Model.ExecutorUserID == G.User.UserID)
+            {
+                <a class="ui label mini addlog basic" onclick="page_action.addlog('@Model.TaskID')">
+                    <i class="plus icon"></i>
+                </a>
+            }
         </div>
         <div class="ui comments mini">
-            @foreach (var item in Model.Logs)
+            @foreach (var item in Model.Logs.OrderBy(c => c.CreateDate))
             {
                 <div class="comment">
-                    <a class="avatar">
-                        <img src="@item.TriggerUser.Avatar">
-                    </a>
+                    <div class="avatar">
+                        <img src="@item.User.Avatar">
+                    </div>
                     <div class="content">
-                        <a class="author">@item.TriggerUser.UserName</a>
+                        <span class="author">@item.User.UserName</span>
                         <div class="metadata">
                             <span class="date">@item.CreateDate</span>
                         </div>
@@ -138,7 +134,7 @@
 </div>
 <script>
     var page_action = {
-        init: function () {
+        init: () => {
             $('#EmergencyLevel').rating({
                 onRate: function (value) {
                     $(this).removeClass('green olive yellow orange red');
@@ -161,16 +157,10 @@
                     }
                 }
             }).rating('set rating', $('#EmergencyLevel').rating('get rating'));
-            $('#p_setVersion').dropdown({
+            $('#setVersion').dropdown({
                 onChange: function (value, text, $choice) {
-                    oUrl = url.replaceParamVal('RequirementVersion', value);
-                    window.location.href = window.location.pathname + oUrl;
-                }
-            });
-            $('#t_setVersion').dropdown({
-                onChange: function (value, text, $choice) {
-                    oUrl = url.replaceParamVal('TaskVersion', value);
-                    window.location.href = window.location.pathname + oUrl;
+                    var id = $choice.parents('.dropdown').data('value');
+                    window.location.href = "/Tasks/View?TaskID=" + id + "&Version=" + value;
                 }
             });
         }

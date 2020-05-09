@@ -8,7 +8,7 @@
     <div class="left">
         <input type="hidden" id="RequirementID" value="@Model?.RequirementID" />
         <div class="ui transparent input fluid" style="margin-bottom: 20px; ">
-            @if (Model != null && Model.Status != DBEnums.RequirementStatus.拒绝)
+            @if (Model != null && Model.Status != DBEnums.RequirementStatus.驳回)
             {
                 <input type="text" id="Title" placeholder="需求标题..." readonly="readonly" value="@Model?.Title" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
             }
@@ -26,7 +26,7 @@
         <div class="ui form tiny">
             <div class="field">
                 <label>优先级</label>
-                @if (Model != null && Model.Status != DBEnums.RequirementStatus.拒绝)
+                @if (Model != null && Model.Status != DBEnums.RequirementStatus.驳回)
                 {
                     <div class="ui disabled rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
                 }
@@ -42,22 +42,21 @@
                 </div>
             </div>
             <div class="field">
-                <label>评审</label>
-                @if (Model != null && Model.Status != DBEnums.RequirementStatus.拒绝)
+                <label>类型</label>
+                @if (Model != null && Model.Status != DBEnums.RequirementStatus.驳回)
                 {
-                    <div class="ui image label basic">
-                        <img src="@Model.AuditorUser.Avatar">
-                        @Model.AuditorUser.UserName
+                    <div class="ui label basic">
+                        @Model.MType
                     </div>
                 }
                 else
                 {
-                    <SelectUsers Fluid="false" Width="150" Placeholder="选择评审人" Clearable="false" ID="AuditorUserID" Default="Model?.AuditorUserID"></SelectUsers>
+                    <SelectEnums Fluid="false" Clearable="false" Default="@(Model==null?-1:(int)Model.MType)" ID="MType" Width="80" Enum="typeof(DBEnums.MType)"></SelectEnums>
                 }
             </div>
             <div class="field">
                 <label>模块</label>
-                @if (Model != null && Model.Status != DBEnums.RequirementStatus.拒绝)
+                @if (Model != null && Model.Status != DBEnums.RequirementStatus.驳回)
                 {
                     <div class="ui label basic">
                         @Model.Module.ModuleName
@@ -78,9 +77,24 @@
                 }
             </div>
             <div class="field">
+                <label>评审</label>
+                @if (Model != null && Model.Status != DBEnums.RequirementStatus.驳回)
+                {
+                    <div class="ui image label basic">
+                        <img src="@Model.AuditorUser.Avatar">
+                        @Model.AuditorUser.UserName
+                    </div>
+                }
+                else
+                {
+                    <SelectUsers Fluid="false" Width="150" Placeholder="选择评审人" Clearable="false" ID="AuditorUserID" Default="Model?.AuditorUserID"></SelectUsers>
+                }
+            </div>
+
+            <div class="field">
                 <button class="ui tiny blue button" onclick="page_action.save()">
                     <i class="save icon"></i>
-                    发布
+                    保存
                 </button>
             </div>
         </div>
@@ -91,7 +105,14 @@
         edit_obj: null,
         EmergencyLevel: $('#EmergencyLevel'),
         init: () => {
-            page_action.edit();
+            page_action.edit_obj = new editor('.context_edit', {
+                edit: true,
+                upload: {
+                    url: '/Home/UPload',
+                    success: (result) => { },
+                    error: (error) => { }
+                }
+            });
             page_action.EmergencyLevel.rating({
                 onRate: (value) => {
                     page_action.EmergencyLevel.removeClass('green olive yellow orange red grey');
@@ -114,16 +135,6 @@
                     }
                 }
             }).rating('set rating', page_action.EmergencyLevel.rating('get rating'));
-        },
-        edit: function () {
-            page_action.edit_obj = new editor('.context_edit', {
-                edit: true,
-                upload: {
-                    url: '/Home/UPload',
-                    success: (result) => { },
-                    error: (error) => { }
-                }
-            });
         },
         save: () => {
             if (event && event.currentTarget) {

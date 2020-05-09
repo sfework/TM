@@ -10,23 +10,16 @@ namespace Web.Models
     {
         public int ID { get; set; }
         public string TagID { get; set; }
-        public DBEnums.LogType LogType { get; set; }
-
-        public int TriggerUserID { get; set; }
-        public int? TargetUserID { get; set; }
-
+        public int UserID { get; set; }
         public string Content { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;
-
         public bool IsDelete { get; set; } = false;
 
         [ForeignKey("TagID")]
         public virtual TMT_Requirements Requirement { get; set; }
         [ForeignKey("TagID")]
         public virtual TMT_Tasks Task { get; set; }
-        [ForeignKey("TriggerUserID")]
-        public virtual TMT_Users TriggerUser { get; set; }
-        [ForeignKey("TargetUserID")]
-        public virtual TMT_Users TargetUser { get; set; }
+        [ForeignKey("UserID")]
+        public virtual TMT_Users User { get; set; }
     }
 }

@@ -1,12 +1,11 @@
 ﻿@{
-    ViewData["Title"] = "需求文档";
+    ViewData["Title"] = Model.Title;
 }
 @model TMT_Requirements
 <link href="~/edit/edit.css" rel="stylesheet" />
 <script src="~/edit/edit.js"></script>
 <div class="document_body">
     <div class="left">
-        <input type="hidden" id="RequirementID" value="@Model.RequirementID" />
         <div class="ui transparent input fluid" style="margin-bottom: 20px; ">
             <input type="text" id="Title" placeholder="需求标题..." value="@Model.Title" readonly="readonly" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
         </div>
@@ -18,10 +17,10 @@
         <div class="ui form tiny">
             <div class="field">
                 <label>版本</label>
-                <div class="ui inline dropdown" id="setVersion" data-value="@Model.RequirementID">
+                <div class="ui floating labeled icon dropdown button" id="setVersion" data-value="@Model.RequirementID">
                     <input type="hidden" value="@Model.NowVersion">
-                    <div class="default text"></div>
-                    <i class="dropdown icon"></i>
+                    <i class="code branch icon"></i>
+                    <span class="text">Add User</span>
                     <div class="menu">
                         @foreach (var item in Model.Detailes)
                         {
@@ -41,10 +40,9 @@
                 </div>
             </div>
             <div class="field">
-                <label>评审</label>
-                <div class="ui image label basic">
-                    <img src="@Model.AuditorUser.Avatar">
-                    @Model.AuditorUser.UserName
+                <label>类型</label>
+                <div class="ui label basic">
+                    @Model.MType
                 </div>
             </div>
             <div class="field">
@@ -53,7 +51,28 @@
                     @Model.Module.ModuleName
                 </div>
             </div>
-            @if (Model.Status == DBEnums.RequirementStatus.待审 && Model.AuditorUserID == G.User.UserID)
+            <div class="field">
+                <label>评审</label>
+                <div class="ui image label basic">
+                    <img src="@Model.AuditorUser.Avatar">
+                    @Model.AuditorUser.UserName
+                </div>
+            </div>
+            @if (Web.Test.Requirement.AllowEdit(Model, G.User.UserID))
+            {
+                <a class="ui tiny blue button" href="/Requirement/Add?RequirementID=@Model.RequirementID">
+                    <i class="edit icon"></i>
+                    编辑
+                </a>
+            }
+            @if (Web.Test.Requirement.AllowSubmit(Model, G.User.UserID))
+            {
+                <button class="ui tiny teal button" onclick="page_action.submit('@Model.RequirementID')">
+                    <i class="share square outline icon"></i>
+                    发布
+                </button>
+            }
+            @if (Web.Test.Requirement.AllowReview(Model, G.User.UserID))
             {
                 <button class="ui tiny yellow button" onclick="page_action.review('@Model.RequirementID')">
                     <i class="stamp icon"></i>
@@ -64,28 +83,14 @@
                     转审
                 </button>
             }
-            @if ((Model.Status == DBEnums.RequirementStatus.拒绝 || Model.Status == DBEnums.RequirementStatus.通过) && Model.CreateUserID == G.User.UserID)
-            {
-                <a class="ui tiny teal button" href="/Requirement/Add?RequirementID=@Model.RequirementID">
-                    <i class="edit icon"></i>
-                    编辑
-                </a>
-            }
-            @if (Model.Status == DBEnums.RequirementStatus.通过 && Model.CreateUserID == G.User.UserID)
-            {
-                <button class="ui tiny orange button" onclick="page_action.cancel('@Model.RequirementID')">
-                    <i class="times icon"></i>
-                    取消
-                </button>
-            }
-            @if ((Model.Status == DBEnums.RequirementStatus.通过 || Model.Status == DBEnums.RequirementStatus.取消) && Model.AuditorUserID == G.User.UserID)
+            @if (Web.Test.Requirement.AllowSealUP(Model, G.User.UserID))
             {
                 <button class="ui tiny grey button" onclick="page_action.sealUP('@Model.RequirementID')">
                     <i class="sign in alternate icon"></i>
                     归档
                 </button>
             }
-            @if (Model.Status == DBEnums.RequirementStatus.拒绝 && Model.CreateUserID == G.User.UserID)
+            @if (Web.Test.Requirement.AllowSubmit(Model, G.User.UserID))
             {
                 <button class="ui tiny red button" onclick="page_action.delete('@Model.RequirementID')">
                     <i class="trash alternate outline icon"></i>
@@ -95,31 +100,33 @@
         </div>
         <div class="ui horizontal divider">
             <i class="tasks icon"></i>
-            相关任务
+            任务
         </div>
         @if (Model.Tasks.Count > 0)
         {
-            <div class="ui list small">
+            <div class="ui comments mini">
                 @foreach (var item in Model.Tasks)
                 {
-                    <div class="item">
-                        <img class="ui avatar image" src="@item.ExecutorUser.Avatar">
+                    <div class="comment">
+                        <div class="avatar">
+                            <img src="@item.ExecutorUser.Avatar">
+                        </div>
                         <div class="content">
-                            <span class="header">@item.ExecutorUser.UserName</span>
-                            <div class="description">
+                            <span class="author">@item.ExecutorUser.UserName</span>
+                            <div class="text" style="margin-top:.1em;">
                                 @switch (item.Status)
                                 {
                                     case DBEnums.TasksStatus.进行:
-                                        <i class="icon caret square right teal" style="font-size: 14px;margin: 0px;" title="@item.Status"></i>
+                                        <i class="play circle outline icon orange" style="font-size: 12px;margin: 0px;" title="@item.Status"></i>
                                         break;
                                     case DBEnums.TasksStatus.完成:
-                                        <i class="icon check square green" style="font-size: 14px;margin: 0px;" title="@item.Status"></i>
+                                        <i class="check circle outline icon green" style="font-size: 12px;margin: 0px;" title="@item.Status"></i>
                                         break;
                                     case DBEnums.TasksStatus.取消:
-                                        <i class="icon window close red" style="font-size: 14px;margin: 0px;" title="@item.Status"></i>
+                                        <i class="stop circle outline icon red" style="font-size: 12px;margin: 0px;" title="@item.Status"></i>
                                         break;
                                 }
-                                @item.Title
+                                <a>@item.Title</a>
                             </div>
                         </div>
                     </div>
@@ -132,23 +139,23 @@
         }
         <div class="ui horizontal divider">
             <i class="history icon"></i>
-            处理记录
-            @if (Model.CreateUserID == G.User.UserID || Model.AuditorUserID == G.User.UserID)
+            记录
+            @if (Web.Test.Requirement.AllowAddLog(Model, G.User.UserID))
             {
-                <a class="ui label mini" style="padding:.55em;" onclick="page_action.addlog('@Model.RequirementID')">
-                    <i class="plus icon" style="margin:0;"></i>
+                <a class="ui label mini addlog basic" onclick="page_action.addlog('@Model.RequirementID')">
+                    <i class="plus icon"></i>
                 </a>
             }
         </div>
         <div class="ui comments mini">
-            @foreach (var item in Model.Logs)
+            @foreach (var item in Model.Logs.OrderBy(c => c.CreateDate))
             {
                 <div class="comment">
                     <div class="avatar">
-                        <img src="@item.TriggerUser.Avatar">
+                        <img src="@item.User.Avatar">
                     </div>
                     <div class="content">
-                        <span class="author">@item.TriggerUser.UserName</span>
+                        <span class="author">@item.User.UserName</span>
                         <div class="metadata">
                             <span class="date">@item.CreateDate</span>
                         </div>
@@ -206,14 +213,11 @@
                 }
             });
         },
-        review: (id) => {
-            modal.load('/Requirement/Review?RequirementID=' + id, 400);
-        },
-        cancel: (id) => {
+        submit: (id) => {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
-                modal.ask('确认取消此需求，不再继续执行吗？', () => {
-                    ajax.post('/Requirement/Cancel', { RequirementID: id }, () => { $(target).load_show(); }, (success, data) => {
+                modal.ask('确认将此需求提交审核吗？', () => {
+                    ajax.post('/Requirement/Submit', { RequirementID: id }, () => { $(target).load_show(); }, (success, data) => {
                         $(target).load_hide();
                         if (success && data.Success) {
                             window.location.reload();
@@ -221,6 +225,9 @@
                     });
                 });
             }
+        },
+        review: (id) => {
+            modal.load('/Requirement/Review?RequirementID=' + id, 400);
         },
         sealUP: (id) => {
             if (event && event.currentTarget) {
@@ -238,7 +245,7 @@
         delete: (id) => {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
-                modal.ask('确认归档此需求吗？归档后将锁定需求不再可编辑。', () => {
+                modal.ask('确认删除此需求吗？', () => {
                     ajax.post('/Requirement/Delete', { RequirementID: id }, () => { $(target).load_show(); }, (success, data) => {
                         $(target).load_hide();
                         if (success && data.Success) {

@@ -1,186 +1,187 @@
 ﻿@{
-    ViewData["Title"] = Model.Task == null ? "新增任务" : "编辑任务：" + Model.Task.Title;
+    ViewData["Title"] = Model == null ? "新增任务" : "编辑任务：" + Model.Title;
 }
-@model Web.ParamModels.Tasks.Tasks_Add_View
-<link href="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.css" rel="stylesheet">
-<script src="https://cdn.bootcss.com/jodit/3.3.24/jodit.min.js"></script>
+@model TMT_Tasks
 <style>
-    .context_box { flex: 1; overflow: hidden; display: flex; flex-direction: row; }
-    .context_box > .cleft { border-radius: 4px; flex: 1; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; background: #fff; padding: 20px 40px 40px 40px; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
-    .context_box > .cright { border-radius: 4px; width: 300px; overflow-x: hidden; overflow-y: auto; height: 100%; float: left; margin-left: 20px; padding: 20px; background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
-
-    .jodit_workplace { border: 0 !important; margin-top: 10px; flex: 1; }
-    .jodit_wysiwyg { padding: 0 !important; height: 100%; }
-    .jodit_container { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-
-    .ui.form.tiny .field.inline.dfluid { display: flex; flex-direction: row; }
-    .dfluid > .ui.dropdown, .ui.form.tiny .field.inline > .ui.label { flex: 1; }
-    .dfluid > label { line-height: 33px; }
+    .req_document_set { margin-bottom: 15px; }
+    .req_document_set > .ui.dropdown { width: 810px; }
+    .req_document_set > .ui.dropdown > .menu { min-width: 810px; }
+    .req_document_set > .ui.dropdown .default.text { font-weight: normal; }
+    .req_document_set > .ui.dropdown .text { font-weight: normal; }
 </style>
-<div class="context_box">
-    <div class="cleft">
-        <div class="" style="width:100%; display:flex;flex-direction:row;margin-bottom:15px;font-size:12px;">
-            <span style="line-height:32.84px;font-weight:bold;">需求：</span>
-            <div class="ui selection dropdown tiny" style="flex:1;" id="Requirement">
-                <input type="hidden" value="@Model.RequirementID" id="RequirementID" />
-                <i class="dropdown icon"></i>
+<link href="~/edit/edit.css" rel="stylesheet" />
+<script src="~/edit/edit.js"></script>
+<div class="document_body">
+    <div class="left">
+        <input type="hidden" id="TaskID" value="@Model?.TaskID" />
+        <div class="req_document_set">
+            <span class="ui text" style="font-size:16px;"><i class="file alternate icon grey"></i></span>
+            <div class="ui search inline dropdown compact@(Model == null?"":" disabled")">
+                <input type="hidden" id="RequirementID" value="@(Model==null?"":Model.RequirementID)" />
                 <div class="default text">选择关联需求</div>
                 <div class="menu">
-                    @foreach (var item in Model.Requirements)
+                    <div class="item" data-value="-1">不关联需求</div>
+                    @foreach (TMT_Requirements item in ViewBag.Requirements)
                     {
-                        <div class="item" data-value="@item.RequirementID">
-                            @item.Title
-                        </div>
+                        <div class="item" data-mtype="@((int)item.MType)" data-emergencylevel="@item.EmergencyLevel" data-moduleid="@item.ModuleID" data-value="@item.RequirementID">@item.Title</div>
                     }
                 </div>
             </div>
-            <span style="margin-left:10px;display:inline-block;height:31px;width:31px;">
-                <button class="ui icon button mini" style="margin-top:2px;@(string.IsNullOrWhiteSpace(Model.RequirementID)?"display:none;":"")">
-                    <i class="eye icon"></i>
-                </button>
-            </span>
         </div>
-        <input type="hidden" id="TaskID" value="@Model.Task?.TaskID" />
-        <div class="ui transparent input fluid" style="margin-bottom:20px;">
-            <input type="text" id="Title" placeholder="任务标题..." value="@Model.Task?.Title" style="font-size:28px;font-weight:bold !important;" autocomplete="off">
+        <div class="ui transparent input fluid" style="margin-bottom: 20px; ">
+            @if (Model != null)
+            {
+                <input type="text" id="Title" placeholder="任务标题..." readonly="readonly" value="@Model.Title" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
+            }
+            else
+            {
+                <input type="text" id="Title" placeholder="任务标题..." value="" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
+            }
         </div>
-        <div class="strbox">
-            @(Model.Task==null?null: Html.Raw(Model.Task.Detailes?.FirstOrDefault(c=>c.Version==Model.Task.NowVersion).Content))
+        <div class="context_edit">
+            @Html.Raw(Model?.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
         </div>
     </div>
-    <div class="cright">
+    <div class="right">
         <div class="ui form tiny">
             <div class="field">
-                <div class="ui button blue small" onclick="modal_action.save(1)">发布</div>
-            </div>
-            <div class="field inline">
                 <label>优先级</label>
-                <div class="ui grey rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model.Task==null?1:Model.Task.EmergencyLevel)" data-max-rating="5"></div>
+                @if (Model != null)
+                {
+                    <div class="ui disabled rating" id="EmergencyLevel" data-icon="star" data-rating="@Model.EmergencyLevel" data-max-rating="5"></div>
+                }
+                else
+                {
+                    <div class="ui rating" id="EmergencyLevel" data-icon="star" data-rating="1" data-max-rating="5"></div>
+                }
             </div>
-            <div class="field inline">
+            <div class="field">
                 <label>项目</label>
                 <div class="ui label basic">
                     <i class="briefcase icon"></i> @G.NowProject.ProjectName
                 </div>
             </div>
-            <div class="field inline dfluid">
-                <label>指派</label>
-                <SelectUsers Placeholder="指派任务负责人" Default="Model?.Task?.ExecutorUserID" Clearable="false" ID="ExecutorUserID"></SelectUsers>
-            </div>
-            <div class="field inline dfluid">
-                <label>模块</label>
-                <div class="ui selection dropdown fluid">
-                    <input type="hidden" id="ModuleID" value="@Model.Task?.ModuleID">
-                    <i class="dropdown icon"></i>
-                    <div class="default text"></div>
-                    <div class="menu">
-                        @foreach (var item in G.NowProject.Modules)
-                        {
-                            <div class="item" data-value="@item.ModuleID">@item.ModuleName</div>
-                        }
+            <div class="field">
+                <label>类型</label>
+                @if (Model != null)
+                {
+                    <div class="ui label basic">
+                        @Model.MType
                     </div>
-                </div>
+                }
+                else
+                {
+                    <SelectEnums Fluid="false" Clearable="false" Default="@(Model==null?-1:(int)Model.MType)" ID="MType" Width="80" Enum="typeof(DBEnums.MType)"></SelectEnums>
+                }
+            </div>
+            <div class="field">
+                <label>模块</label>
+                @if (Model != null)
+                {
+                    <div class="ui label basic">
+                        @Model.Module.ModuleName
+                    </div>
+                }
+                else
+                {
+                    <div class="ui selection dropdown" style="width: 200px;">
+                        <input type="hidden" id="ModuleID" value="@Model?.ModuleID">
+                        <div class="default text"></div>
+                        <div class="menu">
+                            @foreach (var item in G.NowProject.Modules)
+                            {
+                                <div class="item" data-value="@item.ModuleID">@item.ModuleName</div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="field">
+                <label>负责人</label>
+                @if (Model != null)
+                {
+                    <div class="ui image label basic">
+                        <img src="@Model.ExecutorUser.Avatar">
+                        @Model.ExecutorUser.UserName
+                    </div>
+                }
+                else
+                {
+                    <SelectUsers Fluid="false" Width="150" Placeholder="选择负责人" Clearable="false" ID="ExecutorUserID"></SelectUsers>
+                }
+            </div>
+            <div class="field">
+                <button class="ui tiny blue button" onclick="page_action.save()">
+                    <i class="save icon"></i>
+                    @(Model!=null?"更新":"发布")
+                </button>
             </div>
         </div>
     </div>
 </div>
 <script>
-    var modal_action = {
+    var page_action = {
         edit_obj: null,
-        init: function () {
-            modal_action.edit();
-            $('#EmergencyLevel').rating({
-                onRate: function (value) {
-                    $(this).removeClass('green olive yellow orange red grey');
+        EmergencyLevel: $('#EmergencyLevel'),
+        req_document_set_dropdown: $('.req_document_set>.ui.dropdown'),
+        init: () => {
+            page_action.req_document_set_dropdown.attr('tabindex', 0);
+            page_action.req_document_set_dropdown.dropdown({
+                onChange: (value, text, $choice) => {
+                    if ($choice && $choice.data('value') == -1) {
+                        page_action.req_document_set_dropdown.dropdown('restore defaults')
+                    }
+                    else if ($choice) {
+                        page_action.EmergencyLevel.rating('set rating', $choice.data('emergencylevel'));
+                        $('#ModuleID').parent().dropdown('set selected', $choice.data('moduleid'));
+                        $('#MType').parent().dropdown('set selected', $choice.data('mtype'));
+                    }
+                }
+            });
+            page_action.edit_obj = new editor('.context_edit', {
+                edit: true,
+                upload: {
+                    url: '/Home/UPload',
+                    success: (result) => { },
+                    error: (error) => { }
+                }
+            });
+            page_action.EmergencyLevel.rating({
+                onRate: (value) => {
+                    page_action.EmergencyLevel.removeClass('green olive yellow orange red grey');
                     switch (value) {
                         case 1:
-                            $(this).addClass('green');
+                            page_action.EmergencyLevel.addClass('green');
                             break;
                         case 2:
-                            $(this).addClass('olive');
+                            page_action.EmergencyLevel.addClass('olive');
                             break;
                         case 3:
-                            $(this).addClass('yellow');
+                            page_action.EmergencyLevel.addClass('yellow');
                             break;
                         case 4:
-                            $(this).addClass('orange');
+                            page_action.EmergencyLevel.addClass('orange');
                             break;
                         case 5:
-                            $(this).addClass('red');
+                            page_action.EmergencyLevel.addClass('red');
                             break;
                     }
                 }
-            }).rating('set rating', $('#EmergencyLevel').rating('get rating'));
-            $('#Requirement').dropdown({
-                onChange: function (value, text, $choice) {
-                    if (value) {
-                        var target = $(this);
-                        ajax.post('/Tasks/GetRequirement', { RequirementID: value }, function () { $(target).load_show(); }, function (success, data) {
-                            $(target).load_hide();
-                            if (success && data.Success) {
-                                $('#EmergencyLevel').rating('set rating', data.Result.EmergencyLevel);
-                                $('#Title').val(data.Result.Title);
-                                $('#ModuleID').parent().dropdown('set selected', data.Result.ModuleID);
-                            }
-                        });
-                        $(this).next('span').children('button').show();
-                    }
-                    else {
-                        $(this).next('span').children('button').hide();
-                    }
-                },
-                clearable: true
-            });
+            }).rating('set rating', page_action.EmergencyLevel.rating('get rating'));
         },
-        edit: function () {
-            modal_action.edit_obj = new Jodit(".strbox", {
-                //"autofocus": true,
-                "language": "zh_cn",
-                "direction": "ltr",
-                "enter": "P",
-                "defaultMode": "1",
-                "showCharsCounter": false,
-                "showWordsCounter": false,
-                "showXPathInStatusbar": false,
-                "askBeforePasteHTML": false,
-                "askBeforePasteFromWord": false,
-                "placeholder": "",
-                "height": 500,
-                "allowResizeX": false,
-                "allowResizeY": false,
-                "buttons": "paragraph,brush,|,bold,strikethrough,underline,italic,eraser,|,outdent,indent,|,image,file,video,table,link,|,align,undo,redo,hr",
-                //"buttons": "paragraph,brush,|,bold,strikethrough,underline,italic,eraser,|,outdent,indent,|,image,file,video,table,link,|,align,undo,redo,hr,fullsize",
-                uploader: {
-                    url: '/Home/Edit_UPload'
-                },
-            });
-        },
-        save: function (tp) {
+        save: () => {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
-                var data = {
-                    TaskID: $('#TaskID').val(),
-                    RequirementID: $('#RequirementID').val(),
-                    ExecutorUserID: $('#ExecutorUserID').val(),
-                    ModuleID: $('#ModuleID').val(),
-                    EmergencyLevel: $('#EmergencyLevel').rating('get rating'),
-                    Content: modal_action.edit_obj.getEditorValue(),
-                    Title: $('#Title').val()
-                };
-                ajax.post('/Tasks/Add', data, function () { $(target).load_show(); },
-                    function (success, data) {
-                        $(target).load_hide();
-                        if (success && data.Success) {
-                            if (document.referrer) {
-                                window.location.href = document.referrer;
-                            }
-                            else {
-                                window.location.href = '/Requirement/Index';
-                            }
-                        }
-                    });
+                var data = $(target).parents('.document_body').getdata();
+                data.Content = page_action.edit_obj.get();
+                ajax.post('/Tasks/Save', data, () => { $(target).load_show(); }, (success, data) => {
+                    $(target).load_hide();
+                    if (success && data.Success) {
+                        window.location.href = "/Tasks/View?TaskID=" + data.Result;
+                    }
+                });
             }
         }
     };
-    modal_action.init();
+    page_action.init();
 </script>

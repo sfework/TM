@@ -11,6 +11,7 @@ namespace Web.Models
         public string RequirementID { get; set; }
         public string Title { get; set; }
         public int EmergencyLevel { get; set; }
+        public DBEnums.MType MType { get; set; }
         public DBEnums.RequirementStatus Status { get; set; }
         public int ProjectID { get; set; }
         public int ModuleID { get; set; }

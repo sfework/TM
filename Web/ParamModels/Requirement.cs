@@ -14,6 +14,7 @@ namespace Web.ParamModels
             /// </summary>
             public int? Tag { get; set; }
             public Models.DBEnums.RequirementStatus? Status { get; set; }
+            public Models.DBEnums.MType? MType { get; set; }
             public string KeyWord { get; set; }
             public int? ModuleID { get; set; }
         }
@@ -21,6 +22,7 @@ namespace Web.ParamModels
         {
             public string RequirementID { get; set; }
             public string Title { get; set; }
+            public Models.DBEnums.MType? MType { get; set; }
             public int ModuleID { get; set; }
             public int AuditorUserID { get; set; }
             public int EmergencyLevel { get; set; }

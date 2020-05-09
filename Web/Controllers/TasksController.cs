@@ -24,6 +24,10 @@ namespace Web.Controllers
             {
                 Model.List = Model.List.Where(c => c.Status == Model.Status.Value);
             }
+            if (Model.MType.HasValue)
+            {
+                Model.List = Model.List.Where(c => c.MType == Model.MType.Value);
+            }
             if (!string.IsNullOrWhiteSpace(Model.KeyWord))
             {
                 Model.List = Model.List.Where(c => c.Title.Contains(Model.KeyWord));
@@ -37,64 +41,66 @@ namespace Web.Controllers
             return View(Model);
         }
         [HttpGet]
-        public IActionResult Add(string TaskID, string RequirementID)
+        public IActionResult Add(string TaskID)
         {
-            var Model = new ParamModels.Tasks.Tasks_Add_View
+            Models.TMT_Tasks Model = null;
+            if (!string.IsNullOrWhiteSpace(TaskID))
             {
-                TaskID = TaskID,
-                RequirementID = RequirementID,
-                Requirements = DB.TMT_Requirements.Where(c => c.Status == Models.DBEnums.RequirementStatus.通过)
-            };
-            if (!string.IsNullOrWhiteSpace(RequirementID) && !Model.Requirements.Any(c => c.RequirementID == RequirementID))
-            {
-                Model.RequirementID = null;
-            }
-            if (string.IsNullOrWhiteSpace(Model.RequirementID))
-            {
-                if (!string.IsNullOrWhiteSpace(TaskID))
+                Model = DB.TMT_Tasks.Find(TaskID);
+                if (Model.Status != Models.DBEnums.TasksStatus.进行 && Model.CreateUserID != G.User.UserID)
                 {
-                    Model.Task = DB.TMT_Tasks.Find(TaskID);
-                    Model.RequirementID = Model.Task.RequirementID;
+                    return View("_NoRight");
                 }
             }
-            else
-            {
-                var Requirement = Model.Requirements.FirstOrDefault(c => c.RequirementID == Model.RequirementID);
-                Model.Task = new Models.TMT_Tasks
-                {
-                    Title = Requirement.Title,
-                    EmergencyLevel = Requirement.EmergencyLevel,
-                    ModuleID = Requirement.ModuleID
-                };
-            }
+            ViewBag.Requirements = DB.TMT_Requirements.Where(c => c.ProjectID == G.NowProject.ProjectID && c.Status == Models.DBEnums.RequirementStatus.通过);
             return View(Model);
         }
 
+        [HttpGet]
+        public IActionResult View(string TaskID, int? Version)
+        {
+            var Model = DB.TMT_Tasks.Find(TaskID);
+            if (Version.HasValue)
+            {
+                Model.NowVersion = Version.Value;
+            }
+            if (Model.Requirement != null)
+            {
+                Model.Logs = Model.Logs.Union(Model.Requirement.Logs).ToList();
+            }
+            return View(Model);
+        }
         [HttpPost]
-        public IActionResult Add(ParamModels.Tasks.Tasks_Add Model)
+        public IActionResult Save(ParamModels.Tasks.Tasks_Add Model)
         {
             try
             {
+                Models.TMT_Tasks Re = null;
                 if (string.IsNullOrWhiteSpace(Model.Title))
                 {
-                    return Json("[需求标题]不可为空！");
+                    return Json("[任务标题]不可为空！");
                 }
                 if (string.IsNullOrWhiteSpace(Model.TaskID))
                 {
+                    if (!Model.MType.HasValue)
+                    {
+                        return Json("[类型]必须选择！");
+                    }
                     if (Model.ModuleID < 1)
                     {
                         return Json("[模块]必须选择！");
                     }
                     if (Model.ExecutorUserID < 1)
                     {
-                        return Json("[任务负责人]必须指派！");
+                        return Json("[负责人]必须选择！");
                     }
-                    Models.TMT_Tasks Re = new Models.TMT_Tasks
+                    Re = new Models.TMT_Tasks
                     {
                         TaskID = Guid.NewGuid().ToString("N"),
                         RequirementID = Model.RequirementID,
                         Title = Model.Title,
                         EmergencyLevel = Model.EmergencyLevel,
+                        MType=Model.MType.Value,
                         Status = Models.DBEnums.TasksStatus.进行,
                         ProjectID = G.NowProject.ProjectID,
                         ModuleID = Model.ModuleID,
@@ -114,23 +120,21 @@ namespace Web.Controllers
                     Re.Logs.Add(new Models.TMT_Logs
                     {
                         TagID = Re.RequirementID,
-                        LogType = Models.DBEnums.LogType.任务,
-                        TriggerUserID = G.User.UserID,
-                        TargetUserID = null,
+                        UserID = G.User.UserID,
                         Content = "创建第<div class=\"ui label horizontal mini\">" + Re.NowVersion + "</div>版本任务！",
                     });
                     DB.TMT_Tasks.Add(Re);
                 }
                 else
                 {
-                    var Re = DB.TMT_Tasks.Find(Model.TaskID);
+                    Re = DB.TMT_Tasks.Find(Model.TaskID);
                     if (Re.CreateUserID != G.User.UserID)
                     {
-                        return Json("无权对此数据进行操作！");
+                        return Json("无权对此任务进行编辑操作！");
                     }
-                    if (Re.Status == Models.DBEnums.TasksStatus.完成)
+                    if (Re.Status == Models.DBEnums.TasksStatus.完成 || Re.Status == Models.DBEnums.TasksStatus.取消)
                     {
-                        return Json("任务已完成，无法对此数据进行操作！");
+                        return Json("任务已完成或已取消，无法对此任务进行编辑操作！");
                     }
                     Re.NowVersion += 1;
                     Re.Detailes.Add(new Models.TMT_Detaile
@@ -142,17 +146,13 @@ namespace Web.Controllers
                     Re.Logs.Add(new Models.TMT_Logs
                     {
                         TagID = Re.RequirementID,
-                        LogType = Models.DBEnums.LogType.需求,
-                        TriggerUserID = G.User.UserID,
-                        TargetUserID = null,
-                        Content = "将任务更新至第<div class=\"ui label horizontal mini\">" + Re.NowVersion + "</div>版本！",
+                        UserID = G.User.UserID,
+                        Content = "任务更新至第<div class=\"ui label horizontal mini\">" + Re.NowVersion + "</div>版本！",
                     });
-                    Re.Title = Model.Title;
-                    Re.EmergencyLevel = Model.EmergencyLevel;
                     Re.LastUPDate = DateTime.Now;
                 }
                 DB.SaveChanges();
-                return Json();
+                return Success(Re.TaskID);
             }
             catch (Exception Ex)
             {
@@ -167,24 +167,6 @@ namespace Web.Controllers
             return Json(new { Model.Title, Model.EmergencyLevel, Model.ModuleID });
         }
 
-        [HttpGet]
-        public IActionResult View(string TaskID, int? TaskVersion, int? RequirementVersion)
-        {
-            var Model = DB.TMT_Tasks.Find(TaskID);
-            if (TaskVersion.HasValue)
-            {
-                Model.NowVersion = TaskVersion.Value;
-            }
-            if (Model.Requirement != null)
-            {
-                Model.Logs = Model.Logs.Union(Model.Requirement.Logs).OrderBy(c => c.CreateDate).ToList();
-                if (RequirementVersion.HasValue)
-                {
-                    Model.Requirement.NowVersion = RequirementVersion.Value;
-                }
-            }
-            return View(Model);
-        }
 
         [HttpGet]
         public IActionResult HandOver(string TaskID)
@@ -213,9 +195,7 @@ namespace Web.Controllers
             Model.Logs.Add(new Models.TMT_Logs
             {
                 TagID = Model.RequirementID,
-                LogType = Models.DBEnums.LogType.任务,
-                TriggerUserID = G.User.UserID,
-                TargetUserID = null,
+                UserID = G.User.UserID,
                 Content = Content
             });
             Model.ExecutorUserID = UserID;
@@ -248,9 +228,7 @@ namespace Web.Controllers
             Model.Logs.Add(new Models.TMT_Logs
             {
                 TagID = Model.RequirementID,
-                LogType = Models.DBEnums.LogType.任务,
-                TriggerUserID = G.User.UserID,
-                TargetUserID = null,
+                UserID = G.User.UserID,
                 Content = Content
             });
             Model.Status = Models.DBEnums.TasksStatus.完成;
@@ -284,9 +262,7 @@ namespace Web.Controllers
             Model.Logs.Add(new Models.TMT_Logs
             {
                 TagID = Model.RequirementID,
-                LogType = Models.DBEnums.LogType.任务,
-                TriggerUserID = G.User.UserID,
-                TargetUserID = null,
+                UserID = G.User.UserID,
                 Content = Content
             });
             Model.Status = Models.DBEnums.TasksStatus.取消;

@@ -56,7 +56,7 @@ var init = function () {
         onChange: function (value, text, $choice) {
             ajax.post('/Home/ProjectSet', { ProjectID: value }, function () { }, function (success, data) {
                 if (success && data.Success) {
-                    window.location.href = window.location.pathname;
+                    window.location.href = '/';
                 }
             });
         }

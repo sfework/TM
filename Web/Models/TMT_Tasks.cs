@@ -12,6 +12,7 @@ namespace Web.Models
         public string RequirementID { get; set; }
         public string Title { get; set; }
         public int EmergencyLevel { get; set; }
+        public DBEnums.MType MType { get; set; }
         public DBEnums.TasksStatus Status { get; set; }
         public int ProjectID { get; set; }
         public int ModuleID { get; set; }
@@ -39,7 +40,5 @@ namespace Web.Models
         public virtual ICollection<TMT_Detaile> Detailes { get; set; }
 
         public virtual ICollection<TMT_Logs> Logs { get; set; }
-
-
     }
 }

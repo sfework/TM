@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers
 {
-    [NeedSetProject]
-    public class VersionController : ControllersBase
+    public class BUGController : ControllersBase
     {
         public IActionResult Index()
         {

@@ -2,7 +2,7 @@
 body, html { min-width: 1200px; position: relative; overflow-y: hidden; overflow-x: auto; display: flex; flex-direction: column; width: 100%; height: 100%; }
 /*顶部菜单样式修正*/
 .menubox { background: #1b1c1d; padding: 5px; box-shadow: 0px 2px 4px #333333; }
-.menubox > .menu { padding:0 20px;}
+.menubox > .menu { padding: 0 20px; }
 .menubox > .menu > .dropdown.item { color: rgba(255,255,255,.7); }
 .userinfo { padding: 2px 2px !important; }
 .userinfo > .comments { margin: 0; }
@@ -13,7 +13,7 @@ body, html { min-width: 1200px; position: relative; overflow-y: hidden; overflow
 .userinfo > i.dropdown.icon { margin: 0 3px 0px 1em !important; }
 .userinfo .content .text { color: #a7a7a7 !important; }
 .userinfo > .menu { min-width: 95px !important; }
-.projectset { padding-top: .8em !important; height: 32px; margin-top: 4px !important; width:120px;}
+.projectset { padding-top: .8em !important; height: 32px; margin-top: 4px !important; width: 120px; }
 .projectset > .icon { padding: .78571429em 0 .78571429em 0 !important; }
 
 /*搜索区样式修正*/
@@ -24,27 +24,37 @@ body, html { min-width: 1200px; position: relative; overflow-y: hidden; overflow
 /*需求文档添加和编辑页的通用样式*/
 .document_body { width: 1200px; display: flex; flex-direction: row; margin: 0 auto; height: 100%; }
 .document_body > .left { overflow-x: hidden; overflow-y: auto; padding: 30px; width: 900px; height: 100%; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
-.document_body > .right { overflow-x: hidden; overflow-y: auto; flex: 1; height: 100%; padding: 20px; }
-
-textarea { resize:none !important;}
+.document_body > .left::-webkit-scrollbar { width: 2px; }
+.document_body > .right { overflow-x: hidden; overflow-y: auto; flex: 1; height: 100%; padding: 0px 20px 20px 20px; }
+.document_body > .right::-webkit-scrollbar { width: 2px; }
+textarea { resize: none !important; }
 
 .Context { flex: 1; padding: 20px 30px; overflow: hidden; display: flex; flex-direction: column; }
 
 /*分页，searchbox-Context_Scroll-Paging*/
-.Context_Scroll { overflow-x: hidden; overflow-y: auto; flex: 1;}
+.Context_Scroll { overflow-x: hidden; overflow-y: auto; flex: 1; }
 .Context_Scroll::-webkit-scrollbar { width: 12px; }
 .Context_Scroll::-webkit-scrollbar-thumb { border-radius: 3px; }
 .Context > .paging { height: 50px; padding-top: 15px; }
 
-
 .ui.buttons > .ui.button:not(:last-child) { border-right: solid 1px rgba(255, 255, 255, .3); }
 .ui.modal > .close { color: #1d1b1b !important; top: .7rem !important; right: 0rem !important; }
-.jodit_wysiwyg p { margin: 0 !important; }
 
-.ui.image.label.mini img {height:22px !important; }
-
+.ui.image.label.mini img { height: 22px !important; }
+/*需求和任务列表的人员label样式修正*/
 .noborder.label { border: 0 !important; }
-
+/*需求和任务列表的版本label样式修正*/
+.version_lable { padding: .1em .5em !important; min-width: unset !important; font-weight: normal !important; color: rgba(111, 111, 111, 0.87) !important; }
+/*需求和任务列表的版本label样式修正-去除字体加粗*/
+.weight_normal { font-weight: normal !important; }
+/*需求和任务详情页添加记录label样式修正*/
+.addlog { padding: .3em !important; border-radius: .25em !important; }
+.addlog > .icon { margin: .1em !important; }
+/*需求和任务详情页记录列表中的label样式修正*/
+.document_body .ui.comments.mini .ui.label.horizontal.mini { padding: .2em .5em !important; min-width: unset !important; border-radius: .3em !important; margin: 0 .3em 0 .3em !important; }
+/*全屏弹窗文档查看样式修正*/
+.ui.overlay.fullscreen.modal.doc { width: 930px !important; left: calc(50% - 465px) !important; }
+.ui.overlay.fullscreen.modal.doc>.content.scrolling.edit::-webkit-scrollbar { width: 2px; }
 /*弹窗头部降低高度样式修正*/
 .ui.modal > .header { padding: 1rem 1.5rem !important; }
 .ui.overlay.fullscreen.modal > .content { min-height: calc(100vh - 8.52rem) !important; }

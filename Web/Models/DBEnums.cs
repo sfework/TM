@@ -7,25 +7,36 @@ namespace Web.Models
 {
     public class DBEnums
     {
+        /// <summary>
+        /// 需求文档流程状态
+        /// </summary>
         public enum RequirementStatus
         {
-            待审 = 0,
-            拒绝 = 1,
-            通过 = 2,
-            归档 = 3,
-            取消 = 4
+            稿件 = 0,
+            待审 = 1,
+            驳回 = 2,
+            通过 = 3,
+            归档 = 4
         }
+        /// <summary>
+        /// 任务流程状态
+        /// </summary>
         public enum TasksStatus
         {
-            进行 = 0,
-            完成 = 1,
-            取消 = 2
+            稿件 = 0,
+            进行 = 1,
+            完成 = 2,
+            取消 = 3
         }
-        public enum LogType
+        public enum MType
         {
-            需求 = 0,
-            任务 = 1,
-            文档 = 2
+            开发,
+            修复,
+            调整,
+            事务,
+            研究,
+            数据,
+            设计
         }
     }
 }
