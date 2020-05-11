@@ -6,9 +6,8 @@
 <script src="~/edit/edit.js"></script>
 <div class="document_body">
     <div class="left">
-        <div class="ui transparent input fluid" style="margin-bottom: 20px; ">
-            <input type="text" id="Title" placeholder="需求标题..." value="@Model.Title" readonly="readonly" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
-        </div>
+        <div class="ui top left attached label id">@Model.TaskID</div>
+        <span class="title">@Model.Title</span>
         <div class="context_edit">
             @Html.Raw(Model.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
         </div>
@@ -20,7 +19,7 @@
                 <div class="ui floating labeled icon dropdown button" id="setVersion" data-value="@Model.TaskID">
                     <input type="hidden" value="@Model.NowVersion">
                     <i class="code branch icon"></i>
-                    <span class="text">Add User</span>
+                    <span class="text"></span>
                     <div class="menu">
                         @foreach (var item in Model.Detailes)
                         {
@@ -58,22 +57,33 @@
                     @Model.ExecutorUser.UserName
                 </div>
             </div>
-            @if (Model.Status == DBEnums.TasksStatus.进行 && Model.CreateUserID == G.User.UserID)
+            @if (Web.Test.Teaks.AllowEdit(Model, G.User.UserID))
             {
-                <a class="ui tiny teal button" href="/Tasks/Add?TaskID=@Model.TaskID">
+                <a class="ui tiny blue button" href="/Tasks/Add?TaskID=@Model.TaskID">
                     <i class="edit icon"></i>
                     编辑
                 </a>
             }
-            @if (Model.Status == DBEnums.TasksStatus.进行 && Model.ExecutorUserID == G.User.UserID)
+            @if (Web.Test.Teaks.AllowSubmitAndDelete(Model, G.User.UserID))
             {
-                <button class="ui tiny brown button" onclick="page_action.handOver('@Model.RequirementID')">
-                    <i class="random icon"></i>
-                    转交
+                <a class="ui tiny teal button" onclick="page_action.submit(@Model.TaskID)">
+                    <i class="share square outline icon"></i>
+                    发布
+                </a>
+                <button class="ui tiny red button" onclick="page_action.delete(@Model.TaskID)">
+                    <i class="trash alternate outline icon"></i>
+                    删除
                 </button>
-                <button class="ui tiny orange button" onclick="page_action.review('@Model.RequirementID')">
+            }
+            @if (Web.Test.Teaks.AllowHandOverAndDone(Model, G.User.UserID))
+            {
+                <button class="ui tiny brown button" onclick="page_action.handOver(@Model.TaskID)">
+                    <i class="random icon"></i>
+                    转派
+                </button>
+                <button class="ui tiny orange button" onclick="page_action.done(@Model.TaskID)">
                     <i class="stamp icon"></i>
-                    结束
+                    完成
                 </button>
             }
         </div>
@@ -90,8 +100,8 @@
                     </div>
                     <div class="content">
                         <span class="author">@Model.Requirement.CreateUser.UserName</span>
-                        <div class="text" style="margin-top:.1em;">
-                            <a>@Model.Requirement.Title</a>
+                        <div class="text url" style="margin-top:.1em;">
+                            <a onclick="page_action.viewrequirement(@Model.RequirementID)"><span>[#@Model.RequirementID]</span>@Model.Requirement.Title</a>
                         </div>
                     </div>
                 </div>
@@ -104,9 +114,9 @@
         <div class="ui horizontal divider">
             <i class="history icon"></i>
             记录
-            @if (Model.CreateUserID == G.User.UserID || Model.ExecutorUserID == G.User.UserID)
+            @if (Web.Test.Teaks.AllowAddLog(Model, G.User.UserID))
             {
-                <a class="ui label mini addlog basic" onclick="page_action.addlog('@Model.TaskID')">
+                <a class="ui label mini addlog basic" onclick="page_action.addlog(@Model.TaskID)">
                     <i class="plus icon"></i>
                 </a>
             }
@@ -163,6 +173,44 @@
                     window.location.href = "/Tasks/View?TaskID=" + id + "&Version=" + value;
                 }
             });
+        },
+        submit: (id) => {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                modal.ask('确认发布当前任务吗？', () => {
+                    ajax.post('/Tasks/Submit', { TaskID: id }, () => { $(target).load_show(); }, (success, data) => {
+                        $(target).load_hide();
+                        if (success && data.Success) {
+                            window.location.reload();
+                        }
+                    });
+                });
+            }
+        },
+        delete: (id) => {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                modal.ask('确认删除此需求吗？', () => {
+                    ajax.post('/Tasks/Delete', { Tasks: id }, () => { $(target).load_show(); }, (success, data) => {
+                        $(target).load_hide();
+                        if (success && data.Success) {
+                            window.location.href = "/Tasks/Index";
+                        }
+                    });
+                });
+            }
+        },
+        handOver: (id) => {
+            modal.load('/Tasks/HandOver?TaskID=' + id, 400);
+        },
+        done: (id) => {
+            modal.load('/Tasks/Done?TaskID=' + id, 400);
+        },
+        addlog: (id) => {
+            modal.load('/Tasks/AddLog?TaskID=' + id, 400);
+        },
+        viewrequirement: (id) => {
+            modal.load('/Tasks/ViewRequirement?RequirementID=' + id, null, 'overlay fullscreen doc')
         }
     };
     page_action.init();

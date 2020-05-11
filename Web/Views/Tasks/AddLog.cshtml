@@ -1,7 +1,7 @@
 ﻿@{
     Layout = null;
 }
-<div class="header">取消任务</div>
+<div class="header">新增备注</div>
 <div class="content">
     <div class="ui form tiny">
         <input type="hidden" id="TaskID" value="@ViewBag.TaskID">
@@ -13,16 +13,14 @@
 </div>
 <script>
     var modal_action = {
-        handOver: function () {
+        addlog: () => {
             if (event && event.currentTarget) {
                 var target = event.currentTarget;
                 var data = $(target).parents('.ui.modal').find('.ui.form').getdata();
-                ajax.post('/Tasks/Cancel', data, function () {
-                    if (target) { $(target).load_show(); }
-                }, function (success, data) {
-                    if (target) {
-                        $(target).load_hide();
-                    }
+                ajax.post('/Tasks/AddLog', data, () => {
+                    $(target).load_show();
+                }, (success, data) => {
+                    $(target).load_hide();
                     if (success && data.Success) {
                         window.location.reload();
                     }
@@ -32,6 +30,6 @@
     };
 </script>
 <div class="actions">
-    <button class="ui button green small" onclick="modal_action.handOver()">保存</button>
-    <button class="ui button cancel black small">取消</button>
+    <button class="ui button green" onclick="modal_action.addlog()">保存</button>
+    <button class="ui button cancel black">取消</button>
 </div>

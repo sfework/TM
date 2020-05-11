@@ -26,7 +26,7 @@ namespace Web.Models
             稿件 = 0,
             进行 = 1,
             完成 = 2,
-            取消 = 3
+            终止 = 3
         }
         public enum MType
         {
@@ -37,6 +37,12 @@ namespace Web.Models
             研究,
             数据,
             设计
+        }
+
+        public enum LogType
+        {
+            需求 = 0,
+            任务 = 1
         }
     }
 }

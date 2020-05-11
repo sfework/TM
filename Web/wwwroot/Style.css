@@ -23,10 +23,18 @@ body, html { min-width: 1200px; position: relative; overflow-y: hidden; overflow
 .ui.dropdown > .remove.icon { right: 1.5em !important; }
 /*需求文档添加和编辑页的通用样式*/
 .document_body { width: 1200px; display: flex; flex-direction: row; margin: 0 auto; height: 100%; }
-.document_body > .left { overflow-x: hidden; overflow-y: auto; padding: 30px; width: 900px; height: 100%; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
+.document_body > .left { position: relative; overflow-x: hidden; overflow-y: auto; padding: 30px; width: 900px; height: 100%; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(115, 115, 115, 0.08); }
 .document_body > .left::-webkit-scrollbar { width: 2px; }
+.document_body > .left > .id { padding: .4em .6em !important; border-radius: 0 0 2px 0 !important; }
+.document_body > .left > .title { line-height: 33px; font-size: 28px; font-weight: bold !important; word-wrap: break-word; }
 .document_body > .right { overflow-x: hidden; overflow-y: auto; flex: 1; height: 100%; padding: 0px 20px 20px 20px; }
 .document_body > .right::-webkit-scrollbar { width: 2px; }
+/*需求和任务详情页记录列表中的label样式修正*/
+.document_body .ui.comments.mini .ui.label.horizontal.mini { padding: .2em .5em !important; min-width: unset !important; border-radius: .3em !important; margin: 0 .3em 0 .3em !important; }
+.document_body .ui.comments.mini .text.url a { color: #3a3a3a; cursor:pointer;}
+.document_body .ui.comments.mini .text.url a span { color: #afafaf; }
+.document_body .ui.comments.mini .text.url a:hover { color: #4183c4; }
+
 textarea { resize: none !important; }
 
 .Context { flex: 1; padding: 20px 30px; overflow: hidden; display: flex; flex-direction: column; }
@@ -50,8 +58,6 @@ textarea { resize: none !important; }
 /*需求和任务详情页添加记录label样式修正*/
 .addlog { padding: .3em !important; border-radius: .25em !important; }
 .addlog > .icon { margin: .1em !important; }
-/*需求和任务详情页记录列表中的label样式修正*/
-.document_body .ui.comments.mini .ui.label.horizontal.mini { padding: .2em .5em !important; min-width: unset !important; border-radius: .3em !important; margin: 0 .3em 0 .3em !important; }
 /*全屏弹窗文档查看样式修正*/
 .ui.overlay.fullscreen.modal.doc { width: 930px !important; left: calc(50% - 465px) !important; }
 .ui.overlay.fullscreen.modal.doc>.content.scrolling.edit::-webkit-scrollbar { width: 2px; }

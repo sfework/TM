@@ -5,17 +5,15 @@
 <div class="content">
     <div class="ui form tiny">
         <input type="hidden" id="RequirementID" value="@ViewBag.RequirementID">
-        <div class="ui fields two">
-            <div class="field">
-                <label>评审结果</label>
-                <div class="ui selection dropdown">
-                    <input type="hidden" id="Agree" value="true">
-                    <i class="dropdown icon"></i>
-                    <div class="default text"></div>
-                    <div class="menu">
-                        <div class="item" data-value="true">通过</div>
-                        <div class="item" data-value="false">驳回</div>
-                    </div>
+        <div class="field four wide">
+            <label>评审结果</label>
+            <div class="ui selection dropdown">
+                <input type="hidden" id="Agree" value="true">
+                <i class="dropdown icon"></i>
+                <div class="default text"></div>
+                <div class="menu">
+                    <div class="item" data-value="true">通过</div>
+                    <div class="item" data-value="false">驳回</div>
                 </div>
             </div>
         </div>

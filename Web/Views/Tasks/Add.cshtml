@@ -16,26 +16,26 @@
         <input type="hidden" id="TaskID" value="@Model?.TaskID" />
         <div class="req_document_set">
             <span class="ui text" style="font-size:16px;"><i class="file alternate icon grey"></i></span>
-            <div class="ui search inline dropdown compact@(Model == null?"":" disabled")">
-                <input type="hidden" id="RequirementID" value="@(Model==null?"":Model.RequirementID)" />
+            <div class="ui search inline dropdown compact@(ViewBag.IsDraftEdit?"":" disabled")">
+                <input type="hidden" id="RequirementID" value="@Model?.RequirementID" />
                 <div class="default text">选择关联需求</div>
                 <div class="menu">
                     <div class="item" data-value="-1">不关联需求</div>
                     @foreach (TMT_Requirements item in ViewBag.Requirements)
                     {
-                        <div class="item" data-mtype="@((int)item.MType)" data-emergencylevel="@item.EmergencyLevel" data-moduleid="@item.ModuleID" data-value="@item.RequirementID">@item.Title</div>
+                        <div class="item" data-title="@item.Title" data-mtype="@((int)item.MType)" data-emergencylevel="@item.EmergencyLevel" data-moduleid="@item.ModuleID" data-value="@item.RequirementID">@item.Title</div>
                     }
                 </div>
             </div>
         </div>
         <div class="ui transparent input fluid" style="margin-bottom: 20px; ">
-            @if (Model != null)
+            @if (ViewBag.IsDraftEdit)
             {
-                <input type="text" id="Title" placeholder="任务标题..." readonly="readonly" value="@Model.Title" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
+                <input type="text" id="Title" placeholder="任务标题..." value="@Model?.Title" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
             }
             else
             {
-                <input type="text" id="Title" placeholder="任务标题..." value="" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
+                <input type="text" id="Title" placeholder="任务标题..." readonly="readonly" value="@Model?.Title" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
             }
         </div>
         <div class="context_edit">
@@ -46,13 +46,13 @@
         <div class="ui form tiny">
             <div class="field">
                 <label>优先级</label>
-                @if (Model != null)
+                @if (ViewBag.IsDraftEdit)
                 {
-                    <div class="ui disabled rating" id="EmergencyLevel" data-icon="star" data-rating="@Model.EmergencyLevel" data-max-rating="5"></div>
+                    <div class="ui rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
                 }
                 else
                 {
-                    <div class="ui rating" id="EmergencyLevel" data-icon="star" data-rating="1" data-max-rating="5"></div>
+                    <div class="ui disabled rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
                 }
             </div>
             <div class="field">
@@ -63,26 +63,20 @@
             </div>
             <div class="field">
                 <label>类型</label>
-                @if (Model != null)
+                @if (ViewBag.IsDraftEdit)
+                {
+                    <SelectEnums Fluid="false" Clearable="false" Default="@(Model==null?-1:(int)Model.MType)" ID="MType" Width="80" Enum="typeof(DBEnums.MType)"></SelectEnums>
+                }
+                else
                 {
                     <div class="ui label basic">
                         @Model.MType
                     </div>
                 }
-                else
-                {
-                    <SelectEnums Fluid="false" Clearable="false" Default="@(Model==null?-1:(int)Model.MType)" ID="MType" Width="80" Enum="typeof(DBEnums.MType)"></SelectEnums>
-                }
             </div>
             <div class="field">
                 <label>模块</label>
-                @if (Model != null)
-                {
-                    <div class="ui label basic">
-                        @Model.Module.ModuleName
-                    </div>
-                }
-                else
+                @if (ViewBag.IsDraftEdit)
                 {
                     <div class="ui selection dropdown" style="width: 200px;">
                         <input type="hidden" id="ModuleID" value="@Model?.ModuleID">
@@ -95,25 +89,31 @@
                         </div>
                     </div>
                 }
+                else
+                {
+                    <div class="ui label basic">
+                        @Model.Module.ModuleName
+                    </div>
+                }
             </div>
             <div class="field">
                 <label>负责人</label>
-                @if (Model != null)
+                @if (ViewBag.IsDraftEdit)
+                {
+                    <SelectUsers Fluid="false" Width="150" Default="Model?.ExecutorUserID" Placeholder="选择负责人" Clearable="false" ID="ExecutorUserID"></SelectUsers>
+                }
+                else
                 {
                     <div class="ui image label basic">
                         <img src="@Model.ExecutorUser.Avatar">
                         @Model.ExecutorUser.UserName
                     </div>
                 }
-                else
-                {
-                    <SelectUsers Fluid="false" Width="150" Placeholder="选择负责人" Clearable="false" ID="ExecutorUserID"></SelectUsers>
-                }
             </div>
             <div class="field">
                 <button class="ui tiny blue button" onclick="page_action.save()">
                     <i class="save icon"></i>
-                    @(Model!=null?"更新":"发布")
+                    保存
                 </button>
             </div>
         </div>
@@ -132,9 +132,13 @@
                         page_action.req_document_set_dropdown.dropdown('restore defaults')
                     }
                     else if ($choice) {
+                        console.log($choice.data('test'));
                         page_action.EmergencyLevel.rating('set rating', $choice.data('emergencylevel'));
                         $('#ModuleID').parent().dropdown('set selected', $choice.data('moduleid'));
                         $('#MType').parent().dropdown('set selected', $choice.data('mtype'));
+                        if ($('#Title').val()==='') {
+                            $('#Title').val($choice.data('title'));
+                        }
                     }
                 }
             });

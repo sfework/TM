@@ -43,16 +43,24 @@ namespace Web.Controllers
             return View(Model);
         }
 
-        public IActionResult Add(string RequirementID)
+        public IActionResult Add(int? RequirementID)
         {
             Models.TMT_Requirements Model = null;
-            if (!string.IsNullOrWhiteSpace(RequirementID))
+            if (RequirementID.HasValue)
             {
                 Model = DB.TMT_Requirements.Find(RequirementID);
                 if (!Test.Requirement.AllowEdit(Model, G.User.UserID))
                 {
-                    return View("_NoRight");
+                    return NoPermission();
                 }
+            }
+            if (Model == null)
+            {
+                ViewBag.IsDraftEdit = true;
+            }
+            else
+            {
+                ViewBag.IsDraftEdit = Test.Requirement.IsDraftEdit(Model);
             }
             return View(Model);
         }
@@ -66,7 +74,7 @@ namespace Web.Controllers
                 {
                     return Json("[需求标题]不可为空！");
                 }
-                if (string.IsNullOrWhiteSpace(Model.RequirementID))
+                if (!Model.RequirementID.HasValue)
                 {
                     if (!Model.MType.HasValue)
                     {
@@ -82,7 +90,6 @@ namespace Web.Controllers
                     }
                     Re = new Models.TMT_Requirements
                     {
-                        RequirementID = Guid.NewGuid().ToString("N"),
                         Title = Model.Title,
                         EmergencyLevel = Model.EmergencyLevel,
                         MType = Model.MType.Value,
@@ -111,9 +118,9 @@ namespace Web.Controllers
                     {
                         return Json("当前文档状态不可编辑或没有编辑权限！");
                     }
-                    if (Re.Status == Models.DBEnums.RequirementStatus.驳回)
+                    if (Re.Status == Models.DBEnums.RequirementStatus.驳回 || Re.Status == Models.DBEnums.RequirementStatus.稿件)
                     {
-                        var Detaile = Re.Detailes.FirstOrDefault(c => c.Version == Re.NowVersion);
+                        var Detaile = Re.Detailes.FirstOrDefault(c => c.TagID == Re.RequirementID && c.Version == Re.NowVersion);
                         if (Detaile != null)
                         {
                             Detaile.Content = string.IsNullOrWhiteSpace(Model.Content) ? "" : Model.Content;
@@ -124,6 +131,7 @@ namespace Web.Controllers
                         Re.AuditorUserID = Model.AuditorUserID;
                         Re.MType = Model.MType.Value;
                         Re.ModuleID = Model.ModuleID;
+                        Re.AuditorUserID = Model.AuditorUserID;
                     }
                     else if (Re.Status == Models.DBEnums.RequirementStatus.通过)
                     {
@@ -136,15 +144,16 @@ namespace Web.Controllers
                         });
                         Re.Logs.Add(new Models.TMT_Logs
                         {
+                            LogType = Models.DBEnums.LogType.需求,
                             TagID = Re.RequirementID,
                             UserID = G.User.UserID,
-                            Content = "需求更新至第<div class=\"ui label horizontal mini\">" + Re.NowVersion + "</div>版本！",
+                            Content = "[需求#" + Re.RequirementID + "]更新至第<div class=\"ui label horizontal mini\">" + Re.NowVersion + "</div>版本！",
                         });
                     }
                     Re.LastUPDate = DateTime.Now;
                 }
                 DB.SaveChanges();
-                return Success(Re.RequirementID);
+                return Success(Re.RequirementID.ToString());
             }
             catch (Exception Ex)
             {
@@ -152,12 +161,12 @@ namespace Web.Controllers
             }
         }
 
-        public IActionResult View(string RequirementID, int? Version)
+        public IActionResult View(int RequirementID, int? Version)
         {
             var Model = DB.TMT_Requirements.Find(RequirementID);
             if (!Test.Requirement.AllowView(Model, G.User.UserID))
             {
-                return View("_NoRight");
+                return NoPermission();
             }
             foreach (var item in Model.Tasks)
             {
@@ -167,22 +176,24 @@ namespace Web.Controllers
             {
                 Model.NowVersion = Version.Value;
             }
+            Model.Tasks = Model.Tasks.Where(c => c.Status != Models.DBEnums.TasksStatus.稿件).ToList();
             return View(Model);
         }
 
         [HttpPost]
-        public IActionResult Submit(string RequirementID)
+        public IActionResult Submit(int RequirementID)
         {
             var Model = DB.TMT_Requirements.Find(RequirementID);
-            if (!Test.Requirement.AllowSubmit(Model, G.User.UserID))
+            if (!Test.Requirement.AllowSubmitAndDelete(Model, G.User.UserID))
             {
                 return Json("当前文档状态不可发布或没有发布权限！");
             }
             Model.Logs.Add(new Models.TMT_Logs
             {
+                LogType = Models.DBEnums.LogType.需求,
                 TagID = Model.RequirementID,
                 UserID = G.User.UserID,
-                Content = "提交审核，当前文档版本<div class=\"ui label horizontal mini\">" + Model.NowVersion + "</div>！",
+                Content = "[需求#" + Model.RequirementID + "]提交评审！",
             });
             Model.Status = Models.DBEnums.RequirementStatus.待审;
             DB.SaveChanges();
@@ -190,24 +201,24 @@ namespace Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Review(string RequirementID)
+        public IActionResult Review(int RequirementID)
         {
             ViewBag.RequirementID = RequirementID;
             return View();
         }
         [HttpPost]
-        public IActionResult Review(string RequirementID, bool Agree, string Remark)
+        public IActionResult Review(int RequirementID, bool Agree, string Remark)
         {
             var Model = DB.TMT_Requirements.Find(RequirementID);
-            if (!Test.Requirement.AllowReview(Model, G.User.UserID))
+            if (!Test.Requirement.AllowHandOverAndReview(Model, G.User.UserID))
             {
                 return Json("当前文档状态不可审核或没有审核权限！");
             }
             Model.Status = Agree ? Models.DBEnums.RequirementStatus.通过 : Models.DBEnums.RequirementStatus.驳回;
-            var Content = "评审需求，评审结果为：<div class=\"ui label horizontal mini\">" + Model.Status + "</div>";
+            var Content = "[需求#" + Model.RequirementID + "]评审结果为：<div class=\"ui label horizontal mini\">" + Model.Status + "</div>";
             if (!Agree && string.IsNullOrWhiteSpace(Remark))
             {
-                return Json("需求被驳回时必须写明驳回原因（评审备注）！");
+                return Json("需求被驳回时必须写明驳回原因！");
             }
             if (!string.IsNullOrWhiteSpace(Remark))
             {
@@ -215,6 +226,7 @@ namespace Web.Controllers
             }
             Model.Logs.Add(new Models.TMT_Logs
             {
+                LogType = Models.DBEnums.LogType.需求,
                 TagID = Model.RequirementID,
                 UserID = G.User.UserID,
                 Content = Content
@@ -224,7 +236,7 @@ namespace Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult SealUP(string RequirementID)
+        public IActionResult SealUP(int RequirementID)
         {
             var Model = DB.TMT_Requirements.Find(RequirementID);
             if (!Test.Requirement.AllowSealUP(Model, G.User.UserID))
@@ -233,9 +245,10 @@ namespace Web.Controllers
             }
             Model.Logs.Add(new Models.TMT_Logs
             {
+                LogType = Models.DBEnums.LogType.需求,
                 TagID = Model.RequirementID,
                 UserID = G.User.UserID,
-                Content = "归档需求！",
+                Content = "[需求#" + Model.RequirementID + "]归档！",
             });
             Model.Status = Models.DBEnums.RequirementStatus.归档;
             DB.SaveChanges();
@@ -243,31 +256,36 @@ namespace Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult HandOver(string RequirementID)
+        public IActionResult HandOver(int RequirementID)
         {
             ViewBag.RequirementID = RequirementID;
             return View();
         }
         [HttpPost]
-        public IActionResult HandOver(string RequirementID, int UserID, string Remark)
+        public IActionResult HandOver(int RequirementID, int UserID, string Remark)
         {
             var Model = DB.TMT_Requirements.Find(RequirementID);
-            if (!Test.Requirement.AllowReview(Model, G.User.UserID))
+            if (!Test.Requirement.AllowHandOverAndReview(Model, G.User.UserID))
             {
                 return Json("当前文档状态不可转交审核或没有转交审核权限！");
+            }
+            if (UserID < 1)
+            {
+                return Json("转交审核人必须选择！");
             }
             if (Model.AuditorUserID == UserID)
             {
                 return Json("原评审人不能与转交审核人相同！");
             }
             var _User = DB.TMT_Users.Find(UserID);
-            var Content = "需求转交给<div class=\"ui label horizontal mini\">" + _User.UserName + "</div>进行评审！";
+            var Content = "[需求#" + Model.RequirementID + "]转交<div class=\"ui label horizontal mini\">" + _User.UserName + "</div>评审！";
             if (!string.IsNullOrWhiteSpace(Remark))
             {
                 Content += "<br />" + Remark;
             }
             Model.Logs.Add(new Models.TMT_Logs
             {
+                LogType = Models.DBEnums.LogType.需求,
                 TagID = Model.RequirementID,
                 UserID = G.User.UserID,
                 Content = Content
@@ -278,13 +296,13 @@ namespace Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult AddLog(string RequirementID)
+        public IActionResult AddLog(int RequirementID)
         {
             ViewBag.RequirementID = RequirementID;
             return View();
         }
         [HttpPost]
-        public IActionResult AddLog(string RequirementID, string Remark)
+        public IActionResult AddLog(int RequirementID, string Remark)
         {
             var Model = DB.TMT_Requirements.Find(RequirementID);
             if (!Test.Requirement.AllowAddLog(Model, G.User.UserID))
@@ -293,10 +311,12 @@ namespace Web.Controllers
             }
             if (string.IsNullOrWhiteSpace(Remark))
             {
-                return Json("必须填写[备注]！");
+                return Json("[备注]必须填写！");
             }
+            Remark = "[需求#" + Model.RequirementID + "]备注：" + Remark;
             Model.Logs.Add(new Models.TMT_Logs
             {
+                LogType = Models.DBEnums.LogType.需求,
                 TagID = Model.RequirementID,
                 UserID = G.User.UserID,
                 Content = Remark
@@ -306,22 +326,36 @@ namespace Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(string RequirementID)
+        public IActionResult Delete(int RequirementID)
         {
             var Model = DB.TMT_Requirements.Find(RequirementID);
-            if (!Test.Requirement.AllowSubmit(Model, G.User.UserID))
+            if (!Test.Requirement.AllowSubmitAndDelete(Model, G.User.UserID))
             {
                 return Json("当前文档状态不可删除或没有删除权限！");
             }
             Model.Logs.Add(new Models.TMT_Logs
             {
+                LogType = Models.DBEnums.LogType.需求,
                 TagID = Model.RequirementID,
                 UserID = G.User.UserID,
-                Content = "删除需求！",
+                Content = "[需求#" + Model.RequirementID + "]删除！",
             });
             Model.IsDelete = true;
             DB.SaveChanges();
             return Json();
+        }
+
+        [HttpGet]
+        public IActionResult ViewTask(int TaskID)
+        {
+            var Model = DB.TMT_Tasks.Find(TaskID);
+            return View(Model);
+        }
+        [HttpPost]
+        public IActionResult LoadTask(int TaskID, int Version)
+        {
+            var Model = DB.TMT_Tasks.Find(TaskID);
+            return Success(Model.Detailes.FirstOrDefault(c => c.Version == Version).Content);
         }
     }
 }
@@ -362,37 +396,25 @@ namespace Web.Test
             }
             return false;
         }
-        public static bool AllowSubmit(Models.TMT_Requirements Model, int UserID)
+        public static bool AllowSubmitAndDelete(Models.TMT_Requirements Model, int UserID)
         {
-            if ((Model.Status == Models.DBEnums.RequirementStatus.驳回 || Model.Status == Models.DBEnums.RequirementStatus.稿件) && Model.CreateUserID == UserID)
-            {
-                return true;
-            }
-            return false;
+            return (Model.Status == Models.DBEnums.RequirementStatus.驳回 || Model.Status == Models.DBEnums.RequirementStatus.稿件) && Model.CreateUserID == UserID;
         }
-        public static bool AllowReview(Models.TMT_Requirements Model, int UserID)
+        public static bool AllowHandOverAndReview(Models.TMT_Requirements Model, int UserID)
         {
-            if (Model.Status == Models.DBEnums.RequirementStatus.待审 && Model.AuditorUserID == UserID)
-            {
-                return true;
-            }
-            return false;
+            return Model.Status == Models.DBEnums.RequirementStatus.待审 && Model.AuditorUserID == UserID;
         }
         public static bool AllowSealUP(Models.TMT_Requirements Model, int UserID)
         {
-            if (Model.Status == Models.DBEnums.RequirementStatus.通过 && Model.AuditorUserID == UserID)
-            {
-                return true;
-            }
-            return false;
+            return Model.Status == Models.DBEnums.RequirementStatus.通过 && Model.AuditorUserID == UserID;
         }
         public static bool AllowAddLog(Models.TMT_Requirements Model, int UserID)
         {
-            if (Model.Status == Models.DBEnums.RequirementStatus.通过 && (Model.CreateUserID == UserID || Model.AuditorUserID == UserID))
-            {
-                return true;
-            }
-            return false;
+            return Model.Status == Models.DBEnums.RequirementStatus.通过 && (Model.CreateUserID == UserID || Model.AuditorUserID == UserID);
+        }
+        public static bool IsDraftEdit(Models.TMT_Requirements Model)
+        {
+            return Model.Status == Models.DBEnums.RequirementStatus.稿件 || Model.Status == Models.DBEnums.RequirementStatus.驳回;
         }
     }
 }

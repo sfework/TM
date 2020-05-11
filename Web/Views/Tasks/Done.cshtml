@@ -5,6 +5,18 @@
 <div class="content">
     <div class="ui form tiny">
         <input type="hidden" id="TaskID" value="@ViewBag.TaskID">
+        <div class="field five wide">
+            <label>完成状态</label>
+            <div class="ui selection dropdown">
+                <input type="hidden" id="Agree" value="true">
+                <i class="dropdown icon"></i>
+                <div class="default text"></div>
+                <div class="menu">
+                    <div class="item" data-value="true">正常结束</div>
+                    <div class="item" data-value="false">异常终止</div>
+                </div>
+            </div>
+        </div>
         <div class="field">
             <label>备注</label>
             <textarea rows="5" id="Remark"></textarea>

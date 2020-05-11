@@ -20,7 +20,7 @@ namespace Web.ParamModels
         }
         public class Requirement_Add_Model
         {
-            public string RequirementID { get; set; }
+            public int? RequirementID { get; set; }
             public string Title { get; set; }
             public Models.DBEnums.MType? MType { get; set; }
             public int ModuleID { get; set; }

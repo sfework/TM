@@ -9,7 +9,8 @@ namespace Web.Models
     public class TMT_Logs
     {
         public int ID { get; set; }
-        public string TagID { get; set; }
+        public DBEnums.LogType LogType { get; set; }
+        public int TagID { get; set; }
         public int UserID { get; set; }
         public string Content { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;

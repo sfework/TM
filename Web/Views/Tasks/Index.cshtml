@@ -94,6 +94,11 @@
                     <td>
                         @switch (item.Status)
                         {
+                            case DBEnums.TasksStatus.稿件:
+                                <div class="ui tiny label orange basic horizontal">
+                                    @item.Status
+                                </div>
+                                break;
                             case DBEnums.TasksStatus.进行:
                                 <div class="ui tiny label teal basic horizontal">
                                     @item.Status
@@ -104,8 +109,8 @@
                                     @item.Status
                                 </div>
                                 break;
-                            case DBEnums.TasksStatus.取消:
-                                <div class="ui tiny label orange basic horizontal">
+                            case DBEnums.TasksStatus.终止:
+                                <div class="ui tiny label red basic horizontal">
                                     @item.Status
                                 </div>
                                 break;

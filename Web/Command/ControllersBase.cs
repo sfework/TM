@@ -82,6 +82,11 @@ namespace Web
         {
             return new JsonResult(new ResultModel() { ErrorMessage = ErrorMessage }, JsonHelp.Option);
         }
+
+        public IActionResult NoPermission(bool IsModal = false)
+        {
+            return View(IsModal ? "_Modal_NoPermission" : "_NoPermission");
+        }
     }
     public class ResultModel
     {

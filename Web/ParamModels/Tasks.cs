@@ -21,8 +21,8 @@ namespace Web.ParamModels
 
         public class Tasks_Add
         {
-            public string TaskID { get; set; }
-            public string RequirementID { get; set; }
+            public int? TaskID { get; set; }
+            public int? RequirementID { get; set; }
             public int ExecutorUserID { get; set; }
             public Models.DBEnums.MType? MType { get; set; }
             public int ModuleID { get; set; }

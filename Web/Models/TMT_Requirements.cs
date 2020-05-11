@@ -8,7 +8,7 @@ namespace Web.Models
 {
     public class TMT_Requirements
     {
-        public string RequirementID { get; set; }
+        public int RequirementID { get; set; }
         public string Title { get; set; }
         public int EmergencyLevel { get; set; }
         public DBEnums.MType MType { get; set; }

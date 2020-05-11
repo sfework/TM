@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = Model == null ? "新增需求" : "编辑需求";
+    ViewData["Title"] = Model == null ? "新增需求" : "编辑需求：" + Model.Title;
 }
 @model TMT_Requirements
 <link href="~/edit/edit.css" rel="stylesheet" />
@@ -26,13 +26,13 @@
         <div class="ui form tiny">
             <div class="field">
                 <label>优先级</label>
-                @if (Model != null && Model.Status != DBEnums.RequirementStatus.驳回)
+                @if (ViewBag.IsDraftEdit)
                 {
-                    <div class="ui disabled rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
+                    <div class="ui grey rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
                 }
                 else
                 {
-                    <div class="ui grey rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
+                    <div class="ui disabled rating" id="EmergencyLevel" data-icon="star" data-rating="@(Model==null?1:Model.EmergencyLevel)" data-max-rating="5"></div>
                 }
             </div>
             <div class="field">
@@ -43,26 +43,20 @@
             </div>
             <div class="field">
                 <label>类型</label>
-                @if (Model != null && Model.Status != DBEnums.RequirementStatus.驳回)
+                @if (ViewBag.IsDraftEdit)
+                {
+                    <SelectEnums Fluid="false" Clearable="false" Default="@(Model==null?-1:(int)Model.MType)" ID="MType" Width="80" Enum="typeof(DBEnums.MType)"></SelectEnums>
+                }
+                else
                 {
                     <div class="ui label basic">
                         @Model.MType
                     </div>
                 }
-                else
-                {
-                    <SelectEnums Fluid="false" Clearable="false" Default="@(Model==null?-1:(int)Model.MType)" ID="MType" Width="80" Enum="typeof(DBEnums.MType)"></SelectEnums>
-                }
             </div>
             <div class="field">
                 <label>模块</label>
-                @if (Model != null && Model.Status != DBEnums.RequirementStatus.驳回)
-                {
-                    <div class="ui label basic">
-                        @Model.Module.ModuleName
-                    </div>
-                }
-                else
+                @if (ViewBag.IsDraftEdit)
                 {
                     <div class="ui selection dropdown" style="width: 200px;">
                         <input type="hidden" id="ModuleID" value="@Model?.ModuleID">
@@ -75,19 +69,25 @@
                         </div>
                     </div>
                 }
+                else
+                {
+                    <div class="ui label basic">
+                        @Model.Module.ModuleName
+                    </div>
+                }
             </div>
             <div class="field">
                 <label>评审</label>
-                @if (Model != null && Model.Status != DBEnums.RequirementStatus.驳回)
+                @if (ViewBag.IsDraftEdit)
+                {
+                    <SelectUsers Fluid="false" Width="150" Placeholder="选择评审人" Clearable="false" ID="AuditorUserID" Default="Model?.AuditorUserID"></SelectUsers>
+                }
+                else
                 {
                     <div class="ui image label basic">
                         <img src="@Model.AuditorUser.Avatar">
                         @Model.AuditorUser.UserName
                     </div>
-                }
-                else
-                {
-                    <SelectUsers Fluid="false" Width="150" Placeholder="选择评审人" Clearable="false" ID="AuditorUserID" Default="Model?.AuditorUserID"></SelectUsers>
                 }
             </div>
 

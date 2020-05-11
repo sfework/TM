@@ -8,8 +8,8 @@ namespace Web.Models
 {
     public class TMT_Tasks
     {
-        public string TaskID { get; set; }
-        public string RequirementID { get; set; }
+        public int TaskID { get; set; }
+        public int? RequirementID { get; set; }
         public string Title { get; set; }
         public int EmergencyLevel { get; set; }
         public DBEnums.MType MType { get; set; }

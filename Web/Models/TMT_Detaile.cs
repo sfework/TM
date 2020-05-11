@@ -9,7 +9,7 @@ namespace Web.Models
     public class TMT_Detaile
     {
         public int ID { get; set; }
-        public string TagID { get; set; }
+        public int TagID { get; set; }
         public string Content { get; set; }
         public int Version { get; set; }
         public DateTime CreateDate { get; set; }

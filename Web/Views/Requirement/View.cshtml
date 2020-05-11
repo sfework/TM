@@ -6,9 +6,8 @@
 <script src="~/edit/edit.js"></script>
 <div class="document_body">
     <div class="left">
-        <div class="ui transparent input fluid" style="margin-bottom: 20px; ">
-            <input type="text" id="Title" placeholder="需求标题..." value="@Model.Title" readonly="readonly" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
-        </div>
+        <div class="ui top left attached label id">@Model.RequirementID</div>
+        <span class="title">@Model.Title</span>
         <div class="context_edit">
             @Html.Raw(Model.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
         </div>
@@ -20,7 +19,7 @@
                 <div class="ui floating labeled icon dropdown button" id="setVersion" data-value="@Model.RequirementID">
                     <input type="hidden" value="@Model.NowVersion">
                     <i class="code branch icon"></i>
-                    <span class="text">Add User</span>
+                    <span class="text"></span>
                     <div class="menu">
                         @foreach (var item in Model.Detailes)
                         {
@@ -65,36 +64,33 @@
                     编辑
                 </a>
             }
-            @if (Web.Test.Requirement.AllowSubmit(Model, G.User.UserID))
+            @if (Web.Test.Requirement.AllowSubmitAndDelete(Model, G.User.UserID))
             {
-                <button class="ui tiny teal button" onclick="page_action.submit('@Model.RequirementID')">
+                <button class="ui tiny teal button" onclick="page_action.submit(@Model.RequirementID)">
                     <i class="share square outline icon"></i>
                     发布
                 </button>
-            }
-            @if (Web.Test.Requirement.AllowReview(Model, G.User.UserID))
-            {
-                <button class="ui tiny yellow button" onclick="page_action.review('@Model.RequirementID')">
-                    <i class="stamp icon"></i>
-                    审核
+                <button class="ui tiny red button" onclick="page_action.delete(@Model.RequirementID)">
+                    <i class="trash alternate outline icon"></i>
+                    删除
                 </button>
-                <button class="ui tiny brown button" onclick="page_action.handOver('@Model.RequirementID')">
+            }
+            @if (Web.Test.Requirement.AllowHandOverAndReview(Model, G.User.UserID))
+            {
+                <button class="ui tiny yellow button" onclick="page_action.review(@Model.RequirementID)">
+                    <i class="stamp icon"></i>
+                    评审
+                </button>
+                <button class="ui tiny brown button" onclick="page_action.handOver(@Model.RequirementID)">
                     <i class="random icon"></i>
                     转审
                 </button>
             }
             @if (Web.Test.Requirement.AllowSealUP(Model, G.User.UserID))
             {
-                <button class="ui tiny grey button" onclick="page_action.sealUP('@Model.RequirementID')">
+                <button class="ui tiny grey button" onclick="page_action.sealUP(@Model.RequirementID)">
                     <i class="sign in alternate icon"></i>
                     归档
-                </button>
-            }
-            @if (Web.Test.Requirement.AllowSubmit(Model, G.User.UserID))
-            {
-                <button class="ui tiny red button" onclick="page_action.delete('@Model.RequirementID')">
-                    <i class="trash alternate outline icon"></i>
-                    删除
                 </button>
             }
         </div>
@@ -113,7 +109,7 @@
                         </div>
                         <div class="content">
                             <span class="author">@item.ExecutorUser.UserName</span>
-                            <div class="text" style="margin-top:.1em;">
+                            <div class="text url" style="margin-top:.1em;">
                                 @switch (item.Status)
                                 {
                                     case DBEnums.TasksStatus.进行:
@@ -122,11 +118,11 @@
                                     case DBEnums.TasksStatus.完成:
                                         <i class="check circle outline icon green" style="font-size: 12px;margin: 0px;" title="@item.Status"></i>
                                         break;
-                                    case DBEnums.TasksStatus.取消:
+                                    case DBEnums.TasksStatus.终止:
                                         <i class="stop circle outline icon red" style="font-size: 12px;margin: 0px;" title="@item.Status"></i>
                                         break;
                                 }
-                                <a>@item.Title</a>
+                                <a onclick="page_action.viewtask(@item.TaskID)"><span>[#@item.TaskID]</span>@item.Title</a>
                             </div>
                         </div>
                     </div>
@@ -142,7 +138,7 @@
             记录
             @if (Web.Test.Requirement.AllowAddLog(Model, G.User.UserID))
             {
-                <a class="ui label mini addlog basic" onclick="page_action.addlog('@Model.RequirementID')">
+                <a class="ui label mini addlog basic" onclick="page_action.addlog(@Model.RequirementID)">
                     <i class="plus icon"></i>
                 </a>
             }
@@ -173,7 +169,14 @@
         edit_obj: null,
         EmergencyLevel: $('#EmergencyLevel'),
         init: () => {
-            page_action.edit();
+            page_action.edit_obj = new editor('.context_edit', {
+                edit: false,
+                upload: {
+                    url: '/Home/UPload',
+                    success: (result) => { },
+                    error: (error) => { }
+                }
+            });
             page_action.EmergencyLevel.rating({
                 onRate: (value) => {
                     page_action.EmergencyLevel.removeClass('green olive yellow orange red grey');
@@ -200,16 +203,6 @@
                 onChange: function (value, text, $choice) {
                     var id = $choice.parents('.dropdown').data('value');
                     window.location.href = "/Requirement/View?RequirementID=" + id + "&Version=" + value;
-                }
-            });
-        },
-        edit: () => {
-            page_action.edit_obj = new editor('.context_edit', {
-                edit: false,
-                upload: {
-                    url: '/Home/UPload',
-                    success: (result) => { },
-                    error: (error) => { }
                 }
             });
         },
@@ -261,6 +254,9 @@
         addlog: (id) => {
             modal.load('/Requirement/AddLog?RequirementID=' + id, 400);
         },
+        viewtask: (id) => {
+            modal.load('/Requirement/ViewTask?TaskID=' + id, null, 'overlay fullscreen doc')
+        }
     };
     page_action.init();
 </script>
