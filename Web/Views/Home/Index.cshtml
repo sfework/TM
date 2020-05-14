@@ -1,4 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Home";
+    DBEnums.MType? Item = DBEnums.MType.事务;
 }
 <partial name="TestView" model="11111" />
+<SelectEnums Clearable="true" ID="MType" Default="Item" Enum="typeof(DBEnums.MType)" Width="100"></SelectEnums>

@@ -210,7 +210,7 @@
             modal.load('/Tasks/AddLog?TaskID=' + id, 400);
         },
         viewrequirement: (id) => {
-            modal.load('/Requirement/ViewRequirement?RequirementID=' + id, null, 'overlay fullscreen doc')
+            modal.load('/Tasks/ViewRequirement?RequirementID=' + id, null, 'overlay fullscreen doc')
         }
     };
     page_action.init();

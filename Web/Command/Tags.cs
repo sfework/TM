@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,6 @@ namespace Web
             Html = htmlHelper;
         }
     }
-
 
     [HtmlTargetElement("Paging")]
     public class PagingTagHelper : TagHelperBase
@@ -48,7 +48,103 @@ namespace Web
                 MaxPage++;
             }
             Output.TagName = "";
-            Output.Content.SetHtmlContent(await Html.PartialAsync("/Views/Shared/_Paging.cshtml", this));
+            Output.Content.SetHtmlContent(await Html.PartialAsync("/Views/Shared/_Tag_Paging.cshtml", this));
+        }
+    }
+
+    [HtmlTargetElement("SelectEnums")]
+    public class SelectEnumsTagHelper : SelectModel
+    {
+        [HtmlAttributeName("Enum")]
+        public Type EnumValue { get; set; }
+
+        public SelectEnumsTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper) { }
+        public override async Task ProcessAsync(TagHelperContext Context, TagHelperOutput Output)
+        {
+            Init();
+            Default = Default != null ? ((int)Default).ToString() : "";
+            foreach (var item in Enum.GetValues(EnumValue))
+            {
+                Items.Add(item.ToString(), (int)item);
+            }
+            Output.TagName = "";
+            Output.Content.SetHtmlContent(await Html.PartialAsync(Partial, this));
+        }
+    }
+    [HtmlTargetElement("SelectRoles")]
+    public class SelectRolesTagHelper : SelectModel
+    {
+        public SelectRolesTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper) { }
+        public override async Task ProcessAsync(TagHelperContext Context, TagHelperOutput Output)
+        {
+            Init();
+            var DB = (Models.DBContext)VContext.HttpContext.RequestServices.GetService(typeof(Models.DBContext));
+            foreach (var item in DB.TMT_Roles)
+            {
+                Items.Add(item.RoleName, item.RoleID);
+            }
+            Output.TagName = "";
+            Output.Content.SetHtmlContent(await Html.PartialAsync(Partial, this));
+        }
+    }
+    [HtmlTargetElement("SelectUsers")]
+    public class SelectUsersTagHelper : SelectModel
+    {
+        public new List<(int, string, string)> Items { get; set; } = new List<(int, string, string)>();
+
+        public SelectUsersTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper) { }
+
+        public override async Task ProcessAsync(TagHelperContext Context, TagHelperOutput Output)
+        {
+            Init();
+            var DB = (Models.DBContext)VContext.HttpContext.RequestServices.GetService(typeof(Models.DBContext));
+            foreach (var item in DB.TMT_Users.AsNoTracking().Where(c => c.Enable))
+            {
+                Items.Add((item.UserID, item.UserName, item.Avatar));
+            }
+            Output.TagName = "";
+            Output.Content.SetHtmlContent(await Html.PartialAsync(Partial, this));
+        }
+    }
+    [HtmlTargetElement("SelectAvatars")]
+    public class SelectAvatarsTagHelper : SelectModel
+    {
+        [HtmlAttributeName("RandomSet")]
+        public bool RandomSet { get; set; }
+
+        public SelectAvatarsTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper) { }
+
+        public override async Task ProcessAsync(TagHelperContext Context, TagHelperOutput Output)
+        {
+            Init();
+            foreach (var item in new System.IO.DirectoryInfo("wwwroot/Avatar").GetFiles())
+            {
+                Items.Add(item.Name, item.FullName.Replace(System.IO.Directory.GetCurrentDirectory() + "\\wwwroot", ""));
+            }
+            if (RandomSet && Default == null)
+            {
+                Default = Items.Skip(new Random().Next(0, Items.Count)).Take(1).FirstOrDefault().Value;
+            }
+            Output.TagName = "";
+            Output.Content.SetHtmlContent(await Html.PartialAsync(Partial, this));
+        }
+    }
+    [HtmlTargetElement("SelectModules")]
+    public class SelectModulesTagHelper : SelectModel
+    {
+        [HtmlAttributeName("ProjectID")]
+        public int ProjectID { get; set; }
+        public SelectModulesTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper) { }
+        public override async Task ProcessAsync(TagHelperContext Context, TagHelperOutput Output)
+        {
+            Init();
+            var DB = (Models.DBContext)VContext.HttpContext.RequestServices.GetService(typeof(Models.DBContext));
+            foreach (var item in DB.TMT_Modules.Where(c => c.ProjectID == ProjectID))
+            {
+                Items.Add(item.ModuleName, item.ModuleID);
+            }
+            Output.TagName = "";
+            Output.Content.SetHtmlContent(await Html.PartialAsync(Partial, this));
         }
     }
 
@@ -56,7 +152,49 @@ namespace Web
     {
         public SelectModel(IHtmlHelper htmlHelper) : base(htmlHelper)
         {
+
         }
+
+        public void Init()
+        {
+            if (Fluid)
+            {
+                Class += " fluid";
+            }
+            if (Search)
+            {
+                Class += " search";
+            }
+            if (Clearable)
+            {
+                Class += " clearable";
+            }
+            if (Multiple)
+            {
+                Class += " multiple";
+            }
+            if (Width > 0)
+            {
+                Style = string.Format("style=\"width:{0}px !important;\"", Width);
+            }
+            switch (Columns)
+            {
+                case 3:
+                    Class += " three column";
+                    break;
+                case 4:
+                    Class += " four column";
+                    break;
+                case 5:
+                    Class += " five column";
+                    break;
+            }
+        }
+
+        public string Style { get; set; } = "";
+        public string Partial { get; set; } = "/Views/Shared/_Select.cshtml";
+        [HtmlAttributeName("Columns")]
+        public int Columns { get; set; }
         [HtmlAttributeName("Class")]
         public string Class { get; set; }
         [HtmlAttributeName("ID")]
@@ -76,7 +214,7 @@ namespace Web
         /// 是否支持多选
         /// </summary>
         [HtmlAttributeName("Multiple")]
-        public bool Multiple { get; set; } = false;
+        public bool Multiple { get; set; }
         /// <summary>
         /// 选择项
         /// </summary>
@@ -88,98 +226,11 @@ namespace Web
         [HtmlAttributeName("Default")]
         public object Default { get; set; }
         [HtmlAttributeName("Clearable")]
-        public bool Clearable { get; set; } = true;
+        public bool Clearable { get; set; }
 
-        [HtmlAttributeName("Columns")]
-        public int Columns { get; set; }
         [HtmlAttributeName("Search")]
         public bool Search { get; set; }
         [HtmlAttributeName("Fluid")]
-        public bool Fluid { get; set; } = true;
-    }
-    [HtmlTargetElement("SelectRoles")]
-    public class SelectRolesTagHelper : SelectModel
-    {
-        public SelectRolesTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper)
-        {
-        }
-
-        public override async Task ProcessAsync(TagHelperContext Context, TagHelperOutput Output)
-        {
-            var DB = (Models.DBContext)VContext.HttpContext.RequestServices.GetService(typeof(Models.DBContext));
-            foreach (var item in DB.TMT_Roles)
-            {
-                Items.Add(item.RoleName, item.RoleID);
-            }
-            Output.TagName = "";
-            Output.Content.SetHtmlContent(await Html.PartialAsync("/Views/Shared/_Select.cshtml", this));
-        }
-    }
-
-    [HtmlTargetElement("SelectAvatars")]
-    public class SelectAvatarsTagHelper : SelectModel
-    {
-        [HtmlAttributeName("RandomSet")]
-        public bool RandomSet { get; set; }
-
-        public SelectAvatarsTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper)
-        {
-        }
-
-        public override async Task ProcessAsync(TagHelperContext Context, TagHelperOutput Output)
-        {
-            foreach (var item in new System.IO.DirectoryInfo("wwwroot/Avatar").GetFiles())
-            {
-                Items.Add(item.Name, item.FullName.Replace(System.IO.Directory.GetCurrentDirectory() + "\\wwwroot", ""));
-            }
-            if (RandomSet && Default == null)
-            {
-                Default = Items.Skip(new Random().Next(0, Items.Count)).Take(1).FirstOrDefault().Value;
-            }
-            Output.TagName = "";
-            Output.Content.SetHtmlContent(await Html.PartialAsync("/Views/Shared/_Select.cshtml", this));
-        }
-    }
-    [HtmlTargetElement("SelectEnums")]
-    public class SelectEnumsTagHelper : SelectModel
-    {
-        [HtmlAttributeName("Enum")]
-        public Type EnumValue { get; set; }
-
-
-        public SelectEnumsTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper)
-        {
-        }
-        public override async Task ProcessAsync(TagHelperContext Context, TagHelperOutput Output)
-        {
-            foreach (var item in Enum.GetValues(EnumValue))
-            {
-                Items.Add(item.ToString(), (int)item);
-            }
-            Output.TagName = "";
-            Output.Content.SetHtmlContent(await Html.PartialAsync("/Views/Shared/_Select.cshtml", this));
-        }
-    }
-
-
-    [HtmlTargetElement("SelectUsers")]
-    public class SelectUsersTagHelper : SelectModel
-    {
-        public new List<(int, string, string)> Items { get; set; } = new List<(int, string, string)>();
-
-        public SelectUsersTagHelper(IHtmlHelper htmlHelper) : base(htmlHelper)
-        {
-        }
-
-        public override async Task ProcessAsync(TagHelperContext Context, TagHelperOutput Output)
-        {
-            var DB = (Models.DBContext)VContext.HttpContext.RequestServices.GetService(typeof(Models.DBContext));
-            foreach (var item in DB.TMT_Users.AsNoTracking().Where(c => c.Enable))
-            {
-                Items.Add((item.UserID, item.UserName, item.Avatar));
-            }
-            Output.TagName = "";
-            Output.Content.SetHtmlContent(await Html.PartialAsync("/Views/Shared/_Select.cshtml", this));
-        }
+        public bool Fluid { get; set; }
     }
 }

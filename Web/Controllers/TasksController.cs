@@ -47,7 +47,7 @@ namespace Web.Controllers
             if (TaskID.HasValue)
             {
                 Model = DB.TMT_Tasks.Find(TaskID);
-                if (Model.Status != Models.DBEnums.TasksStatus.进行 && Model.CreateUserID != G.User.UserID)
+                if (!Test.Teaks.AllowEdit(Model, G.User.UserID))
                 {
                     return NoPermission();
                 }
@@ -315,16 +315,18 @@ namespace Web.Controllers
         }
 
 
+
+
         [HttpGet]
-        public IActionResult ViewRequirement(int RequirementID)
+        public IActionResult ViewTask(int TaskID)
         {
-            var Model = DB.TMT_Requirements.Find(RequirementID);
+            var Model = DB.TMT_Tasks.Find(TaskID);
             return View(Model);
         }
         [HttpPost]
-        public IActionResult LoadRequirement(int RequirementID, int Version)
+        public IActionResult LoadTask(int TaskID, int Version)
         {
-            var Model = DB.TMT_Requirements.Find(RequirementID);
+            var Model = DB.TMT_Tasks.Find(TaskID);
             return Success(Model.Detailes.FirstOrDefault(c => c.Version == Version).Content);
         }
     }

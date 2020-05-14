@@ -346,15 +346,15 @@ namespace Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult ViewTask(int TaskID)
+        public IActionResult ViewRequirement(int RequirementID)
         {
-            var Model = DB.TMT_Tasks.Find(TaskID);
+            var Model = DB.TMT_Requirements.Find(RequirementID);
             return View(Model);
         }
         [HttpPost]
-        public IActionResult LoadTask(int TaskID, int Version)
+        public IActionResult LoadRequirement(int RequirementID, int Version)
         {
-            var Model = DB.TMT_Tasks.Find(TaskID);
+            var Model = DB.TMT_Requirements.Find(RequirementID);
             return Success(Model.Detailes.FirstOrDefault(c => c.Version == Version).Content);
         }
     }

@@ -1,4 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "测试管理";
 }
-BUG
+@model Web.ParamModels.Bug.Bug_Index
+<partial name="_Partial_Search" model="new _Partial { Item=Model,Type= DBEnums.LogType.测试}" />

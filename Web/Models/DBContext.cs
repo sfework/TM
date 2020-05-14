@@ -43,6 +43,9 @@ namespace Web.Models
 
             Builder.Entity<TMT_Tasks>().HasKey(c => c.TaskID);
             Builder.Entity<TMT_Tasks>().HasQueryFilter(c => !c.IsDelete);
+
+            Builder.Entity<TMT_Bug>().HasKey(c => c.BugID);
+            Builder.Entity<TMT_Bug>().HasQueryFilter(c => !c.IsDelete);
         }
         public DbSet<TMT_Users> TMT_Users { get; set; }
         public DbSet<TMT_Roles> TMT_Roles { get; set; }
@@ -55,6 +58,8 @@ namespace Web.Models
         public DbSet<TMT_Tasks> TMT_Tasks { get; set; }
         public DbSet<TMT_Detaile> TMT_Detaile { get; set; }
         public DbSet<TMT_Logs> TMT_Logs { get; set; }
+
+        public DbSet<TMT_Bug> TMT_Bug { get; set; }
 
     }
 }

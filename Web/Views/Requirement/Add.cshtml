@@ -7,17 +7,16 @@
 <div class="document_body">
     <div class="left">
         <input type="hidden" id="RequirementID" value="@Model?.RequirementID" />
-        <div class="ui transparent input fluid" style="margin-bottom: 20px; ">
-            @if (Model != null && Model.Status != DBEnums.RequirementStatus.驳回)
-            {
-                <input type="text" id="Title" placeholder="需求标题..." readonly="readonly" value="@Model?.Title" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
-            }
-            else
-            {
-                <input type="text" id="Title" placeholder="需求标题..." value="@Model?.Title" style="font-size: 28px; font-weight: bold !important; " autocomplete="off">
-            }
-
-        </div>
+        @if (ViewBag.IsDraftEdit)
+        {
+            <div class="ui transparent input fluid">
+                <input type="text" class="title" id="Title" placeholder="需求标题..." value="@Model?.Title" autocomplete="off">
+            </div>
+        }
+        else
+        {
+            <span class="title" style="margin-top:0 !important;">@Model.Title</span>
+        }
         <div class="context_edit">
             @Html.Raw(Model?.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
         </div>
@@ -45,7 +44,7 @@
                 <label>类型</label>
                 @if (ViewBag.IsDraftEdit)
                 {
-                    <SelectEnums Fluid="false" Clearable="false" Default="@(Model==null?-1:(int)Model.MType)" ID="MType" Width="80" Enum="typeof(DBEnums.MType)"></SelectEnums>
+                    <SelectEnums Fluid="false" Clearable="false" Default="@Model?.MType" ID="MType" Width="80" Enum="typeof(DBEnums.MType)"></SelectEnums>
                 }
                 else
                 {
@@ -90,7 +89,6 @@
                     </div>
                 }
             </div>
-
             <div class="field">
                 <button class="ui tiny blue button" onclick="page_action.save()">
                     <i class="save icon"></i>

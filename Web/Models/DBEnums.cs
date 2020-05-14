@@ -42,7 +42,16 @@ namespace Web.Models
         public enum LogType
         {
             需求 = 0,
-            任务 = 1
+            任务 = 1,
+            测试 = 2
+        }
+
+        public enum BugStatus
+        {
+            稿件 = 0,
+            进行 = 1,
+            提测 = 2,
+            关闭 = 3
         }
     }
 }

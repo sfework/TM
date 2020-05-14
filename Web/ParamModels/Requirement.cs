@@ -12,7 +12,7 @@ namespace Web.ParamModels
             /// <summary>
             /// 1=由我创建,2=由我评审
             /// </summary>
-            public int? Tag { get; set; }
+            public int Tag { get; set; }
             public Models.DBEnums.RequirementStatus? Status { get; set; }
             public Models.DBEnums.MType? MType { get; set; }
             public string KeyWord { get; set; }

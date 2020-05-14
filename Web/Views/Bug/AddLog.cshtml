@@ -1,0 +1,35 @@
+﻿@{
+    Layout = null;
+}
+<div class="header">新增备注</div>
+<div class="content">
+    <div class="ui form tiny">
+        <input type="hidden" id="TaskID" value="@ViewBag.TaskID">
+        <div class="field">
+            <label>备注</label>
+            <textarea rows="5" id="Remark"></textarea>
+        </div>
+    </div>
+</div>
+<script>
+    var modal_action = {
+        addlog: () => {
+            if (event && event.currentTarget) {
+                var target = event.currentTarget;
+                var data = $(target).parents('.ui.modal').find('.ui.form').getdata();
+                ajax.post('/Tasks/AddLog', data, () => {
+                    $(target).load_show();
+                }, (success, data) => {
+                    $(target).load_hide();
+                    if (success && data.Success) {
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+    };
+</script>
+<div class="actions">
+    <button class="ui button green" onclick="modal_action.addlog()">保存</button>
+    <button class="ui button cancel black">取消</button>
+</div>

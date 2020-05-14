@@ -1,9 +1,9 @@
 ﻿@{
     Layout = null;
 }
-@model TMT_Tasks
+@model TMT_Requirements
 <div class="header">
-    <i class="tasks icon"></i>
+    <i class="file alternate icon"></i>
     @Model.Title
 </div>
 <div class="content scrolling edit">
@@ -16,10 +16,10 @@
         edit_obj: null,
         init: () => {
             modal_action.init_edit();
-            $('#task_setVersion').dropdown({
+            $('#requirement_setVersion').dropdown({
                 onChange: function (value, text, $choice) {
                     var id = $choice.parents('.dropdown').data('value');
-                    ajax.post('/Requirement/LoadTask', { TaskID: id, Version: value }, () => { }, (success, data) => {
+                    ajax.post('/Requirement/LoadRequirement', { RequirementID: id, Version: value }, () => { }, (success, data) => {
                         if (success && data.Success) {
                             $choice.parents('.ui.modal').find('.context_con').html(data.Result);
                             modal_action.init_edit();
@@ -42,7 +42,7 @@
     modal_action.init();
 </script>
 <div class="actions">
-    <div class="ui left floated floating labeled icon dropdown button" id="task_setVersion" data-value="@Model.TaskID">
+    <div class="ui left floated floating labeled icon dropdown button" id="requirement_setVersion" data-value="@Model.RequirementID">
         <input type="hidden" value="@Model.NowVersion">
         <i class="code branch icon"></i>
         <span class="text"></span>

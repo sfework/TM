@@ -1,23 +1,10 @@
 ﻿@{
-    var ColumnStr = "";
-    switch (Model.Columns)
-    {
-        case 3:
-            ColumnStr = "three column";
-            break;
-        case 4:
-            ColumnStr = "four column";
-            break;
-        case 5:
-            ColumnStr = "five column";
-            break;
-    }
+    var MTP = Model.GetType();
 }
 @model SelectModel
-
-@if (Model.Columns > 0)
+@if (MTP == typeof(Web.SelectUsersTagHelper) && Model.Columns > 0)
 {
-    <select class="ui @(Model.Fluid?"fluid":"") search @ColumnStr dropdown" multiple="" id="@Model.ID">
+    <select class="ui dropdown @Model.Class" id="@Model.ID">
         @if (Model.GetType() == typeof(Web.SelectUsersTagHelper))
         {
             var TModel = (Web.SelectUsersTagHelper)Model;
@@ -30,18 +17,18 @@
 }
 else
 {
-    <div class="ui @(Model.Fluid?"fluid":"") selection @(Model.Search ? "search" : "") dropdown @(Model.Clearable ? "clearable" : "") @(Model.Multiple ? "multiple" : "") @Model.Class" @(Model.Width > 0 ? Html.Raw(string.Format("style=\"width:{0}px !important;\"", Model.Width)) : Html.Raw(""))>
+    <div class="ui dropdown selection @Model.Class" @Html.Raw(Model.Style)>
         <input type="hidden" id="@Model.ID" value="@Model.Default">
         <div class="default text">@Model.Placeholder</div>
         <div class="menu">
-            @if (Model.GetType() == typeof(Web.SelectRolesTagHelper) || Model.GetType() == typeof(Web.SelectEnumsTagHelper))
+            @if (MTP == typeof(Web.SelectRolesTagHelper) || MTP == typeof(Web.SelectEnumsTagHelper) || MTP == typeof(Web.SelectModulesTagHelper))
             {
                 foreach (var item in Model.Items)
                 {
                     <div class="item" data-value="@item.Value">@item.Key</div>
                 }
             }
-            else if (Model.GetType() == typeof(Web.SelectAvatarsTagHelper))
+            else if (MTP == typeof(Web.SelectAvatarsTagHelper))
             {
                 foreach (var item in Model.Items)
                 {
@@ -51,7 +38,7 @@ else
                     </div>
                 }
             }
-            else if (Model.GetType() == typeof(Web.SelectUsersTagHelper))
+            else if (MTP == typeof(Web.SelectUsersTagHelper))
             {
                 var TModel = (Web.SelectUsersTagHelper)Model;
                 foreach (var item in TModel.Items)
@@ -62,6 +49,7 @@ else
                     </div>
                 }
             }
+
         </div>
     </div>
 }

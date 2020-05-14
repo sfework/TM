@@ -1,7 +1,7 @@
 ﻿@{
-    ViewData["Title"] = Model == null ? "新增任务" : "编辑任务：" + Model.Title;
+    ViewData["Title"] = Model == null ? "新增测试" : "编辑测试：" + Model.Title;
 }
-@model TMT_Tasks
+@model TMT_Bug
 <style>
     .req_document_set { margin-bottom: 15px; }
     .req_document_set > .ui.dropdown { width: 810px; }
@@ -13,17 +13,16 @@
 <script src="~/edit/edit.js"></script>
 <div class="document_body">
     <div class="left">
-        <input type="hidden" id="TaskID" value="@Model?.TaskID" />
+        <input type="hidden" id="BugID" value="@Model?.BugID" />
         <div class="req_document_set">
-            <span class="ui text" style="font-size:16px;"><i class="file alternate icon grey"></i></span>
-            <div class="ui search inline dropdown compact@(ViewBag.IsDraftEdit?"":" disabled")">
-                <input type="hidden" id="RequirementID" value="@Model?.RequirementID" />
-                <div class="default text">选择关联需求</div>
+            <div class="ui tiny search clearable dropdown selection compact@(ViewBag.IsDraftEdit?"":" disabled")">
+                <input type="hidden" id="TaskID" value="@Model?.TaskID" />
+                <div class="default text">选择关联任务</div>
                 <div class="menu">
                     <div class="item" data-value="-1">不关联需求</div>
-                    @foreach (TMT_Requirements item in ViewBag.Requirements)
+                    @foreach (TMT_Tasks item in ViewBag.Tasks)
                     {
-                        <div class="item" data-title="@item.Title" data-mtype="@((int)item.MType)" data-emergencylevel="@item.EmergencyLevel" data-moduleid="@item.ModuleID" data-value="@item.RequirementID">@item.Title</div>
+                        <div class="item" data-executoruserid="@item.ExecutorUserID" data-title="@item.Title" data-mtype="@((int)item.MType)" data-emergencylevel="@item.EmergencyLevel" data-moduleid="@item.ModuleID" data-value="@item.TaskID">@item.Title</div>
                     }
                 </div>
             </div>
@@ -39,7 +38,7 @@
             }
         </div>
         <div class="context_edit">
-            @Html.Raw(Model?.Detailes.FirstOrDefault(c => c.Version == Model.NowVersion).Content)
+            @Html.Raw(Model?.Content)
         </div>
     </div>
     <div class="right">
@@ -65,7 +64,7 @@
                 <label>类型</label>
                 @if (ViewBag.IsDraftEdit)
                 {
-                    <SelectEnums Fluid="false" Clearable="false" Default="@Model?.MType" ID="MType" Width="80" Enum="typeof(DBEnums.MType)"></SelectEnums>
+                    <SelectEnums Default="@Model?.MType" ID="MType" Enum="typeof(DBEnums.MType)"></SelectEnums>
                 }
                 else
                 {
@@ -78,7 +77,7 @@
                 <label>模块</label>
                 @if (ViewBag.IsDraftEdit)
                 {
-                    <div class="ui selection dropdown" style="width: 200px;">
+                    <div class="ui selection dropdown">
                         <input type="hidden" id="ModuleID" value="@Model?.ModuleID">
                         <div class="default text"></div>
                         <div class="menu">
@@ -100,7 +99,7 @@
                 <label>负责人</label>
                 @if (ViewBag.IsDraftEdit)
                 {
-                    <SelectUsers Fluid="false" Width="150" Default="Model?.ExecutorUserID" Placeholder="选择负责人" Clearable="false" ID="ExecutorUserID"></SelectUsers>
+                    <SelectUsers Default="Model?.ExecutorUserID" ID="ExecutorUserID"></SelectUsers>
                 }
                 else
                 {
@@ -134,8 +133,9 @@
                     else if ($choice) {
                         page_action.EmergencyLevel.rating('set rating', $choice.data('emergencylevel'));
                         $('#ModuleID').parent().dropdown('set selected', $choice.data('moduleid'));
+                        $('#ExecutorUserID').parent().dropdown('set selected', $choice.data('executoruserid'));
                         $('#MType').parent().dropdown('set selected', $choice.data('mtype'));
-                        if ($('#Title').val()==='') {
+                        if ($('#Title').val() === '') {
                             $('#Title').val($choice.data('title'));
                         }
                     }
@@ -177,10 +177,10 @@
                 var target = event.currentTarget;
                 var data = $(target).parents('.document_body').getdata();
                 data.Content = page_action.edit_obj.get();
-                ajax.post('/Tasks/Save', data, () => { $(target).load_show(); }, (success, data) => {
+                ajax.post('/Bug/Save', data, () => { $(target).load_show(); }, (success, data) => {
                     $(target).load_hide();
                     if (success && data.Success) {
-                        window.location.href = "/Tasks/View?TaskID=" + data.Result;
+                        window.location.href = "/Bug/View?BugID=" + data.Result;
                     }
                 });
             }
